@@ -1,8 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Scale } from 'lucide-react';
 import { SITE_NAME, SITE_EMAIL } from '../../config/constants';
 import { useLanguage } from '../../i18n/LanguageContext';
+import Logo from '../../assets/migron.webp';
 
 const Footer = () => {
     const { t } = useLanguage();
@@ -18,11 +18,8 @@ const Footer = () => {
             <div className="max-w-[1600px] mx-auto">
                 <div className="grid grid-cols-1 md:grid-cols-12 gap-16">
                     <div className="md:col-span-5">
-                        <Link to="/" className="flex items-center gap-3 mb-8 hover:opacity-80 transition-opacity" aria-label={`${SITE_NAME} Anasayfa`}>
-                            <div className="bg-[#ccff00] w-8 h-8 flex items-center justify-center">
-                                <Scale size={18} className="text-black" />
-                            </div>
-                            <span id="footer-title" className="font-black text-4xl tracking-tighter italic uppercase">{SITE_NAME}</span>
+                        <Link to="/" className="flex items-center mb-8 hover:opacity-80 transition-opacity" aria-label={`${SITE_NAME} Anasayfa`}>
+                            <img src={Logo} alt={SITE_NAME} className="h-16 w-auto object-contain" />
                         </Link>
                         <p className="text-lg text-white/40 uppercase font-black tracking-tight leading-tight">
                             {t('footer_tagline')}

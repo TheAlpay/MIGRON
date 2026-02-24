@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import Logo from '../../assets/migron.webp';
 
 const SITE_URL = 'https://migron.mtive.tech';
 
@@ -10,7 +11,7 @@ const SEOHead = ({ title, description, path = '/', ogImage = null }) => {
     const fullTitle = title ? `${title} | MIGRON` : 'MIGRON | Göç & Hukuk Platformu';
     const fullUrl = `${SITE_URL}${path}`;
     const desc = description || 'MIGRON — Avustralya göçmenlik hukuku, vize danışmanlığı ve diaspora teknoloji platformu.';
-    const image = ogImage || `${SITE_URL}/og-image.png`;
+    const image = ogImage || `${SITE_URL}${Logo}`;
 
     useEffect(() => {
         // Title
