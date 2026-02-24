@@ -1,17 +1,56 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Shield, Zap, ArrowUpRight } from 'lucide-react';
+import { Shield, Zap, ArrowUpRight, Clock } from 'lucide-react';
+import { collection, query, where, getDocs } from 'firebase/firestore';
+import { db } from '../../config/firebase';
 import { useLanguage } from '../../i18n/LanguageContext';
 
 const BentoGrid = () => {
     const { t } = useLanguage();
+    const [articles, setArticles] = useState([]);
 
-    const blogPosts = [
-        { id: 2, category: t('blog2_cat'), title: t('blog2_title'), date: t('time_5h'), path: '/egitim' },
-        { id: 3, category: t('blog3_cat'), title: t('blog3_title'), date: t('time_12h'), path: '/sosyal' },
-        { id: 4, category: t('blog4_cat'), title: t('blog4_title'), date: t('time_1d'), path: '/projeler' },
-        { id: 5, category: t('blog5_cat'), title: t('blog5_title'), date: t('time_2d'), path: '/hukuk' },
-    ];
+    useEffect(() => {
+        const fetchArticles = async () => {
+            try {
+                const q = query(
+                    collection(db, 'articles'),
+                    where('status', '==', 'published')
+                );
+                const snapshot = await getDocs(q);
+                const fetched = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                // Sort by createdAt descending, limit to 20
+                fetched.sort((a, b) => {
+                    const dateA = a.createdAt?.toDate?.() || new Date(0);
+                    const dateB = b.createdAt?.toDate?.() || new Date(0);
+                    return dateB - dateA;
+                });
+                setArticles(fetched.slice(0, 20));
+            } catch (err) {
+                console.error('Error fetching articles:', err);
+            }
+        };
+        fetchArticles();
+    }, []);
+
+    const categoryColors = {
+        hukuk: '#ccff00',
+        egitim: '#00d4ff',
+        sosyal: '#ff6b6b',
+        projeler: '#a78bfa',
+    };
+
+    const formatDate = (timestamp) => {
+        if (!timestamp) return '';
+        const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+        const now = new Date();
+        const diff = now - date;
+        const hours = Math.floor(diff / (1000 * 60 * 60));
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        if (hours < 1) return 'Az önce';
+        if (hours < 24) return `${hours}s önce`;
+        if (days < 7) return `${days}g önce`;
+        return date.toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' });
+    };
 
     return (
         <section className="max-w-[1600px] mx-auto px-6 py-24">
@@ -29,25 +68,22 @@ const BentoGrid = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                {/* Bento Item 1 - Large */}
-                <Link to="/hukuk" className="md:col-span-2 md:row-span-2 bg-[#111] p-10 border border-white/5 hover:border-[#ccff00]/50 transition-all group flex flex-col justify-between min-h-[400px]">
+                {/* Bento Item 1 - Hukuki Risk Analizi (NOT clickable) */}
+                <div className="md:col-span-2 md:row-span-2 bg-[#111] p-10 border border-white/5 flex flex-col justify-between min-h-[400px]">
                     <div>
                         <div className="flex justify-between items-start mb-12">
                             <Shield className="text-[#ccff00]" size={40} />
                             <span className="text-[10px] font-bold text-white/40">{t('safe_data')}</span>
                         </div>
-                        <h5 className="text-3xl font-black uppercase leading-tight group-hover:text-[#ccff00] transition-colors italic">{t('bento_title')}</h5>
+                        <h5 className="text-3xl font-black uppercase leading-tight italic">{t('bento_title')}</h5>
                     </div>
-                    <div className="mt-8 flex items-center justify-between">
+                    <div className="mt-8">
                         <p className="text-sm text-white/40 max-w-[250px] uppercase font-bold tracking-tight">{t('bento_desc')}</p>
-                        <div className="w-12 h-12 bg-white/5 flex items-center justify-center group-hover:bg-[#ccff00] group-hover:text-black transition-all">
-                            <ArrowUpRight size={20} />
-                        </div>
                     </div>
-                </Link>
+                </div>
 
-                {/* Bento Item 2 - Australia Status */}
-                <Link to="/hukuk" className="md:col-span-2 bg-[#ccff00] text-black p-10 flex flex-col justify-center relative overflow-hidden hover:brightness-110 transition-all">
+                {/* Bento Item 2 - Australia Status (NOT clickable) */}
+                <div className="md:col-span-2 bg-[#ccff00] text-black p-10 flex flex-col justify-center relative overflow-hidden">
                     <Zap className="absolute right-[-20px] top-[-20px] w-48 h-48 opacity-10 rotate-12" />
                     <h5 className="text-4xl font-black italic tracking-tighter uppercase mb-4">{t('australia')}</h5>
                     <div className="flex gap-8 mt-4">
@@ -60,18 +96,37 @@ const BentoGrid = () => {
                             <div className="text-[10px] font-bold uppercase tracking-widest">{t('legal_tracking')}</div>
                         </div>
                     </div>
-                </Link>
+                </div>
 
-                {/* Bento Items - Blog posts */}
-                {blogPosts.map((post) => (
-                    <Link to={post.path} key={post.id} className="bg-[#111] p-8 border border-white/5 hover:border-white/20 transition-all cursor-pointer flex flex-col justify-between group">
-                        <div className="flex justify-between text-[10px] font-bold text-white/40 mb-8 uppercase tracking-widest">
-                            <span>{post.category}</span>
-                            <span>{post.date}</span>
-                        </div>
-                        <h6 className="text-xl font-black uppercase leading-none group-hover:text-[#ccff00]">{post.title}</h6>
-                    </Link>
-                ))}
+                {/* Dynamic Article Blocks from Firestore */}
+                {articles.length > 0 ? (
+                    articles.map((article) => (
+                        <Link
+                            to={`/makale/${article.slug}`}
+                            key={article.id}
+                            className="bg-[#111] p-8 border border-white/5 hover:border-white/20 transition-all cursor-pointer flex flex-col justify-between group"
+                        >
+                            <div className="flex justify-between text-[10px] font-bold text-white/40 mb-8 uppercase tracking-widest">
+                                <span style={{ color: categoryColors[article.category] || '#ccff00' }}>
+                                    {article.category}
+                                </span>
+                                <span className="flex items-center gap-1">
+                                    <Clock size={10} />
+                                    {formatDate(article.createdAt)}
+                                </span>
+                            </div>
+                            <h6 className="text-xl font-black uppercase leading-none group-hover:text-[#ccff00] transition-colors">
+                                {article.title}
+                            </h6>
+                        </Link>
+                    ))
+                ) : (
+                    <div className="md:col-span-2 bg-[#111] p-8 border border-white/5 flex items-center justify-center">
+                        <p className="text-white/20 text-sm font-bold uppercase tracking-widest">
+                            {t('page_coming_soon')}
+                        </p>
+                    </div>
+                )}
             </div>
         </section>
     );
