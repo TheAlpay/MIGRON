@@ -12,12 +12,19 @@ import SubPage from './components/pages/SubPage';
 import ArticlePage from './components/pages/ArticlePage';
 import AdminLogin from './components/admin/AdminLogin';
 import AdminDashboard from './components/admin/AdminDashboard';
+import SEOHead from './components/seo/SEOHead';
 
 const HomePage = () => (
-  <main className="pt-20">
-    <HeroSlider />
-    <BentoGrid />
-  </main>
+  <>
+    <SEOHead
+      title="Anasayfa"
+      description="MIGRON — Avustralya göçmenlik hukuku ve danışmanlık platformu. Güncel analizler ve hukuki rehberlik."
+    />
+    <main id="main-content" className="pt-20">
+      <HeroSlider />
+      <BentoGrid />
+    </main>
+  </>
 );
 
 const AdminPage = () => {
@@ -53,6 +60,12 @@ const App = () => {
   return (
     <LanguageProvider>
       <BrowserRouter>
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:bg-[#ccff00] focus:text-black focus:px-4 focus:py-2 focus:font-black focus:uppercase"
+        >
+          İçeriğe Atla
+        </a>
         <Routes>
           {/* Admin Route — no navbar/footer */}
           <Route path="/admin" element={<AdminPage />} />

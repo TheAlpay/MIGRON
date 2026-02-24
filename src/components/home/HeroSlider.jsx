@@ -35,13 +35,22 @@ const HeroSlider = () => {
     }, [slides.length]);
 
     return (
-        <section className="relative h-[80vh] min-h-[600px] bg-black overflow-hidden border-b border-white/10">
+        <section
+            className="relative h-[80vh] min-h-[600px] bg-black overflow-hidden border-b border-white/10"
+            role="region"
+            aria-roledescription="carousel"
+            aria-label="Öne Çıkan Haberler"
+        >
             {slides.map((slide, index) => (
                 <div
                     key={index}
                     className={`absolute inset-0 transition-all duration-1000 ease-in-out ${activeSlide === index ? 'opacity-100 scale-100' : 'opacity-0 scale-110'}`}
+                    role="group"
+                    aria-roledescription="slide"
+                    aria-label={`${index + 1} / ${slides.length}: ${slide.title}`}
+                    aria-hidden={activeSlide !== index}
                 >
-                    <img src={slide.image} className="w-full h-full object-cover opacity-40 grayscale hover:grayscale-0 transition-all duration-700" alt={slide.title} />
+                    <img src={slide.image} className="w-full h-full object-cover opacity-40 grayscale hover:grayscale-0 transition-all duration-700" alt={slide.title} loading={index === 0 ? "eager" : "lazy"} />
                     <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent"></div>
                     <div className="absolute inset-0 flex flex-col justify-end p-8 md:p-24 max-w-[1200px]">
                         <div className="flex gap-2 mb-6">
@@ -56,7 +65,7 @@ const HeroSlider = () => {
                             {slide.description}
                         </p>
                         <div className="flex gap-4">
-                            <button className="bg-white text-black px-10 py-4 font-black uppercase text-sm hover:bg-[#ccff00] transition-colors flex items-center gap-2 group">
+                            <button className="bg-white text-black px-10 py-4 font-black uppercase text-sm hover:bg-[#ccff00] transition-colors flex items-center gap-2 group" aria-label={`${slide.title} detaylarını gör`}>
                                 {t('btn_open_file')} <ArrowUpRight className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
                             </button>
                         </div>
@@ -65,10 +74,18 @@ const HeroSlider = () => {
             ))}
 
             <div className="absolute bottom-12 right-12 flex gap-4 z-20">
-                <button onClick={() => setActiveSlide((activeSlide - 1 + slides.length) % slides.length)} className="w-14 h-14 border border-white/20 flex items-center justify-center hover:bg-white hover:text-black transition-all">
+                <button
+                    onClick={() => setActiveSlide((activeSlide - 1 + slides.length) % slides.length)}
+                    className="w-14 h-14 border border-white/20 flex items-center justify-center hover:bg-white hover:text-black transition-all"
+                    aria-label="Önceki slide"
+                >
                     <ChevronLeft size={32} />
                 </button>
-                <button onClick={() => setActiveSlide((activeSlide + 1) % slides.length)} className="w-14 h-14 border border-white/20 flex items-center justify-center hover:bg-white hover:text-black transition-all">
+                <button
+                    onClick={() => setActiveSlide((activeSlide + 1) % slides.length)}
+                    className="w-14 h-14 border border-white/20 flex items-center justify-center hover:bg-white hover:text-black transition-all"
+                    aria-label="Sonraki slide"
+                >
                     <ChevronRight size={32} />
                 </button>
             </div>

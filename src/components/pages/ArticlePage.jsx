@@ -6,6 +6,7 @@ import { ArrowLeft, Clock, Tag } from 'lucide-react';
 import { useLanguage } from '../../i18n/LanguageContext';
 import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import SEOHead from '../seo/SEOHead';
 
 const ArticlePage = () => {
     const { slug } = useParams();
@@ -62,38 +63,45 @@ const ArticlePage = () => {
     };
 
     return (
-        <div className="min-h-screen bg-[#050505] text-[#e0e0e0] pt-20">
-            <article className="max-w-[800px] mx-auto px-6 py-16">
-                <Link to={categoryPaths[article.category] || '/'} className="inline-flex items-center gap-2 text-white/40 hover:text-[#ccff00] transition-colors text-sm font-bold uppercase tracking-widest mb-8">
-                    <ArrowLeft size={16} /> {categoryLabels[article.category] || t('page_back_home')}
-                </Link>
+        <>
+            <SEOHead
+                title={article.title}
+                description={article.excerpt || article.title}
+                path={`/makale/${slug}`}
+            />
+            <div className="min-h-screen bg-[#050505] text-[#e0e0e0] pt-20">
+                <article className="max-w-[800px] mx-auto px-6 py-16">
+                    <Link to={categoryPaths[article.category] || '/'} className="inline-flex items-center gap-2 text-white/40 hover:text-[#ccff00] transition-colors text-sm font-bold uppercase tracking-widest mb-8">
+                        <ArrowLeft size={16} /> {categoryLabels[article.category] || t('page_back_home')}
+                    </Link>
 
-                <div className="flex items-center gap-4 mb-6">
-                    <span className="px-3 py-1 bg-[#ccff00] text-black text-[10px] font-black uppercase tracking-widest">
-                        {categoryLabels[article.category]}
-                    </span>
-                    {article.createdAt && (
-                        <span className="flex items-center gap-1 text-white/30 text-xs">
-                            <Clock size={12} /> {formatDate(article.createdAt)}
+                    <div className="flex items-center gap-4 mb-6">
+                        <span className="px-3 py-1 bg-[#ccff00] text-black text-[10px] font-black uppercase tracking-widest">
+                            {categoryLabels[article.category]}
                         </span>
+                        {article.createdAt && (
+                            <span className="flex items-center gap-1 text-white/30 text-xs">
+                                <Clock size={12} /> {formatDate(article.createdAt)}
+                            </span>
+                        )}
+                    </div>
+
+                    <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tighter italic leading-tight mb-6">
+                        {article.title}
+                    </h1>
+
+                    {article.excerpt && (
+                        <p className="text-lg text-white/50 border-l-4 border-[#ccff00] pl-6 mb-12 font-medium">
+                            {article.excerpt}
+                        </p>
                     )}
-                </div>
 
-                <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tighter italic leading-tight mb-6">
-                    {article.title}
-                </h1>
-
-                {article.excerpt && (
-                    <p className="text-lg text-white/50 border-l-4 border-[#ccff00] pl-6 mb-12 font-medium">
-                        {article.excerpt}
-                    </p>
-                )}
-
-                <div className="prose prose-invert prose-lg max-w-none prose-headings:text-[#ccff00] prose-headings:uppercase prose-headings:tracking-tight prose-a:text-[#ccff00] prose-strong:text-white prose-blockquote:border-[#ccff00] prose-code:text-[#ccff00]">
-                    <Markdown remarkPlugins={[remarkGfm]}>{article.content}</Markdown>
-                </div>
-            </article>
-        </div>
+                    <div className="prose prose-invert prose-lg max-w-none prose-headings:text-[#ccff00] prose-headings:uppercase prose-headings:tracking-tight prose-a:text-[#ccff00] prose-strong:text-white prose-blockquote:border-[#ccff00] prose-code:text-[#ccff00]">
+                        <Markdown remarkPlugins={[remarkGfm]}>{article.content}</Markdown>
+                    </div>
+                </article>
+            </div>
+        </>
     );
 };
 

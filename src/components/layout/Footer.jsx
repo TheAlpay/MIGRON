@@ -14,15 +14,15 @@ const Footer = () => {
     ];
 
     return (
-        <footer className="bg-black border-t-8 border-[#ccff00] py-24 px-6">
+        <footer className="bg-black border-t-8 border-[#ccff00] py-24 px-6" aria-labelledby="footer-title">
             <div className="max-w-[1600px] mx-auto">
                 <div className="grid grid-cols-1 md:grid-cols-12 gap-16">
                     <div className="md:col-span-5">
-                        <Link to="/" className="flex items-center gap-3 mb-8 hover:opacity-80 transition-opacity">
+                        <Link to="/" className="flex items-center gap-3 mb-8 hover:opacity-80 transition-opacity" aria-label={`${SITE_NAME} Anasayfa`}>
                             <div className="bg-[#ccff00] w-8 h-8 flex items-center justify-center">
                                 <Scale size={18} className="text-black" />
                             </div>
-                            <span className="font-black text-4xl tracking-tighter italic uppercase">{SITE_NAME}</span>
+                            <span id="footer-title" className="font-black text-4xl tracking-tighter italic uppercase">{SITE_NAME}</span>
                         </Link>
                         <p className="text-lg text-white/40 uppercase font-black tracking-tight leading-tight">
                             {t('footer_tagline')}
@@ -31,15 +31,17 @@ const Footer = () => {
                     <div className="md:col-span-7 grid grid-cols-2 md:grid-cols-3 gap-8">
                         <div>
                             <h5 className="text-[10px] font-black text-[#ccff00] uppercase tracking-[0.3em] mb-6">{t('footer_nav')}</h5>
-                            <ul className="space-y-4 text-xs font-bold text-white/60">
-                                {footerLinks.map(item => (
-                                    <li key={item.label}>
-                                        <Link to={item.path} className="hover:text-white transition-colors tracking-widest">
-                                            {item.label}
-                                        </Link>
-                                    </li>
-                                ))}
-                            </ul>
+                            <nav aria-label="Footer Navigasyon">
+                                <ul className="space-y-4 text-xs font-bold text-white/60">
+                                    {footerLinks.map(item => (
+                                        <li key={item.label}>
+                                            <Link to={item.path} className="hover:text-white transition-colors tracking-widest">
+                                                {item.label}
+                                            </Link>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </nav>
                         </div>
                         <div>
                             <h5 className="text-[10px] font-black text-[#ccff00] uppercase tracking-[0.3em] mb-6">{t('footer_legal_title')}</h5>
@@ -49,7 +51,7 @@ const Footer = () => {
                         </div>
                         <div>
                             <h5 className="text-[10px] font-black text-[#ccff00] uppercase tracking-[0.3em] mb-6">{t('footer_contact')}</h5>
-                            <a href={`mailto:${SITE_EMAIL}`} className="text-xs font-black italic tracking-widest underline decoration-[#ccff00] hover:text-[#ccff00] transition-colors">
+                            <a href={`mailto:${SITE_EMAIL}`} className="text-xs font-black italic tracking-widest underline decoration-[#ccff00] hover:text-[#ccff00] transition-colors" aria-label={`E-posta gönder: ${SITE_EMAIL}`}>
                                 {SITE_EMAIL}
                             </a>
                         </div>

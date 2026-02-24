@@ -56,8 +56,8 @@ const BentoGrid = () => {
         <section className="max-w-[1600px] mx-auto px-6 py-24">
             <div className="flex items-end justify-between mb-16">
                 <div>
-                    <h3 className="text-[10px] font-black tracking-[0.4em] text-[#ccff00] uppercase mb-4">{t('section_flow')}</h3>
-                    <h4 className="text-4xl md:text-6xl font-black uppercase tracking-tighter">{t('section_analyses')}</h4>
+                    <h2 className="text-[10px] font-black tracking-[0.4em] text-[#ccff00] uppercase mb-4">{t('section_flow')}</h2>
+                    <h3 className="text-4xl md:text-6xl font-black uppercase tracking-tighter">{t('section_analyses')}</h3>
                 </div>
                 <div className="text-right hidden md:block">
                     <p className="text-[10px] text-white/40 font-bold uppercase tracking-widest leading-loose">
@@ -75,7 +75,7 @@ const BentoGrid = () => {
                             <Shield className="text-[#ccff00]" size={40} />
                             <span className="text-[10px] font-bold text-white/40">{t('safe_data')}</span>
                         </div>
-                        <h5 className="text-3xl font-black uppercase leading-tight italic">{t('bento_title')}</h5>
+                        <h4 className="text-3xl font-black uppercase leading-tight italic">{t('bento_title')}</h4>
                     </div>
                     <div className="mt-8">
                         <p className="text-sm text-white/40 max-w-[250px] uppercase font-bold tracking-tight">{t('bento_desc')}</p>
@@ -85,7 +85,7 @@ const BentoGrid = () => {
                 {/* Bento Item 2 - Australia Status (NOT clickable) */}
                 <div className="md:col-span-2 bg-[#ccff00] text-black p-10 flex flex-col justify-center relative overflow-hidden">
                     <Zap className="absolute right-[-20px] top-[-20px] w-48 h-48 opacity-10 rotate-12" />
-                    <h5 className="text-4xl font-black italic tracking-tighter uppercase mb-4">{t('australia')}</h5>
+                    <h4 className="text-4xl font-black italic tracking-tighter uppercase mb-4">{t('australia')}</h4>
                     <div className="flex gap-8 mt-4">
                         <div>
                             <div className="text-2xl font-black">%98</div>
@@ -105,6 +105,7 @@ const BentoGrid = () => {
                             to={`/makale/${article.slug}`}
                             key={article.id}
                             className="bg-[#111] p-8 border border-white/5 hover:border-white/20 transition-all cursor-pointer flex flex-col justify-between group"
+                            aria-label={`${article.title} makalesini oku`}
                         >
                             <div className="flex justify-between text-[10px] font-bold text-white/40 mb-8 uppercase tracking-widest">
                                 <span style={{ color: categoryColors[article.category] || '#ccff00' }}>
@@ -115,9 +116,9 @@ const BentoGrid = () => {
                                     {formatDate(article.createdAt)}
                                 </span>
                             </div>
-                            <h6 className="text-xl font-black uppercase leading-none group-hover:text-[#ccff00] transition-colors">
+                            <h4 className="text-xl font-black uppercase leading-none group-hover:text-[#ccff00] transition-colors">
                                 {article.title}
-                            </h6>
+                            </h4>
                         </Link>
                     ))
                 ) : (

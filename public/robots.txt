@@ -1,0 +1,7 @@
+# MIGRON — robots.txt
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /api/
+
+Sitemap: https://migron.mtive.tech/sitemap.xml
