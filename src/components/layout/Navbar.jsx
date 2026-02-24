@@ -1,8 +1,9 @@
 import React, { useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Scale, Globe } from 'lucide-react';
+import { Menu, X, Globe } from 'lucide-react';
 import { SITE_NAME } from '../../config/constants';
 import { useLanguage } from '../../i18n/LanguageContext';
+import Logo from '../../assets/migron.webp';
 
 const Navbar = ({ isMenuOpen, setIsMenuOpen }) => {
     const { t, toggleLanguage, lang } = useLanguage();
@@ -36,13 +37,8 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }) => {
         <>
             <nav className="fixed top-0 w-full z-50 bg-black/80 backdrop-blur-xl border-b border-white/10" aria-label="Ana navigasyon">
                 <div className="max-w-[1600px] mx-auto px-6 h-20 flex items-center justify-between">
-                    <Link to="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity" aria-label="MIGRON Anasayfa">
-                        <div className="bg-[#ccff00] p-1">
-                            <Scale className="text-black" size={24} strokeWidth={3} />
-                        </div>
-                        <span className="font-black text-2xl tracking-tighter uppercase italic">
-                            {SITE_NAME}
-                        </span>
+                    <Link to="/" className="flex items-center hover:opacity-80 transition-opacity" aria-label="MIGRON Anasayfa">
+                        <img src={Logo} alt={SITE_NAME} className="h-10 w-auto object-contain" />
                     </Link>
 
                     <div className="hidden lg:flex items-center gap-10 text-[11px] font-bold tracking-[0.2em]">
