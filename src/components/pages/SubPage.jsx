@@ -28,14 +28,21 @@ const SubPage = ({ pageId }) => {
 
         const fetchArticles = async () => {
             try {
+                // Simple query without orderBy to avoid needing a composite index
                 const q = query(
                     collection(db, 'articles'),
                     where('category', '==', config.category),
-                    where('status', '==', 'published'),
-                    orderBy('createdAt', 'desc')
+                    where('status', '==', 'published')
                 );
                 const snapshot = await getDocs(q);
-                setArticles(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+                const fetched = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                // Sort client-side by createdAt descending
+                fetched.sort((a, b) => {
+                    const dateA = a.createdAt?.toDate?.() || new Date(0);
+                    const dateB = b.createdAt?.toDate?.() || new Date(0);
+                    return dateB - dateA;
+                });
+                setArticles(fetched);
             } catch (err) {
                 console.error('Error fetching articles:', err);
             }

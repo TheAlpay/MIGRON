@@ -14,9 +14,14 @@ const AdminDashboard = ({ user, onLogout }) => {
     const fetchArticles = async () => {
         setLoading(true);
         try {
-            const q = query(collection(db, 'articles'), orderBy('createdAt', 'desc'));
-            const snapshot = await getDocs(q);
-            setArticles(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+            const snapshot = await getDocs(collection(db, 'articles'));
+            const fetched = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            fetched.sort((a, b) => {
+                const dateA = a.createdAt?.toDate?.() || new Date(0);
+                const dateB = b.createdAt?.toDate?.() || new Date(0);
+                return dateB - dateA;
+            });
+            setArticles(fetched);
         } catch (err) {
             console.error('Error fetching articles:', err);
         }
