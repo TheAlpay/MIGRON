@@ -1,16 +1,38 @@
 import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, ArrowUpRight } from 'lucide-react';
-import { slides } from '../../data/content';
+import { useLanguage } from '../../i18n/LanguageContext';
 
 const HeroSlider = () => {
     const [activeSlide, setActiveSlide] = useState(0);
+    const { t } = useLanguage();
+
+    const slides = [
+        {
+            title: t('slide1_title'),
+            tags: [t('slide1_tag1'), t('slide1_tag2')],
+            description: t('slide1_desc'),
+            image: "https://images.unsplash.com/photo-1523482580672-f109ba8cb9be?auto=format&fit=crop&q=80&w=1000"
+        },
+        {
+            title: t('slide2_title'),
+            tags: [t('slide2_tag1'), t('slide2_tag2')],
+            description: t('slide2_desc'),
+            image: "https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?auto=format&fit=crop&q=80&w=1000"
+        },
+        {
+            title: t('slide3_title'),
+            tags: [t('slide3_tag1'), t('slide3_tag2')],
+            description: t('slide3_desc'),
+            image: "https://images.unsplash.com/photo-1517483000871-1dbf64a6e1c6?auto=format&fit=crop&q=80&w=1000"
+        }
+    ];
 
     useEffect(() => {
         const interval = setInterval(() => {
             setActiveSlide((prev) => (prev + 1) % slides.length);
         }, 6000);
         return () => clearInterval(interval);
-    }, []);
+    }, [slides.length]);
 
     return (
         <section className="relative h-[80vh] min-h-[600px] bg-black overflow-hidden border-b border-white/10">
@@ -35,7 +57,7 @@ const HeroSlider = () => {
                         </p>
                         <div className="flex gap-4">
                             <button className="bg-white text-black px-10 py-4 font-black uppercase text-sm hover:bg-[#ccff00] transition-colors flex items-center gap-2 group">
-                                Dosyayı Aç <ArrowUpRight className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+                                {t('btn_open_file')} <ArrowUpRight className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
                             </button>
                         </div>
                     </div>
