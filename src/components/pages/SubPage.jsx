@@ -70,37 +70,39 @@ const SubPage = ({ pageId }) => {
                 path={`/${pageId}`}
             />
             <div className="min-h-screen bg-[#050505] text-[#e0e0e0] pt-20">
-                {/* Hero Section */}
-                <section className="relative py-32 px-6 border-b border-white/10">
+                {/* Hero Section - Radical Compact */}
+                <section className="relative pt-8 pb-6 px-6 border-b border-white/10">
                     <div className="max-w-[1200px] mx-auto">
-                        <Link to="/" className="inline-flex items-center gap-2 text-white/40 hover:text-[#ccff00] transition-colors text-sm font-bold uppercase tracking-widest mb-12">
-                            <ArrowLeft size={16} /> {t('page_back_home')}
-                        </Link>
+                        <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+                            <Link to="/" className="inline-flex items-center gap-2 text-white/40 hover:text-[#ccff00] transition-colors text-[10px] font-black uppercase tracking-[0.2em]">
+                                <ArrowLeft size={14} /> {t('page_back_home')}
+                            </Link>
+                            <p className="text-[10px] text-white/40 uppercase font-black tracking-[0.2em]">
+                                {t(config.subtitleKey)}
+                            </p>
+                        </div>
 
-                        <div className="flex items-center gap-4 mb-8">
-                            <div className="p-3" style={{ backgroundColor: config.accent }}>
-                                <IconComponent className="text-black" size={32} strokeWidth={2.5} />
-                            </div>
-                            <div>
-                                <h1 className="text-5xl md:text-7xl font-black uppercase tracking-tighter italic" style={{ color: config.accent }}>
+                        <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
+                            <div className="flex items-center gap-4">
+                                <div className="p-2.5" style={{ backgroundColor: config.accent }}>
+                                    <IconComponent className="text-black" size={28} strokeWidth={3} />
+                                </div>
+                                <h1 className="text-4xl md:text-6xl font-black uppercase tracking-tighter italic" style={{ color: config.accent }}>
                                     {t(config.titleKey)}
                                 </h1>
                             </div>
-                        </div>
 
-                        <p className="text-sm text-white/40 uppercase font-bold tracking-widest">
-                            {t(config.subtitleKey)}
-                        </p>
+                            <div className="max-w-xl">
+                                <p className="text-sm md:text-base text-white/50 leading-relaxed font-medium">
+                                    {t(config.descKey)}
+                                </p>
+                            </div>
+                        </div>
                     </div>
                 </section>
 
                 {/* Content Section */}
-                <section className="max-w-[1200px] mx-auto px-6 py-24">
-                    <div className="bg-[#111] border border-white/5 p-12 mb-8">
-                        <p className="text-xl text-white/60 leading-relaxed">
-                            {t(config.descKey)}
-                        </p>
-                    </div>
+                <section className="max-w-[1200px] mx-auto px-6 py-8">
 
                     {pageId === 'iletisim' ? (
                         <div className="bg-[#111] border border-white/5 p-12">
