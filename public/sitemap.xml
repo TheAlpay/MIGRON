@@ -21,9 +21,14 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://migron.mtive.tech/projeler</loc>
+    <loc>https://migron.mtive.tech/sss</loc>
     <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://migron.mtive.tech/program-turleri</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
   </url>
   <url>
     <loc>https://migron.mtive.tech/iletisim</loc>
