@@ -2,25 +2,32 @@ import React, { useState, useRef, useEffect } from 'react';
 import { MessageSquare, Send, X } from 'lucide-react';
 import { useLanguage } from '../../i18n/LanguageContext';
 
-// In local dev (npm run dev), /api/chat doesn't exist (Vercel serverless only runs in prod
-// or with `vercel dev`). As a fallback, we call Gemini directly from the browser using
-// VITE_GEMINI_API_KEY. This is NOT exposed in production builds (only /api/chat is used there).
-const VITE_GEMINI_KEY = import.meta.env.VITE_GEMINI_API_KEY;
+// Local dev fallback — calls Groq directly from browser when /api/chat isn't available
+const VITE_GROQ_KEY = import.meta.env.VITE_GROQ_API_KEY;
 
-const callGeminiDirect = async (message) => {
-    const res = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${VITE_GEMINI_KEY}`,
-        {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                contents: [{ parts: [{ text: `Role: Professional Legal Assistant for Migron. Context: Australian Migration Law. Style: Direct, slightly academic, no fluff. Query: ${message}` }] }]
-            })
-        }
-    );
+const callGroqDirect = async (message) => {
+    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${VITE_GROQ_KEY}`
+        },
+        body: JSON.stringify({
+            model: 'llama-3.3-70b-versatile',
+            messages: [
+                {
+                    role: 'system',
+                    content: 'Sen MIGRON platformunun yapay zeka asistanısın. Avustralya göçmenlik hukuku, vize süreçleri ve yasal prosedürler konusunda uzmanlaşmış, profesyonel ve kısa yanıtlar veren bir hukuki asistansın. Türkçe veya İngilizce soruları anlayıp Türkçe yanıt ver.'
+                },
+                { role: 'user', content: message }
+            ],
+            max_tokens: 800,
+            temperature: 0.7
+        })
+    });
     const data = await res.json();
-    if (!res.ok) throw new Error(data?.error?.message || 'Gemini API error');
-    return data.candidates?.[0]?.content?.parts?.[0]?.text || 'Veri hattında hata.';
+    if (!res.ok) throw new Error(data?.error?.message || 'Groq API error');
+    return data.choices?.[0]?.message?.content || 'Yanıt alınamadı.';
 };
 
 const AiTerminal = () => {
@@ -28,7 +35,7 @@ const AiTerminal = () => {
     const [chatOpen, setChatOpen] = useState(false);
     const [chatInput, setChatInput] = useState('');
     const [chatHistory, setChatHistory] = useState([
-        { role: 'assistant', text: null } // rendered with t('chat_welcome')
+        { role: 'assistant', text: null }
     ]);
     const [isTyping, setIsTyping] = useState(false);
     const messagesEndRef = useRef(null);
@@ -38,7 +45,6 @@ const AiTerminal = () => {
     }, [chatHistory, isTyping]);
 
     const handleSendMessage = async () => {
-        // Capture BEFORE clearing — this was the original bug
         const messageText = chatInput.trim();
         if (!messageText) return;
 
@@ -47,7 +53,7 @@ const AiTerminal = () => {
         setIsTyping(true);
 
         try {
-            // 1st: try the Vercel serverless proxy (works in production)
+            // 1st: try the Vercel serverless proxy (production)
             const response = await fetch('/api/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -60,14 +66,13 @@ const AiTerminal = () => {
                 return;
             }
 
-            // 2nd: if proxy fails (e.g. 404 in local dev), try direct Gemini call
-            if (VITE_GEMINI_KEY) {
-                const text = await callGeminiDirect(messageText);
+            // 2nd: fallback — direct Groq call (local dev)
+            if (VITE_GROQ_KEY) {
+                const text = await callGroqDirect(messageText);
                 setChatHistory(prev => [...prev, { role: 'assistant', text }]);
                 return;
             }
 
-            // Both failed
             const errData = await response.json().catch(() => ({}));
             throw new Error(errData.error || `HTTP ${response.status}`);
 
