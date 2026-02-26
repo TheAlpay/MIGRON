@@ -9,7 +9,7 @@ const VITE_GEMINI_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 
 const callGeminiDirect = async (message) => {
     const res = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${VITE_GEMINI_KEY}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${VITE_GEMINI_KEY}`,
         {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },

@@ -31,7 +31,7 @@ export default async function handler(req, res) {
             return res.status(400).json({ error: 'Message too long (max 500 characters)' });
         }
 
-        const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+        const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
 
         const response = await fetch(geminiUrl, {
             method: 'POST',
