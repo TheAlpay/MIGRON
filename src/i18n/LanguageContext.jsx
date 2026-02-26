@@ -11,7 +11,8 @@ const translations = {
         nav_legal: "HUKUK SİSTEMİ",
         nav_education: "EĞİTİM",
         nav_social: "SOSYAL",
-        nav_projects: "PROJELER",
+        nav_program: "PROGRAM TÜRLERİ",
+        nav_faq: "SSS",
         nav_contact: "İLETİŞİM",
         lang_toggle: "EN",
 
@@ -103,7 +104,8 @@ const translations = {
         nav_legal: "LEGAL SYSTEM",
         nav_education: "EDUCATION",
         nav_social: "SOCIAL",
-        nav_projects: "PROJECTS",
+        nav_program: "PROGRAM TYPES",
+        nav_faq: "FAQ",
         nav_contact: "CONTACT",
         lang_toggle: "TR",
 

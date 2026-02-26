@@ -29,7 +29,8 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }) => {
         { label: t('nav_legal'), path: '/hukuk' },
         { label: t('nav_education'), path: '/egitim' },
         { label: t('nav_social'), path: '/sosyal' },
-        { label: t('nav_projects'), path: '/projeler' },
+        { label: t('nav_program'), path: '/program-turleri' },
+        { label: t('nav_faq'), path: '/sss' },
         { label: t('nav_contact'), path: '/iletisim' },
     ];
 

@@ -10,6 +10,8 @@ import BentoGrid from './components/home/BentoGrid';
 import AiTerminal from './components/chat/AiTerminal';
 import SubPage from './components/pages/SubPage';
 import ArticlePage from './components/pages/ArticlePage';
+import SSSPage from './components/pages/SSSPage';
+import ProgramTurleriPage from './components/pages/ProgramTurleriPage';
 import AdminLogin from './components/admin/AdminLogin';
 import AdminDashboard from './components/admin/AdminDashboard';
 import SEOHead from './components/seo/SEOHead';
@@ -80,7 +82,8 @@ const App = () => {
                 <Route path="/hukuk" element={<SubPage pageId="hukuk" />} />
                 <Route path="/egitim" element={<SubPage pageId="egitim" />} />
                 <Route path="/sosyal" element={<SubPage pageId="sosyal" />} />
-                <Route path="/projeler" element={<SubPage pageId="projeler" />} />
+                <Route path="/sss" element={<SSSPage />} />
+                <Route path="/program-turleri" element={<ProgramTurleriPage />} />
                 <Route path="/iletisim" element={<SubPage pageId="iletisim" />} />
                 <Route path="/makale/:slug" element={<ArticlePage />} />
               </Routes>

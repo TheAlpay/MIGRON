@@ -8,9 +8,9 @@ const Footer = () => {
     const { t } = useLanguage();
 
     const footerLinks = [
-        { label: t('footer_nav_legal'), path: '/hukuk' },
-        { label: t('footer_nav_australia'), path: '/hukuk' },
-        { label: t('footer_nav_data'), path: '/projeler' },
+        { label: t('nav_legal'), path: '/hukuk' },
+        { label: t('nav_program'), path: '/program-turleri' },
+        { label: t('nav_faq'), path: '/sss' },
     ];
 
     return (

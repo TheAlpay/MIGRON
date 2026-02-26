@@ -9,7 +9,8 @@ const categories = [
     { value: 'hukuk', label: 'Hukuk Sistemi' },
     { value: 'egitim', label: 'Eğitim' },
     { value: 'sosyal', label: 'Sosyal' },
-    { value: 'projeler', label: 'Projeler' },
+    { value: 'sss', label: 'SSS (Sık Sorulan Sorular)' },
+    { value: 'program-turleri', label: 'Program Türleri' },
 ];
 
 const ArticleEditor = ({ article, onSave, onCancel }) => {
@@ -20,6 +21,7 @@ const ArticleEditor = ({ article, onSave, onCancel }) => {
     const [category, setCategory] = useState(article?.category || 'hukuk');
     const [lang, setLang] = useState(article?.lang || 'tr');
     const [status, setStatus] = useState(article?.status || 'draft');
+    const [coverImage, setCoverImage] = useState(article?.coverImage || '');
     const [showPreview, setShowPreview] = useState(false);
     const [saving, setSaving] = useState(false);
 
@@ -57,6 +59,7 @@ const ArticleEditor = ({ article, onSave, onCancel }) => {
                 category,
                 lang,
                 status,
+                coverImage: coverImage.trim() || null,
                 updatedAt: serverTimestamp(),
             };
 
@@ -154,6 +157,21 @@ const ArticleEditor = ({ article, onSave, onCancel }) => {
                         className="w-full bg-[#111] border border-white/10 p-3 text-white/60 outline-none focus:border-[#ccff00] text-sm font-mono"
                         placeholder="makale-url-slug"
                     />
+                </div>
+
+                <div className="mb-6">
+                    <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest block mb-2">Kapak Görseli URL (İsteğe Bağlı)</label>
+                    <input
+                        value={coverImage}
+                        onChange={(e) => setCoverImage(e.target.value)}
+                        className="w-full bg-[#111] border border-white/10 p-3 text-white/60 outline-none focus:border-[#ccff00] text-sm font-mono"
+                        placeholder="https://images.unsplash.com/... veya başka bir görsel URL'si"
+                    />
+                    {coverImage && (
+                        <div className="mt-2 relative">
+                            <img src={coverImage} alt="Kapak önizleme" className="w-full max-h-40 object-cover opacity-60" onError={(e) => e.target.style.display = 'none'} />
+                        </div>
+                    )}
                 </div>
 
                 <div className="mb-6">

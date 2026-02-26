@@ -53,8 +53,9 @@ const ArticlePage = () => {
         );
     }
 
-    const categoryPaths = { hukuk: '/hukuk', egitim: '/egitim', sosyal: '/sosyal', projeler: '/projeler' };
-    const categoryLabels = { hukuk: 'Hukuk Sistemi', egitim: 'Eğitim', sosyal: 'Sosyal', projeler: 'Projeler' };
+    const categoryPaths = { hukuk: '/hukuk', egitim: '/egitim', sosyal: '/sosyal', sss: '/sss', 'program-turleri': '/program-turleri' };
+    const categoryLabels = { hukuk: 'Hukuk Sistemi', egitim: 'Eğitim', sosyal: 'Sosyal', sss: 'SSS', 'program-turleri': 'Program Türleri' };
+    const categoryColors = { hukuk: '#ccff00', egitim: '#00d4ff', sosyal: '#ff6b6b', sss: '#ccff00', 'program-turleri': '#a78bfa' };
 
     const formatDate = (timestamp) => {
         if (!timestamp) return '';
@@ -76,8 +77,11 @@ const ArticlePage = () => {
                     </Link>
 
                     <div className="flex items-center gap-4 mb-6">
-                        <span className="px-3 py-1 bg-[#ccff00] text-black text-[10px] font-black uppercase tracking-widest">
-                            {categoryLabels[article.category]}
+                        <span
+                            className="px-3 py-1 text-black text-[10px] font-black uppercase tracking-widest"
+                            style={{ backgroundColor: categoryColors[article.category] || '#ccff00' }}
+                        >
+                            {categoryLabels[article.category] || article.category}
                         </span>
                         {article.createdAt && (
                             <span className="flex items-center gap-1 text-white/30 text-xs">
@@ -89,6 +93,17 @@ const ArticlePage = () => {
                     <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tighter italic leading-tight mb-6">
                         {article.title}
                     </h1>
+
+                    {article.coverImage && (
+                        <div className="mb-8 -mx-6">
+                            <img
+                                src={article.coverImage}
+                                alt={article.title}
+                                className="w-full max-h-[400px] object-cover"
+                                onError={(e) => e.target.style.display = 'none'}
+                            />
+                        </div>
+                    )}
 
                     {article.excerpt && (
                         <p className="text-lg text-white/50 border-l-4 border-[#ccff00] pl-6 mb-12 font-medium">
