@@ -1,9 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, HelpCircle, ChevronDown, ChevronUp } from 'lucide-react';
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from '../../config/firebase';
 import SEOHead from '../seo/SEOHead';
 
-const faqData = [
+// ── Varsayılan Veriler (Firebase boşsa bunlar gösterilir) ────────────────────
+const defaultFaqData = [
     {
         category: "VİZE & BAŞVURU",
         accent: "#ccff00",
@@ -13,15 +16,15 @@ const faqData = [
                 a: "Avustralya'da göçmenlik için birçok vize türü bulunmaktadır: Skilled Independent (189), Skilled Nominated (190), Employer Sponsored (482/186), Partner, Student ve İnsani vizeler bunların başlıcalarıdır. Durumunuza en uygun vizeyi belirlemek için puan hesaplamanızı yapmanız önerilir."
             },
             {
-                q: "Poinst testi nedir ve nasıl hesaplanır?",
-                a: "Point test (puan testi), skilled göçmenlik vizelerinde başvuruculara yaş, İngilizce dil seviyesi, deneyim, eğitim ve diğer faktörlere göre puan verilmesine dayanan bir sistemdir. Skilled Independent (189) vizesi için genellikle 65 puan required'dır ancak davet puanları çok daha yüksek seyredebilmektedir."
+                q: "Puan testi nedir ve nasıl hesaplanır?",
+                a: "Point test (puan testi), skilled göçmenlik vizelerinde başvuruculara yaş, İngilizce dil seviyesi, deneyim, eğitim ve diğer faktörlere göre puan verilmesine dayanan bir sistemdir. Skilled Independent (189) vizesi için genellikle 65 puan gereklidir ancak davet puanları çok daha yüksek seyredebilmektedir."
             },
             {
                 q: "EOI (Expression of Interest) nedir?",
                 a: "EOI, SkillSelect sistemi üzerinden verilen resmi bir ilgi beyanıdır. Puan testine göre havuzda beklediğiniz ve davet beklediğiniz aşamadır. Davet aldıktan sonra 60 gün içinde vize başvurusunu tamamlamanız gerekir."
             },
             {
-                q: "Vize başvurusunun ortalama ne kadar sürmektedir?",
+                q: "Vize başvurusunun ortalama ne kadar sürdüğü?",
                 a: "Vize işlem süreleri vize türüne ve bireysel duruma göre büyük farklılıklar göstermektedir. Skilled vizeler için birkaç aydan 2-3 yıla kadar uzayan süreler görülebilmektedir. Partner vizeleri ortalama 12-24 ay sürebilmektedir."
             }
         ]
@@ -89,7 +92,7 @@ const FAQItem = ({ question, answer, accent }) => {
                 }
             </button>
             {open && (
-                <div className="px-6 pb-6 text-white/60 text-sm leading-relaxed border-t border-white/5" style={{ borderColor: `${accent}20` }}>
+                <div className="px-6 pb-6 text-white/60 text-sm leading-relaxed border-t border-white/5">
                     <p className="pt-4">{answer}</p>
                 </div>
             )}
@@ -98,6 +101,35 @@ const FAQItem = ({ question, answer, accent }) => {
 };
 
 const SSSPage = () => {
+    const [faqData, setFaqData] = useState(defaultFaqData);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchFAQ = async () => {
+            try {
+                const snapshot = await getDocs(collection(db, 'faqItems'));
+                if (!snapshot.empty) {
+                    const items = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+                    items.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+                    // Group by category
+                    const grouped = {};
+                    items.forEach(item => {
+                        const cat = item.category || 'GENEL';
+                        if (!grouped[cat]) grouped[cat] = { category: cat, accent: item.accent || '#ccff00', questions: [] };
+                        grouped[cat].questions.push({ q: item.question, a: item.answer });
+                    });
+                    setFaqData(Object.values(grouped));
+                }
+                // If snapshot is empty, defaultFaqData stays
+            } catch (err) {
+                console.error('Error fetching FAQ:', err);
+                // On error, defaultFaqData stays
+            }
+            setLoading(false);
+        };
+        fetchFAQ();
+    }, []);
+
     return (
         <>
             <SEOHead
@@ -106,26 +138,20 @@ const SSSPage = () => {
                 path="/sss"
             />
             <div className="min-h-screen bg-[#050505] text-[#e0e0e0] pt-20">
-                {/* Hero */}
                 <section className="relative pt-8 pb-6 px-6 border-b border-white/10">
                     <div className="max-w-[1200px] mx-auto">
                         <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
                             <Link to="/" className="inline-flex items-center gap-2 text-white/40 hover:text-[#ccff00] transition-colors text-[10px] font-black uppercase tracking-[0.2em]">
                                 <ArrowLeft size={14} /> Anasayfaya Dön
                             </Link>
-                            <p className="text-[10px] text-white/40 uppercase font-black tracking-[0.2em]">
-                                Göçmenlik Rehberi
-                            </p>
+                            <p className="text-[10px] text-white/40 uppercase font-black tracking-[0.2em]">Göçmenlik Rehberi</p>
                         </div>
-
                         <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
                             <div className="flex items-center gap-4">
                                 <div className="p-2.5 bg-[#ccff00]">
                                     <HelpCircle className="text-black" size={28} strokeWidth={3} />
                                 </div>
-                                <h1 className="text-4xl md:text-6xl font-black uppercase tracking-tighter italic text-[#ccff00]">
-                                    SSS
-                                </h1>
+                                <h1 className="text-4xl md:text-6xl font-black uppercase tracking-tighter italic text-[#ccff00]">SSS</h1>
                             </div>
                             <div className="max-w-xl">
                                 <p className="text-sm md:text-base text-white/50 leading-relaxed font-medium">
@@ -136,35 +162,28 @@ const SSSPage = () => {
                     </div>
                 </section>
 
-                {/* FAQ Content */}
                 <section className="max-w-[1200px] mx-auto px-6 py-12">
-                    {faqData.map((section) => (
-                        <div key={section.category} className="mb-10">
-                            <h2
-                                className="text-[10px] font-black tracking-[0.3em] uppercase mb-4 inline-block px-3 py-1"
-                                style={{ backgroundColor: `${section.accent}15`, color: section.accent }}
-                            >
-                                {section.category}
-                            </h2>
-                            {section.questions.map((item, i) => (
-                                <FAQItem
-                                    key={i}
-                                    question={item.q}
-                                    answer={item.a}
-                                    accent={section.accent}
-                                />
-                            ))}
-                        </div>
-                    ))}
+                    {loading ? (
+                        <div className="text-center text-white/40 py-12 animate-pulse">Yükleniyor...</div>
+                    ) : (
+                        faqData.map((section) => (
+                            <div key={section.category} className="mb-10">
+                                <h2
+                                    className="text-[10px] font-black tracking-[0.3em] uppercase mb-4 inline-block px-3 py-1"
+                                    style={{ backgroundColor: `${section.accent}15`, color: section.accent }}
+                                >
+                                    {section.category}
+                                </h2>
+                                {section.questions.map((item, i) => (
+                                    <FAQItem key={i} question={item.q} answer={item.a} accent={section.accent} />
+                                ))}
+                            </div>
+                        ))
+                    )}
 
                     <div className="bg-[#111] border border-white/5 p-8 mt-8 text-center">
-                        <p className="text-white/30 text-sm font-bold uppercase tracking-widest mb-3">
-                            Sorunuz burada yok mu?
-                        </p>
-                        <Link
-                            to="/iletisim"
-                            className="inline-flex items-center gap-2 bg-[#ccff00] text-black px-6 py-3 font-black uppercase text-sm hover:brightness-110 transition-all"
-                        >
+                        <p className="text-white/30 text-sm font-bold uppercase tracking-widest mb-3">Sorunuz burada yok mu?</p>
+                        <Link to="/iletisim" className="inline-flex items-center gap-2 bg-[#ccff00] text-black px-6 py-3 font-black uppercase text-sm hover:brightness-110 transition-all">
                             Bize Ulaşın
                         </Link>
                     </div>
