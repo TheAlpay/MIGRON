@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, ArrowUpRight } from 'lucide-react';
 import { useLanguage } from '../../i18n/LanguageContext';
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from '../../config/firebase';
 
 const HeroSlider = () => {
     const [activeSlide, setActiveSlide] = useState(0);
     const { t } = useLanguage();
 
-    const slides = [
+    // Hardcoded fallback slides (from translations)
+    const defaultSlides = [
         {
             title: t('slide1_title'),
             tags: [t('slide1_tag1'), t('slide1_tag2')],
@@ -26,6 +29,25 @@ const HeroSlider = () => {
             image: "https://images.unsplash.com/photo-1517483000871-1dbf64a6e1c6?auto=format&fit=crop&q=80&w=1000"
         }
     ];
+
+    const [slides, setSlides] = useState(defaultSlides);
+
+    useEffect(() => {
+        const fetchSlides = async () => {
+            try {
+                const snapshot = await getDocs(collection(db, 'sliders'));
+                if (!snapshot.empty) {
+                    const items = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+                    items.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+                    setSlides(items);
+                }
+                // If empty, defaultSlides stays
+            } catch (err) {
+                console.error('Error fetching sliders:', err);
+            }
+        };
+        fetchSlides();
+    }, []);
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -54,7 +76,7 @@ const HeroSlider = () => {
                     <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent"></div>
                     <div className="absolute inset-0 flex flex-col justify-end p-8 md:p-24 max-w-[1200px]">
                         <div className="flex gap-2 mb-6">
-                            {slide.tags.map(tag => (
+                            {(slide.tags || []).map(tag => (
                                 <span key={tag} className="px-3 py-1 bg-[#ccff00] text-black text-[10px] font-black uppercase tracking-widest">{tag}</span>
                             ))}
                         </div>
