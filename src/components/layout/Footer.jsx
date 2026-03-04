@@ -7,10 +7,16 @@ import Logo from '../../assets/migron.webp';
 const Footer = () => {
     const { t } = useLanguage();
 
-    const footerLinks = [
+    const navLinks = [
         { label: t('nav_legal'), path: '/hukuk' },
         { label: t('nav_program'), path: '/program-turleri' },
         { label: t('nav_faq'), path: '/sss' },
+        { label: t('nav_contact'), path: '/iletisim' },
+    ];
+
+    const toolLinks = [
+        { label: 'Puan Hesaplama', path: '/puan-hesapla' },
+        { label: 'Vize Kontrol Listesi', path: '/vize-kontrol-listesi' },
     ];
 
     return (
@@ -25,12 +31,14 @@ const Footer = () => {
                             {t('footer_tagline')}
                         </p>
                     </div>
+
                     <div className="md:col-span-7 grid grid-cols-2 md:grid-cols-3 gap-8">
+                        {/* Navigation */}
                         <div>
                             <h5 className="text-[10px] font-black text-[#ccff00] uppercase tracking-[0.3em] mb-6">{t('footer_nav')}</h5>
                             <nav aria-label="Footer Navigasyon">
                                 <ul className="space-y-4 text-xs font-bold text-white/60">
-                                    {footerLinks.map(item => (
+                                    {navLinks.map(item => (
                                         <li key={item.label}>
                                             <Link to={item.path} className="hover:text-white transition-colors tracking-widest">
                                                 {item.label}
@@ -40,20 +48,37 @@ const Footer = () => {
                                 </ul>
                             </nav>
                         </div>
+
+                        {/* Tools */}
                         <div>
-                            <h5 className="text-[10px] font-black text-[#ccff00] uppercase tracking-[0.3em] mb-6">{t('footer_legal_title')}</h5>
-                            <p className="text-[9px] text-white/30 uppercase leading-relaxed font-bold tracking-tight">
-                                {t('footer_legal_text')}
-                            </p>
+                            <h5 className="text-[10px] font-black text-[#ccff00] uppercase tracking-[0.3em] mb-6">ARAÇLAR</h5>
+                            <nav aria-label="Footer Araçlar">
+                                <ul className="space-y-4 text-xs font-bold text-white/60">
+                                    {toolLinks.map(item => (
+                                        <li key={item.label}>
+                                            <Link to={item.path} className="hover:text-white transition-colors tracking-widest">
+                                                {item.label}
+                                            </Link>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </nav>
                         </div>
+
+                        {/* Contact */}
                         <div>
                             <h5 className="text-[10px] font-black text-[#ccff00] uppercase tracking-[0.3em] mb-6">{t('footer_contact')}</h5>
-                            <a href={`mailto:${SITE_EMAIL}`} className="text-xs font-black italic tracking-widest underline decoration-[#ccff00] hover:text-[#ccff00] transition-colors" aria-label={`E-posta gönder: ${SITE_EMAIL}`}>
+                            <a
+                                href={`mailto:${SITE_EMAIL}`}
+                                className="text-xs font-black italic tracking-widest underline decoration-[#ccff00] hover:text-[#ccff00] transition-colors"
+                                aria-label={`E-posta gönder: ${SITE_EMAIL}`}
+                            >
                                 {SITE_EMAIL}
                             </a>
                         </div>
                     </div>
                 </div>
+
                 <div className="mt-24 pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center text-[10px] font-black tracking-[0.5em] text-white/20 uppercase">
                     <span>© {new Date().getFullYear()} MIGRON SUBSIDIARY</span>
                     <span className="mt-4 md:mt-0 italic">{t('footer_slogan')}</span>

@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Globe } from 'lucide-react';
+import { Menu, X, Globe, ChevronDown, Calculator, ClipboardList } from 'lucide-react';
 import { SITE_NAME } from '../../config/constants';
 import { useLanguage } from '../../i18n/LanguageContext';
 import Logo from '../../assets/migron.webp';
@@ -8,6 +8,7 @@ import Logo from '../../assets/migron.webp';
 const Navbar = ({ isMenuOpen, setIsMenuOpen }) => {
     const { t, toggleLanguage, lang } = useLanguage();
     const location = useLocation();
+    const [toolsOpen, setToolsOpen] = useState(false);
 
     // Lock body scroll when mobile menu is open
     useEffect(() => {
@@ -53,6 +54,31 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }) => {
                                 <span className={`absolute -bottom-1 left-0 h-[2px] bg-[#ccff00] transition-all ${location.pathname === item.path ? 'w-full' : 'w-0 group-hover:w-full'}`}></span>
                             </Link>
                         ))}
+
+                        {/* Araçlar dropdown */}
+                        <div className="relative" onMouseEnter={() => setToolsOpen(true)} onMouseLeave={() => setToolsOpen(false)}>
+                            <button className={`flex items-center gap-1 hover:text-[#ccff00] transition-colors ${toolsOpen ? 'text-[#ccff00]' : ''}`}>
+                                ARAÇLAR <ChevronDown size={12} className={`transition-transform ${toolsOpen ? 'rotate-180' : ''}`} />
+                            </button>
+                            {toolsOpen && (
+                                <div className="absolute top-full left-0 mt-2 bg-black border border-white/10 min-w-[200px] shadow-xl z-50">
+                                    <Link
+                                        to="/puan-hesapla"
+                                        onClick={() => setToolsOpen(false)}
+                                        className="flex items-center gap-3 px-4 py-3 text-[11px] font-bold tracking-wider hover:bg-[#ccff00]/10 hover:text-[#ccff00] transition-colors border-b border-white/5"
+                                    >
+                                        <Calculator size={14} /> Puan Hesaplama
+                                    </Link>
+                                    <Link
+                                        to="/vize-kontrol-listesi"
+                                        onClick={() => setToolsOpen(false)}
+                                        className="flex items-center gap-3 px-4 py-3 text-[11px] font-bold tracking-wider hover:bg-[#ccff00]/10 hover:text-[#ccff00] transition-colors"
+                                    >
+                                        <ClipboardList size={14} /> Vize Kontrol Listesi
+                                    </Link>
+                                </div>
+                            )}
+                        </div>
 
                         <button
                             onClick={toggleLanguage}
@@ -113,6 +139,15 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }) => {
                                 {item.label}
                             </Link>
                         ))}
+                        <div className="border-t border-white/10 pt-6 mt-2">
+                            <p className="text-[9px] font-black text-white/30 uppercase tracking-[0.3em] mb-4">ARAÇLAR</p>
+                            <Link to="/puan-hesapla" onClick={() => setIsMenuOpen(false)} className="flex items-center gap-2 text-lg font-black uppercase text-white/70 hover:text-[#ccff00] transition-colors mb-4">
+                                <Calculator size={20} /> Puan Hesaplama
+                            </Link>
+                            <Link to="/vize-kontrol-listesi" onClick={() => setIsMenuOpen(false)} className="flex items-center gap-2 text-lg font-black uppercase text-white/70 hover:text-[#ccff00] transition-colors">
+                                <ClipboardList size={20} /> Vize Kontrol Listesi
+                            </Link>
+                        </div>
                     </nav>
                 </div>
             )}

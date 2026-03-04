@@ -7,11 +7,15 @@ import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
 import HeroSlider from './components/home/HeroSlider';
 import BentoGrid from './components/home/BentoGrid';
+import LiveTicker from './components/home/LiveTicker';
+import AustraliaMap from './components/home/AustraliaMap';
 import AiTerminal from './components/chat/AiTerminal';
 import SubPage from './components/pages/SubPage';
 import ArticlePage from './components/pages/ArticlePage';
 import SSSPage from './components/pages/SSSPage';
 import ProgramTurleriPage from './components/pages/ProgramTurleriPage';
+import PointsCalculatorPage from './components/pages/PointsCalculatorPage';
+import VisaChecklistPage from './components/pages/VisaChecklistPage';
 import AdminLogin from './components/admin/AdminLogin';
 import AdminDashboard from './components/admin/AdminDashboard';
 import SEOHead from './components/seo/SEOHead';
@@ -20,11 +24,13 @@ const HomePage = () => (
   <>
     <SEOHead
       title="Anasayfa"
-      description="MIGRON — Avustralya göçmenlik hukuku ve danışmanlık platformu. Güncel analizler ve hukuki rehberlik."
+      description="MIGRON — Avustralya göçmenlik hukuku ve danışmanlık platformu. Güncel analizler, canlı kur ve hukuki rehberlik."
     />
     <main id="main-content" className="pt-20">
       <HeroSlider />
+      <LiveTicker />
       <BentoGrid />
+      <AustraliaMap />
     </main>
   </>
 );
@@ -84,6 +90,8 @@ const App = () => {
                 <Route path="/sosyal" element={<SubPage pageId="sosyal" />} />
                 <Route path="/sss" element={<SSSPage />} />
                 <Route path="/program-turleri" element={<ProgramTurleriPage />} />
+                <Route path="/puan-hesapla" element={<PointsCalculatorPage />} />
+                <Route path="/vize-kontrol-listesi" element={<VisaChecklistPage />} />
                 <Route path="/iletisim" element={<SubPage pageId="iletisim" />} />
                 <Route path="/makale/:slug" element={<ArticlePage />} />
               </Routes>
