@@ -9,6 +9,7 @@ import HeroSlider from './components/home/HeroSlider';
 import BentoGrid from './components/home/BentoGrid';
 import LiveTicker from './components/home/LiveTicker';
 import AustraliaMap from './components/home/AustraliaMap';
+import CurrencyWidget from './components/home/CurrencyWidget';
 import AiTerminal from './components/chat/AiTerminal';
 import SubPage from './components/pages/SubPage';
 import ArticlePage from './components/pages/ArticlePage';
@@ -55,10 +56,7 @@ const AdminPage = () => {
     );
   }
 
-  if (!user) {
-    return <AdminLogin onLogin={setUser} />;
-  }
-
+  if (!user) return <AdminLogin onLogin={setUser} />;
   return <AdminDashboard user={user} onLogout={() => setUser(null)} />;
 };
 
@@ -75,14 +73,11 @@ const App = () => {
           İçeriğe Atla
         </a>
         <Routes>
-          {/* Admin Route — no navbar/footer */}
           <Route path="/admin" element={<AdminPage />} />
-
-          {/* Public Routes */}
           <Route path="*" element={
             <div className="min-h-screen bg-[#050505] text-[#e0e0e0] font-sans selection:bg-[#ccff00] selection:text-black">
               <Navbar isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />
-
+              <CurrencyWidget />
               <Routes>
                 <Route path="/" element={<HomePage />} />
                 <Route path="/hukuk" element={<SubPage pageId="hukuk" />} />
@@ -95,7 +90,6 @@ const App = () => {
                 <Route path="/iletisim" element={<SubPage pageId="iletisim" />} />
                 <Route path="/makale/:slug" element={<ArticlePage />} />
               </Routes>
-
               <AiTerminal />
               <Footer />
             </div>

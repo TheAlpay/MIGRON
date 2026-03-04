@@ -1,177 +1,110 @@
 import React, { useState } from 'react';
 import { MapPin, Briefcase, Home, DollarSign, Users, X } from 'lucide-react';
 
-// Cities positioned as a % within a 600×400 container
-// Based on approximate lat/lng mapped to SVG space
+// SVG coordinate mapping: viewBox "0 0 100 83"
+// x = (lng - 113) / 41 * 100
+// y = (|lat| - 10) / 34 * 83
 const CITIES = [
     {
-        id: 'sydney',
-        name: 'Sydney',
-        state: 'NSW',
-        x: 88, y: 66,
-        color: '#ccff00',
-        population: '5.3 milyon',
-        avgRent: '$2.200/ay',
-        avgSalary: '$2.100/hafta',
-        costIndex: 'Yüksek',
-        climate: 'Ilıman',
+        id: 'darwin', name: 'Darwin', state: 'NT',
+        svgX: 43.5, svgY: 6, labelDx: 1.5, labelDy: -1,
+        color: '#10b981', population: '150.000',
+        avgRent: '$1.600/ay', avgSalary: '$2.200/hafta', costIndex: 'Orta', climate: 'Tropikal',
         occupations: [
-            { title: 'Yazılım Geliştirici', demand: 98 },
-            { title: 'Hemşire', demand: 95 },
-            { title: 'Muhasebeci', demand: 88 },
-            { title: 'İnşaat Mühendisi', demand: 85 },
-            { title: 'Öğretmen', demand: 82 },
-        ],
-        desc: "Avustralya'nın en büyük şehri. Finans, teknoloji ve hizmet sektörü dominant.",
-    },
-    {
-        id: 'melbourne',
-        name: 'Melbourne',
-        state: 'VIC',
-        x: 76, y: 80,
-        color: '#00d4ff',
-        population: '5.1 milyon',
-        avgRent: '$1.900/ay',
-        avgSalary: '$2.000/hafta',
-        costIndex: 'Orta-Yüksek',
-        climate: 'Dört Mevsim',
-        occupations: [
-            { title: 'Mühendis', demand: 96 },
-            { title: 'Hemşire+Sağlık', demand: 94 },
-            { title: 'Öğretmen', demand: 90 },
-            { title: 'Veri Analisti', demand: 87 },
-            { title: 'Mimar', demand: 80 },
-        ],
-        desc: "Kültür, sanat ve eğitim merkezi. İkinci büyük şehir, düşük yaşam maliyetiyle öne çıkıyor.",
-    },
-    {
-        id: 'brisbane',
-        name: 'Brisbane',
-        state: 'QLD',
-        x: 90, y: 45,
-        color: '#ff6b6b',
-        population: '2.6 milyon',
-        avgRent: '$1.850/ay',
-        avgSalary: '$1.850/hafta',
-        costIndex: 'Orta',
-        climate: 'Subtropikal',
-        occupations: [
-            { title: 'İnşaat Mühendisi', demand: 97 },
-            { title: 'Hemşire', demand: 93 },
-            { title: 'Maden Mühendisi', demand: 88 },
-            { title: 'Elektrikçi', demand: 85 },
-            { title: 'Yazılım Geliştirici', demand: 82 },
-        ],
-        desc: "2032 Olimpiyat şehri. İnşaat patlaması, güneşli iklim ve büyüyen ekonomi.",
-    },
-    {
-        id: 'perth',
-        name: 'Perth',
-        state: 'WA',
-        x: 14, y: 60,
-        color: '#f59e0b',
-        population: '2.1 milyon',
-        avgRent: '$1.750/ay',
-        avgSalary: '$2.050/hafta',
-        costIndex: 'Orta',
-        climate: 'Akdeniz',
-        occupations: [
-            { title: 'Maden Mühendisi', demand: 99 },
-            { title: 'Jeolog', demand: 96 },
-            { title: 'Makine Mühendisi', demand: 92 },
-            { title: 'Kaynak Uzmanı', demand: 88 },
-            { title: 'Hemşire', demand: 87 },
-        ],
-        desc: "Madencilik başkenti. En yüksek maaşlarla en izole büyük şehir.",
-    },
-    {
-        id: 'adelaide',
-        name: 'Adelaide',
-        state: 'SA',
-        x: 60, y: 70,
-        color: '#a78bfa',
-        population: '1.4 milyon',
-        avgRent: '$1.500/ay',
-        avgSalary: '$1.800/hafta',
-        costIndex: 'Düşük-Orta',
-        climate: 'Akdeniz',
-        occupations: [
-            { title: 'Savunma/Defence', demand: 95 },
-            { title: 'Hemşire', demand: 92 },
-            { title: 'Yazılım Geliştirici', demand: 86 },
-            { title: 'Öğretmen', demand: 83 },
-            { title: 'Gıda Teknolojisti', demand: 78 },
-        ],
-        desc: "Yaşam kalitesinin en yüksek şehri. Savunma sanayii ve tarım sektörü güçlü.",
-    },
-    {
-        id: 'darwin',
-        name: 'Darwin',
-        state: 'NT',
-        x: 44, y: 8,
-        color: '#10b981',
-        population: '150.000',
-        avgRent: '$1.600/ay',
-        avgSalary: '$2.200/hafta',
-        costIndex: 'Orta',
-        climate: 'Tropikal',
-        occupations: [
-            { title: 'Sağlık Çalışanı', demand: 98 },
-            { title: 'İnşaat Uzmanı', demand: 94 },
-            { title: 'Öğretmen', demand: 90 },
-            { title: 'Mühendis', demand: 87 },
-            { title: 'Sosyal Hizmet', demand: 85 },
+            { title: 'Sağlık Çalışanı', demand: 98 }, { title: 'İnşaat Uzmanı', demand: 94 },
+            { title: 'Öğretmen', demand: 90 }, { title: 'Mühendis', demand: 87 }, { title: 'Sosyal Hizmet', demand: 85 },
         ],
         desc: "Uzak bölge bonuslarıyla en yüksek maaş imkânı. 491 bölgesel vizesi için ideal.",
     },
     {
-        id: 'canberra',
-        name: 'Canberra',
-        state: 'ACT',
-        x: 83, y: 72,
-        color: '#ec4899',
-        population: '460.000',
-        avgRent: '$1.900/ay',
-        avgSalary: '$2.300/hafta',
-        costIndex: 'Orta-Yüksek',
-        climate: 'Karasal',
+        id: 'perth', name: 'Perth', state: 'WA',
+        svgX: 7, svgY: 53.5, labelDx: 1.5, labelDy: -1,
+        color: '#f59e0b', population: '2.1 milyon',
+        avgRent: '$1.750/ay', avgSalary: '$2.050/hafta', costIndex: 'Orta', climate: 'Akdeniz',
         occupations: [
-            { title: 'Kamu Görevlisi', demand: 99 },
-            { title: 'Bilişim Uzmanı', demand: 95 },
-            { title: 'Politika Analisti', demand: 90 },
-            { title: 'Mühendis', demand: 85 },
-            { title: 'Araştırmacı', demand: 82 },
+            { title: 'Maden Mühendisi', demand: 99 }, { title: 'Jeolog', demand: 96 },
+            { title: 'Makine Mühendisi', demand: 92 }, { title: 'Kaynak Uzmanı', demand: 88 }, { title: 'Hemşire', demand: 87 },
+        ],
+        desc: "Madencilik başkenti. En yüksek maaşlarla en izole büyük şehir.",
+    },
+    {
+        id: 'adelaide', name: 'Adelaide', state: 'SA',
+        svgX: 62.4, svgY: 60.9, labelDx: 1.5, labelDy: -1,
+        color: '#a78bfa', population: '1.4 milyon',
+        avgRent: '$1.500/ay', avgSalary: '$1.800/hafta', costIndex: 'Düşük-Orta', climate: 'Akdeniz',
+        occupations: [
+            { title: 'Savunma/Defence', demand: 95 }, { title: 'Hemşire', demand: 92 },
+            { title: 'Yazılım Geliştirici', demand: 86 }, { title: 'Öğretmen', demand: 83 }, { title: 'Gıda Teknolojisti', demand: 78 },
+        ],
+        desc: "Yaşam kalitesinin en yüksek şehri. Savunma sanayii ve tarım sektörü güçlü.",
+    },
+    {
+        id: 'melbourne', name: 'Melbourne', state: 'VIC',
+        svgX: 77.9, svgY: 67.5, labelDx: -12, labelDy: -1.5,
+        color: '#00d4ff', population: '5.1 milyon',
+        avgRent: '$1.900/ay', avgSalary: '$2.000/hafta', costIndex: 'Orta-Yüksek', climate: 'Dört Mevsim',
+        occupations: [
+            { title: 'Mühendis', demand: 96 }, { title: 'Hemşire', demand: 94 },
+            { title: 'Öğretmen', demand: 90 }, { title: 'Veri Analisti', demand: 87 }, { title: 'Mimar', demand: 80 },
+        ],
+        desc: "Kültür, sanat ve eğitim merkezi. İkinci büyük şehir, düşük yaşam maliyetiyle öne çıkıyor.",
+    },
+    {
+        id: 'canberra', name: 'Canberra', state: 'ACT',
+        svgX: 88.1, svgY: 61.9, labelDx: -12, labelDy: -1.5,
+        color: '#ec4899', population: '460.000',
+        avgRent: '$1.900/ay', avgSalary: '$2.300/hafta', costIndex: 'Orta-Yüksek', climate: 'Karasal',
+        occupations: [
+            { title: 'Kamu Görevlisi', demand: 99 }, { title: 'Bilişim Uzmanı', demand: 95 },
+            { title: 'Politika Analisti', demand: 90 }, { title: 'Mühendis', demand: 85 }, { title: 'Araştırmacı', demand: 82 },
         ],
         desc: "Avustralya'nın başkenti. En yüksek ortalama maaş, güvenli ve planlı şehir.",
     },
     {
-        id: 'hobart',
-        name: 'Hobart',
-        state: 'TAS',
-        x: 79, y: 93,
-        color: '#6366f1',
-        population: '240.000',
-        avgRent: '$1.500/ay',
-        avgSalary: '$1.750/hafta',
-        costIndex: 'Düşük',
-        climate: 'Serin',
+        id: 'sydney', name: 'Sydney', state: 'NSW',
+        svgX: 93.2, svgY: 58.4, labelDx: 1.5, labelDy: -1,
+        color: '#ccff00', population: '5.3 milyon',
+        avgRent: '$2.200/ay', avgSalary: '$2.100/hafta', costIndex: 'Yüksek', climate: 'Ilıman',
         occupations: [
-            { title: 'Hemşire', demand: 96 },
-            { title: 'Öğretmen', demand: 92 },
-            { title: 'İnşaat Uzmanı', demand: 88 },
-            { title: 'Turizm Çalışanı', demand: 82 },
-            { title: 'Tarım Uzmanı', demand: 79 },
+            { title: 'Yazılım Geliştirici', demand: 98 }, { title: 'Hemşire', demand: 95 },
+            { title: 'Muhasebeci', demand: 88 }, { title: 'İnşaat Mühendisi', demand: 85 }, { title: 'Öğretmen', demand: 82 },
         ],
-        desc: "En düşük yaşam maliyeti. 491/190 vizesi için colonisationkolaylığı. Doğa ve sakinlik.",
+        desc: "Avustralya'nın en büyük şehri. Finans, teknoloji ve hizmet sektörü dominant.",
+    },
+    {
+        id: 'brisbane', name: 'Brisbane', state: 'QLD',
+        svgX: 97.6, svgY: 42.6, labelDx: -12, labelDy: -1.5,
+        color: '#ff6b6b', population: '2.6 milyon',
+        avgRent: '$1.850/ay', avgSalary: '$1.850/hafta', costIndex: 'Orta', climate: 'Subtropikal',
+        occupations: [
+            { title: 'İnşaat Mühendisi', demand: 97 }, { title: 'Hemşire', demand: 93 },
+            { title: 'Maden Mühendisi', demand: 88 }, { title: 'Elektrikçi', demand: 85 }, { title: 'Yazılım Geliştirici', demand: 82 },
+        ],
+        desc: "2032 Olimpiyat şehri. İnşaat patlaması, güneşli iklim ve büyüyen ekonomi.",
+    },
+    {
+        id: 'hobart', name: 'Hobart', state: 'TAS',
+        svgX: 83.7, svgY: 80.3, labelDx: 1.5, labelDy: -1,
+        color: '#6366f1', population: '240.000',
+        avgRent: '$1.500/ay', avgSalary: '$1.750/hafta', costIndex: 'Düşük', climate: 'Serin',
+        occupations: [
+            { title: 'Hemşire', demand: 96 }, { title: 'Öğretmen', demand: 92 },
+            { title: 'İnşaat Uzmanı', demand: 88 }, { title: 'Turizm Çalışanı', demand: 82 }, { title: 'Tarım Uzmanı', demand: 79 },
+        ],
+        desc: "En düşük yaşam maliyeti. 491/190 vizesi için kolaylık. Doğa ve sakinlik.",
     },
 ];
+
+// Australia SVG outline (viewBox 0 0 100 83)
+const AUSTRALIA_PATH = "M 0.5,39 L 13.7,25 L 22.4,19 L 33.5,11 L 43.5,6 L 41,14 L 43,16 L 49,12 L 55,16 L 57,14 L 65,8 L 79.5,1.5 L 80,17 L 82.2,22.5 L 88.2,27 L 97.6,42.6 L 93.2,58.4 L 90.2,66.6 L 81.5,71.2 L 74.4,70.7 L 67.3,68.5 L 39,57 L 24.9,58 L 11.9,61 L 5,59.6 Z";
+// Tasmania (separate island)
+const TAS_PATH = "M 83,77 L 86,76 L 88,79 L 86,82 L 83,82 Z";
 
 const AustraliaMap = () => {
     const [selected, setSelected] = useState(null);
 
     return (
         <section className="max-w-[1600px] mx-auto px-6 py-24">
-            {/* Header */}
             <div className="mb-12">
                 <p className="text-[10px] font-black tracking-[0.4em] text-[#ccff00] uppercase mb-4">İnteraktif Harita</p>
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
@@ -179,94 +112,110 @@ const AustraliaMap = () => {
                         AVUSTRALYA <span className="text-[#ccff00] italic">ŞEHİRLERİ</span>
                     </h2>
                     <p className="text-sm text-white/40 max-w-sm">
-                        Şehre tıkla: kira, maaş ve o şehirdeki en çok talep edilen meslekleri gör.
+                        Şehre tıkla — kira, maaş ve en çok talep edilen meslekleri gör.
                     </p>
                 </div>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Map */}
-                <div className="lg:col-span-2">
-                    <div
-                        className="relative bg-[#0a0a0a] border border-white/5 overflow-hidden"
-                        style={{ paddingTop: '66%' }}
+                {/* SVG Map */}
+                <div className="lg:col-span-2 bg-[#0a0a0a] border border-white/5 p-4">
+                    <p className="text-[9px] text-white/20 font-mono uppercase tracking-widest mb-3">
+                        AVUSTRALYA — 2025 VERİLERİ · Şehre tıkla
+                    </p>
+                    <svg
+                        viewBox="-2 -2 106 87"
+                        className="w-full"
+                        style={{ aspectRatio: '106/87' }}
+                        aria-label="Avustralya interaktif harita"
                     >
-                        <div className="absolute inset-0">
-                            {/* Grid background */}
-                            <svg className="absolute inset-0 w-full h-full opacity-5" xmlns="http://www.w3.org/2000/svg">
-                                <defs>
-                                    <pattern id="mapgrid" width="40" height="40" patternUnits="userSpaceOnUse">
-                                        <path d="M 40 0 L 0 0 0 40" fill="none" stroke="white" strokeWidth="0.5" />
-                                    </pattern>
-                                </defs>
-                                <rect width="100%" height="100%" fill="url(#mapgrid)" />
-                            </svg>
+                        {/* Grid lines */}
+                        <defs>
+                            <pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse">
+                                <path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.04)" strokeWidth="0.3" />
+                            </pattern>
+                        </defs>
+                        <rect x="-2" y="-2" width="110" height="91" fill="url(#grid)" />
 
-                            {/* AU rough outline as abstract element */}
-                            <div className="absolute inset-4 border border-white/5 rounded-sm" />
+                        {/* Australia mainland outline */}
+                        <path
+                            d={AUSTRALIA_PATH}
+                            fill="#ccff00"
+                            fillOpacity="0.04"
+                            stroke="#ccff00"
+                            strokeWidth="0.35"
+                            strokeOpacity="0.35"
+                            strokeLinejoin="round"
+                        />
 
-                            {/* Label */}
-                            <p className="absolute top-3 left-4 text-[9px] font-black text-white/20 uppercase tracking-widest">
-                                AVUSTRALYA — 2025 VERİLERİ
-                            </p>
+                        {/* Tasmania */}
+                        <path
+                            d={TAS_PATH}
+                            fill="#ccff00"
+                            fillOpacity="0.04"
+                            stroke="#ccff00"
+                            strokeWidth="0.35"
+                            strokeOpacity="0.25"
+                        />
 
-                            {/* City dots */}
-                            {CITIES.map(city => (
-                                <button
+                        {/* City dots + labels */}
+                        {CITIES.map(city => {
+                            const isSelected = selected?.id === city.id;
+                            return (
+                                <g
                                     key={city.id}
-                                    onClick={() => setSelected(selected?.id === city.id ? null : city)}
-                                    className="absolute group"
-                                    style={{ left: `${city.x}%`, top: `${city.y}%`, transform: 'translate(-50%, -50%)' }}
-                                    aria-label={`${city.name} şehir detayları`}
+                                    onClick={() => setSelected(isSelected ? null : city)}
+                                    style={{ cursor: 'pointer' }}
+                                    role="button"
+                                    aria-label={city.name}
                                 >
-                                    {/* Ping animation */}
-                                    <span className="absolute inline-flex h-full w-full rounded-full opacity-30 animate-ping"
-                                        style={{ backgroundColor: city.color }} />
-                                    {/* Dot */}
-                                    <span
-                                        className="relative inline-flex w-3 h-3 rounded-full border-2 transition-transform group-hover:scale-150"
-                                        style={{
-                                            backgroundColor: selected?.id === city.id ? city.color : 'black',
-                                            borderColor: city.color,
-                                        }}
+                                    {/* Ping animation circle */}
+                                    <circle
+                                        cx={city.svgX} cy={city.svgY} r="2.5"
+                                        fill={city.color} fillOpacity="0.15"
+                                    >
+                                        <animate attributeName="r" values="1.5;3.5;1.5" dur="2.5s" repeatCount="indefinite" />
+                                        <animate attributeName="fill-opacity" values="0.3;0;0.3" dur="2.5s" repeatCount="indefinite" />
+                                    </circle>
+                                    {/* Main dot */}
+                                    <circle
+                                        cx={city.svgX} cy={city.svgY}
+                                        r={isSelected ? 2 : 1.5}
+                                        fill={isSelected ? city.color : '#050505'}
+                                        stroke={city.color}
+                                        strokeWidth="0.6"
                                     />
-                                    {/* Label */}
-                                    <span
-                                        className="absolute left-4 top-1/2 -translate-y-1/2 text-[10px] font-black whitespace-nowrap uppercase tracking-wider opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
-                                        style={{ color: city.color }}
+                                    {/* City name — always visible */}
+                                    <text
+                                        x={city.svgX + city.labelDx}
+                                        y={city.svgY + city.labelDy}
+                                        fontSize="2.2"
+                                        fontWeight="900"
+                                        fill={city.color}
+                                        fontFamily="Arial, sans-serif"
+                                        style={{ textTransform: 'uppercase', letterSpacing: '0.03em' }}
                                     >
                                         {city.name}
-                                    </span>
-                                </button>
-                            ))}
-
-                            {/* Legend */}
-                            <div className="absolute bottom-3 right-3 text-[9px] text-white/20 font-mono">
-                                {CITIES.length} şehir · Tıkla
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* City list on mobile */}
-                    <div className="flex flex-wrap gap-2 mt-4 lg:hidden">
-                        {CITIES.map(city => (
-                            <button
-                                key={city.id}
-                                onClick={() => setSelected(selected?.id === city.id ? null : city)}
-                                className="px-3 py-1.5 text-[10px] font-black uppercase tracking-wider border transition-all"
-                                style={{
-                                    borderColor: city.color,
-                                    backgroundColor: selected?.id === city.id ? `${city.color}20` : 'transparent',
-                                    color: city.color,
-                                }}
-                            >
-                                {city.name}
-                            </button>
-                        ))}
-                    </div>
+                                    </text>
+                                    {/* State label */}
+                                    <text
+                                        x={city.svgX + city.labelDx}
+                                        y={city.svgY + city.labelDy + 2.4}
+                                        fontSize="1.6"
+                                        fill={city.color}
+                                        fillOpacity="0.45"
+                                        fontFamily="Arial, sans-serif"
+                                        fontWeight="bold"
+                                    >
+                                        {city.state}
+                                    </text>
+                                </g>
+                            );
+                        })}
+                    </svg>
                 </div>
 
-                {/* Detail panel */}
+                {/* City detail panel */}
                 <div className="lg:col-span-1">
                     {selected ? (
                         <div className="bg-[#111] border border-white/5 h-full p-6" style={{ borderTop: `3px solid ${selected.color}` }}>
@@ -281,10 +230,7 @@ const AustraliaMap = () => {
                                     <X size={16} />
                                 </button>
                             </div>
-
                             <p className="text-sm text-white/50 mb-6 leading-relaxed">{selected.desc}</p>
-
-                            {/* Stats */}
                             <div className="grid grid-cols-2 gap-3 mb-6">
                                 {[
                                     { icon: Users, label: 'Nüfus', value: selected.population },
@@ -301,8 +247,6 @@ const AustraliaMap = () => {
                                     </div>
                                 ))}
                             </div>
-
-                            {/* Occupation demand */}
                             <div>
                                 <div className="flex items-center gap-2 mb-3">
                                     <Briefcase size={12} style={{ color: selected.color }} />
@@ -316,10 +260,7 @@ const AustraliaMap = () => {
                                                 <span className="font-black" style={{ color: selected.color }}>{occ.demand}%</span>
                                             </div>
                                             <div className="h-1 bg-white/5 overflow-hidden">
-                                                <div
-                                                    className="h-full transition-all duration-700"
-                                                    style={{ width: `${occ.demand}%`, backgroundColor: selected.color, opacity: 0.7 }}
-                                                />
+                                                <div className="h-full transition-all duration-700" style={{ width: `${occ.demand}%`, backgroundColor: selected.color, opacity: 0.7 }} />
                                             </div>
                                         </div>
                                     ))}
@@ -329,12 +270,8 @@ const AustraliaMap = () => {
                     ) : (
                         <div className="bg-[#111] border border-white/5 h-full p-6 flex flex-col items-center justify-center text-center min-h-[300px]">
                             <MapPin size={32} className="text-white/10 mb-4" />
-                            <p className="text-white/20 font-black uppercase tracking-widest text-sm">
-                                Bir şehir seç
-                            </p>
-                            <p className="text-white/10 text-xs mt-2">
-                                Kira, maaş ve meslek talebi bilgilerini görmek için haritadan şehre tıkla
-                            </p>
+                            <p className="text-white/20 font-black uppercase tracking-widest text-sm">Bir şehir seç</p>
+                            <p className="text-white/10 text-xs mt-2">Haritadan şehre tıkla</p>
                         </div>
                     )}
                 </div>

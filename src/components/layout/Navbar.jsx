@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, Globe, ChevronDown, Calculator, ClipboardList } from 'lucide-react';
 import { SITE_NAME } from '../../config/constants';
@@ -9,6 +9,16 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }) => {
     const { t, toggleLanguage, lang } = useLanguage();
     const location = useLocation();
     const [toolsOpen, setToolsOpen] = useState(false);
+    const toolsRef = useRef(null);
+
+    // Close dropdown on outside click
+    useEffect(() => {
+        const handler = (e) => {
+            if (toolsRef.current && !toolsRef.current.contains(e.target)) setToolsOpen(false);
+        };
+        document.addEventListener('mousedown', handler);
+        return () => document.removeEventListener('mousedown', handler);
+    }, []);
 
     // Lock body scroll when mobile menu is open
     useEffect(() => {
@@ -40,7 +50,7 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }) => {
             <nav className="fixed top-0 w-full z-50 bg-black/80 backdrop-blur-xl border-b border-white/10" aria-label="Ana navigasyon">
                 <div className="max-w-[1600px] mx-auto px-6 h-20 flex items-center justify-between">
                     <Link to="/" className="flex items-center hover:opacity-80 transition-opacity" aria-label="MIGRON Anasayfa">
-                        <img src={Logo} alt={SITE_NAME} className="h-10 w-auto object-contain" />
+                        <img src={Logo} alt={SITE_NAME} className="h-14 w-auto object-contain" />
                     </Link>
 
                     <div className="hidden lg:flex items-center gap-10 text-[11px] font-bold tracking-[0.2em]">
@@ -55,26 +65,29 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }) => {
                             </Link>
                         ))}
 
-                        {/* Araçlar dropdown */}
-                        <div className="relative" onMouseEnter={() => setToolsOpen(true)} onMouseLeave={() => setToolsOpen(false)}>
-                            <button className={`flex items-center gap-1 hover:text-[#ccff00] transition-colors ${toolsOpen ? 'text-[#ccff00]' : ''}`}>
+                        {/* Araçlar dropdown — click based */}
+                        <div className="relative" ref={toolsRef}>
+                            <button
+                                onClick={() => setToolsOpen(o => !o)}
+                                className={`flex items-center gap-1 hover:text-[#ccff00] transition-colors ${toolsOpen ? 'text-[#ccff00]' : ''}`}
+                            >
                                 ARAÇLAR <ChevronDown size={12} className={`transition-transform ${toolsOpen ? 'rotate-180' : ''}`} />
                             </button>
                             {toolsOpen && (
-                                <div className="absolute top-full left-0 mt-2 bg-black border border-white/10 min-w-[200px] shadow-xl z-50">
+                                <div className="absolute top-full left-0 bg-black border border-white/10 min-w-[220px] shadow-xl z-[100]">
                                     <Link
                                         to="/puan-hesapla"
                                         onClick={() => setToolsOpen(false)}
-                                        className="flex items-center gap-3 px-4 py-3 text-[11px] font-bold tracking-wider hover:bg-[#ccff00]/10 hover:text-[#ccff00] transition-colors border-b border-white/5"
+                                        className="flex items-center gap-3 px-4 py-4 text-[11px] font-bold tracking-wider hover:bg-[#ccff00]/10 hover:text-[#ccff00] transition-colors border-b border-white/5"
                                     >
-                                        <Calculator size={14} /> Puan Hesaplama
+                                        <Calculator size={16} /> Puan Hesaplama
                                     </Link>
                                     <Link
                                         to="/vize-kontrol-listesi"
                                         onClick={() => setToolsOpen(false)}
-                                        className="flex items-center gap-3 px-4 py-3 text-[11px] font-bold tracking-wider hover:bg-[#ccff00]/10 hover:text-[#ccff00] transition-colors"
+                                        className="flex items-center gap-3 px-4 py-4 text-[11px] font-bold tracking-wider hover:bg-[#ccff00]/10 hover:text-[#ccff00] transition-colors"
                                     >
-                                        <ClipboardList size={14} /> Vize Kontrol Listesi
+                                        <ClipboardList size={16} /> Vize Kontrol Listesi
                                     </Link>
                                 </div>
                             )}
