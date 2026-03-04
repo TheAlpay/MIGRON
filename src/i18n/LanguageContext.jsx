@@ -15,6 +15,9 @@ const translations = {
         nav_faq: "SSS",
         nav_contact: "İLETİŞİM",
         lang_toggle: "EN",
+        nav_tools: "ARAÇLAR",
+        nav_points_calc: "Puan Hesaplama",
+        nav_visa_checklist: "Vize Kontrol Listesi",
 
         // Hero Slider
         slide1_title: "AVUSTRALYA: 2026 GÖÇ REFORMU",
@@ -59,6 +62,31 @@ const translations = {
         time_12h: "12S ÖNCE",
         time_1d: "1G ÖNCE",
         time_2d: "2G ÖNCE",
+
+        // BentoGrid categories & time
+        cat_hukuk: "HUKUK",
+        cat_egitim: "EĞİTİM",
+        cat_sosyal: "SOSYAL",
+        cat_program: "PROGRAM TÜRLERİ",
+        time_just_now: "Az önce",
+        time_h_ago: "s önce",
+        time_d_ago: "g önce",
+
+        // AustraliaMap
+        map_section_label: "İNTERAKTİF HARİTA",
+        map_title_bold: "AVUSTRALYA",
+        map_title_italic: "ŞEHİRLERİ",
+        map_subtitle: "Şehre tıkla — kira, maaş ve en çok talep edilen meslekleri gör.",
+        map_source: "AVUSTRALYA — 2025 VERİLERİ · Şehre tıkla",
+        map_stat_population: "Nüfus",
+        map_stat_rent: "Kira (1+1)",
+        map_stat_salary: "Ort. Maaş",
+        map_stat_cost: "Maliyet",
+        map_occupations_label: "En Çok Talep Edilen Meslekler",
+        map_placeholder_title: "Bir şehir seç",
+        map_placeholder_desc: "Haritadan şehre tıkla",
+        map_legend: "şehir · Tıkla",
+        ticker_live: "CANLI",
 
         // Footer
         footer_nav: "Navigasyon",
@@ -108,6 +136,9 @@ const translations = {
         nav_faq: "FAQ",
         nav_contact: "CONTACT",
         lang_toggle: "TR",
+        nav_tools: "TOOLS",
+        nav_points_calc: "Points Calculator",
+        nav_visa_checklist: "Visa Checklist",
 
         // Hero Slider
         slide1_title: "AUSTRALIA: 2026 IMMIGRATION REFORM",
@@ -152,6 +183,31 @@ const translations = {
         time_12h: "12H AGO",
         time_1d: "1D AGO",
         time_2d: "2D AGO",
+
+        // BentoGrid categories & time
+        cat_hukuk: "LEGAL",
+        cat_egitim: "EDUCATION",
+        cat_sosyal: "SOCIAL",
+        cat_program: "PROGRAM TYPES",
+        time_just_now: "Just now",
+        time_h_ago: "h ago",
+        time_d_ago: "d ago",
+
+        // AustraliaMap
+        map_section_label: "INTERACTIVE MAP",
+        map_title_bold: "AUSTRALIA",
+        map_title_italic: "CITIES",
+        map_subtitle: "Click a city — see rent, salary and top in-demand occupations.",
+        map_source: "AUSTRALIA — 2025 DATA · Click a city",
+        map_stat_population: "Population",
+        map_stat_rent: "Rent (1BR)",
+        map_stat_salary: "Avg. Salary",
+        map_stat_cost: "Cost Index",
+        map_occupations_label: "Top In-Demand Occupations",
+        map_placeholder_title: "Select a city",
+        map_placeholder_desc: "Click a city on the map",
+        map_legend: "cities · Click",
+        ticker_live: "LIVE",
 
         // Footer
         footer_nav: "Navigation",

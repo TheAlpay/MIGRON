@@ -1,24 +1,44 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
+import { TrendingUp, TrendingDown } from 'lucide-react';
+import { useLanguage } from '../../i18n/LanguageContext';
 
-// ── Static 2025 cost of living data (ABS + Numbeo sourced) ──────────────────
-const COST_ITEMS = [
-    { label: 'Sydney Kira (1+1)', value: '~$2.200/ay', city: 'SYD' },
-    { label: 'Melbourne Kira (1+1)', value: '~$1.900/ay', city: 'MEL' },
-    { label: 'Brisbane Kira (1+1)', value: '~$1.850/ay', city: 'BNE' },
-    { label: 'Perth Kira (1+1)', value: '~$1.750/ay', city: 'PER' },
-    { label: 'Haftalık Market (2 kişi)', value: '$180–220', city: 'AUS' },
-    { label: 'Benzin (unleaded)', value: '~$1.82/L', city: 'AUS' },
-    { label: 'Ulaşım (aylık)', value: '~$165', city: 'SYD' },
-    { label: 'Restoran (2 kişi)', value: '~$90–120', city: 'AUS' },
-    { label: 'Elektrik+Su (aylık)', value: '~$200–280', city: 'AUS' },
-    { label: 'Asgari Ücret', value: '$24.10/saat', city: 'AUS' },
-    { label: 'Ort. Tam Zamanlı Maaş', value: '~$1.900/hafta', city: 'AUS' },
-    { label: 'Kahve (flat white)', value: '$5–6', city: 'AUS' },
-    { label: 'Bira (400ml pub)', value: '~$10–12', city: 'AUS' },
-    { label: 'Gym Üyeliği (aylık)', value: '~$50–80', city: 'AUS' },
-    { label: 'Üniversite (yıllık)', value: '$20.000–50.000', city: 'AUS' },
-];
+// ── Bilingual cost of living data (ABS + Numbeo sourced) ─────────────────
+const COST_ITEMS = {
+    tr: [
+        { label: 'Sydney Kira (1+1)', value: '~$2.200/ay', city: 'SYD' },
+        { label: 'Melbourne Kira (1+1)', value: '~$1.900/ay', city: 'MEL' },
+        { label: 'Brisbane Kira (1+1)', value: '~$1.850/ay', city: 'BNE' },
+        { label: 'Perth Kira (1+1)', value: '~$1.750/ay', city: 'PER' },
+        { label: 'Haftalık Market (2 kişi)', value: '$180–220', city: 'AUS' },
+        { label: 'Benzin (unleaded)', value: '~$1.82/L', city: 'AUS' },
+        { label: 'Ulaşım (aylık)', value: '~$165', city: 'SYD' },
+        { label: 'Restoran (2 kişi)', value: '~$90–120', city: 'AUS' },
+        { label: 'Elektrik+Su (aylık)', value: '~$200–280', city: 'AUS' },
+        { label: 'Asgari Ücret', value: '$24.10/saat', city: 'AUS' },
+        { label: 'Ort. Tam Zamanlı Maaş', value: '~$1.900/hafta', city: 'AUS' },
+        { label: 'Kahve (flat white)', value: '$5–6', city: 'AUS' },
+        { label: 'Bira (400ml pub)', value: '~$10–12', city: 'AUS' },
+        { label: 'Gym Üyeliği (aylık)', value: '~$50–80', city: 'AUS' },
+        { label: 'Üniversite (yıllık)', value: '$20.000–50.000', city: 'AUS' },
+    ],
+    en: [
+        { label: 'Sydney Rent (1BR)', value: '~$2,200/mo', city: 'SYD' },
+        { label: 'Melbourne Rent (1BR)', value: '~$1,900/mo', city: 'MEL' },
+        { label: 'Brisbane Rent (1BR)', value: '~$1,850/mo', city: 'BNE' },
+        { label: 'Perth Rent (1BR)', value: '~$1,750/mo', city: 'PER' },
+        { label: 'Weekly Groceries (2 ppl)', value: '$180–220', city: 'AUS' },
+        { label: 'Petrol (unleaded)', value: '~$1.82/L', city: 'AUS' },
+        { label: 'Public Transport (mo)', value: '~$165', city: 'SYD' },
+        { label: 'Restaurant (2 people)', value: '~$90–120', city: 'AUS' },
+        { label: 'Electricity+Water (mo)', value: '~$200–280', city: 'AUS' },
+        { label: 'Minimum Wage', value: '$24.10/hr', city: 'AUS' },
+        { label: 'Avg. Full-Time Salary', value: '~$1,900/wk', city: 'AUS' },
+        { label: 'Coffee (flat white)', value: '$5–6', city: 'AUS' },
+        { label: 'Beer (400ml pub)', value: '~$10–12', city: 'AUS' },
+        { label: 'Gym Membership (mo)', value: '~$50–80', city: 'AUS' },
+        { label: 'University (annual)', value: '$20,000–50,000', city: 'AUS' },
+    ],
+};
 
 const fetchRates = async () => {
     try {
@@ -32,6 +52,7 @@ const fetchRates = async () => {
 };
 
 const LiveTicker = () => {
+    const { t, lang } = useLanguage();
     const [rates, setRates] = useState(null);
     const [prevRates, setPrevRates] = useState(null);
     const [lastUpdated, setLastUpdated] = useState(null);
@@ -86,15 +107,16 @@ const LiveTicker = () => {
         return null;
     };
 
+    const costItems = COST_ITEMS[lang] || COST_ITEMS.tr;
     const rateItems = rates ? [
-        { label: '1 AUD → TRY', value: rates.TRY?.toFixed(2), trend: trend('TRY'), live: true, color: '#ccff00' },
-        { label: '1 AUD → USD', value: rates.USD?.toFixed(4), trend: trend('USD'), live: true, color: '#00d4ff' },
-        { label: '1 AUD → EUR', value: rates.EUR?.toFixed(4), trend: trend('EUR'), live: true, color: '#a78bfa' },
+        { key: 'TRY', label: '1 AUD → TRY', value: rates.TRY?.toFixed(2), trend: trend('TRY'), live: true, color: '#ccff00' },
+        { key: 'USD', label: '1 AUD → USD', value: rates.USD?.toFixed(4), trend: trend('USD'), live: true, color: '#00d4ff' },
+        { key: 'EUR', label: '1 AUD → EUR', value: rates.EUR?.toFixed(4), trend: trend('EUR'), live: true, color: '#a78bfa' },
     ] : [];
 
     const allItems = [
         ...rateItems,
-        ...COST_ITEMS.map(i => ({ ...i, live: false, color: '#ffffff' })),
+        ...costItems.map(i => ({ ...i, live: false, color: '#ffffff' })),
     ];
 
     // Double the items for seamless loop
@@ -110,7 +132,7 @@ const LiveTicker = () => {
             {/* Left label */}
             <div className="absolute left-0 top-0 bottom-0 z-20 flex items-center px-3 bg-[#ccff00]">
                 <span className="text-black font-black text-[9px] uppercase tracking-[0.2em] whitespace-nowrap">
-                    {rates ? '● CANLI' : '● AUS'}
+                    {rates ? `● ${t('ticker_live')}` : '● AUS'}
                 </span>
             </div>
 
@@ -125,7 +147,7 @@ const LiveTicker = () => {
                             {item.live && (
                                 <span className="text-[9px] font-black px-1.5 py-0.5 uppercase tracking-widest"
                                     style={{ backgroundColor: `${item.color}20`, color: item.color }}>
-                                    CANLI
+                                    {t('ticker_live')}
                                 </span>
                             )}
                             {item.city && !item.live && (

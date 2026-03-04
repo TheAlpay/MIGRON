@@ -71,7 +71,7 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }) => {
                                 onClick={() => setToolsOpen(o => !o)}
                                 className={`flex items-center gap-1 hover:text-[#ccff00] transition-colors ${toolsOpen ? 'text-[#ccff00]' : ''}`}
                             >
-                                ARAÇLAR <ChevronDown size={12} className={`transition-transform ${toolsOpen ? 'rotate-180' : ''}`} />
+                                {t('nav_tools')} <ChevronDown size={12} className={`transition-transform ${toolsOpen ? 'rotate-180' : ''}`} />
                             </button>
                             {toolsOpen && (
                                 <div className="absolute top-full left-0 bg-black border border-white/10 min-w-[220px] shadow-xl z-[100]">
@@ -80,14 +80,14 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }) => {
                                         onClick={() => setToolsOpen(false)}
                                         className="flex items-center gap-3 px-4 py-4 text-[11px] font-bold tracking-wider hover:bg-[#ccff00]/10 hover:text-[#ccff00] transition-colors border-b border-white/5"
                                     >
-                                        <Calculator size={16} /> Puan Hesaplama
+                                        <Calculator size={16} /> {t('nav_points_calc')}
                                     </Link>
                                     <Link
                                         to="/vize-kontrol-listesi"
                                         onClick={() => setToolsOpen(false)}
                                         className="flex items-center gap-3 px-4 py-4 text-[11px] font-bold tracking-wider hover:bg-[#ccff00]/10 hover:text-[#ccff00] transition-colors"
                                     >
-                                        <ClipboardList size={16} /> Vize Kontrol Listesi
+                                        <ClipboardList size={16} /> {t('nav_visa_checklist')}
                                     </Link>
                                 </div>
                             )}
@@ -153,12 +153,12 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }) => {
                             </Link>
                         ))}
                         <div className="border-t border-white/10 pt-6 mt-2">
-                            <p className="text-[9px] font-black text-white/30 uppercase tracking-[0.3em] mb-4">ARAÇLAR</p>
+                            <p className="text-[9px] font-black text-white/30 uppercase tracking-[0.3em] mb-4">{t('nav_tools')}</p>
                             <Link to="/puan-hesapla" onClick={() => setIsMenuOpen(false)} className="flex items-center gap-2 text-lg font-black uppercase text-white/70 hover:text-[#ccff00] transition-colors mb-4">
-                                <Calculator size={20} /> Puan Hesaplama
+                                <Calculator size={20} /> {t('nav_points_calc')}
                             </Link>
                             <Link to="/vize-kontrol-listesi" onClick={() => setIsMenuOpen(false)} className="flex items-center gap-2 text-lg font-black uppercase text-white/70 hover:text-[#ccff00] transition-colors">
-                                <ClipboardList size={20} /> Vize Kontrol Listesi
+                                <ClipboardList size={20} /> {t('nav_visa_checklist')}
                             </Link>
                         </div>
                     </nav>

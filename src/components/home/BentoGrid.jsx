@@ -6,7 +6,7 @@ import { db } from '../../config/firebase';
 import { useLanguage } from '../../i18n/LanguageContext';
 
 const BentoGrid = () => {
-    const { t } = useLanguage();
+    const { t, lang } = useLanguage();
     const [articles, setArticles] = useState([]);
     const [riskCard, setRiskCard] = useState(null);
     const [auCard, setAuCard] = useState(null);
@@ -46,6 +46,8 @@ const BentoGrid = () => {
         'program-turleri': '#a78bfa',
     };
 
+    const CAT_MAP = { hukuk: t('cat_hukuk'), egitim: t('cat_egitim'), sosyal: t('cat_sosyal'), 'program-turleri': t('cat_program') };
+
     const formatDate = (timestamp) => {
         if (!timestamp) return '';
         const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
@@ -53,10 +55,10 @@ const BentoGrid = () => {
         const diff = now - date;
         const hours = Math.floor(diff / (1000 * 60 * 60));
         const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-        if (hours < 1) return 'Az önce';
-        if (hours < 24) return `${hours}s önce`;
-        if (days < 7) return `${days}g önce`;
-        return date.toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' });
+        if (hours < 1) return t('time_just_now');
+        if (hours < 24) return `${hours}${t('time_h_ago')}`;
+        if (days < 7) return `${days}${t('time_d_ago')}`;
+        return date.toLocaleDateString(lang === 'tr' ? 'tr-TR' : 'en-AU', { day: 'numeric', month: 'short' });
     };
 
     return (
@@ -124,7 +126,7 @@ const BentoGrid = () => {
                         >
                             <div className="flex justify-between text-[10px] font-bold text-white/40 mb-8 uppercase tracking-widest">
                                 <span style={{ color: categoryColors[article.category] || '#ccff00' }}>
-                                    {article.category}
+                                    {CAT_MAP[article.category] || article.category?.toUpperCase()}
                                 </span>
                                 <span className="flex items-center gap-1">
                                     <Clock size={10} />
