@@ -167,13 +167,15 @@ const ProgramModal = ({ program, onClose }) => {
                 )}
 
                 <div className="mt-8 pt-6 border-t border-white/10">
-                    <Link
-                        to="/hukuk"
+                    <a
+                        href="https://ye-ro.com/iletisim"
+                        target="_blank"
+                        rel="noopener noreferrer"
                         onClick={onClose}
                         className="inline-flex items-center gap-2 bg-[#ccff00] text-black px-5 py-2.5 font-black uppercase text-sm hover:brightness-110 transition-all"
                     >
-                        Hukuki Analiz <ArrowUpRight size={16} />
-                    </Link>
+                        Yero ile İletişime Geç <ArrowUpRight size={16} />
+                    </a>
                 </div>
             </div>
         </div>
@@ -294,11 +296,16 @@ const ProgramTurleriPage = () => {
                     <div className="mt-8 bg-[#111] border border-white/5 p-8 flex flex-col md:flex-row items-center justify-between gap-6">
                         <div>
                             <p className="font-black text-lg uppercase">Hangi program size uygun?</p>
-                            <p className="text-white/40 text-sm mt-1">Hukuk sistemi sayfamızda detaylı analizlere ulaşabilirsiniz.</p>
+                            <p className="text-white/40 text-sm mt-1">Uluslararası destek ortağımız Yero ile iletişime geçin.</p>
                         </div>
-                        <Link to="/hukuk" className="inline-flex items-center gap-2 bg-[#ccff00] text-black px-6 py-3 font-black uppercase text-sm hover:brightness-110 transition-all shrink-0">
-                            Hukuk Sistemi <ArrowUpRight size={16} />
-                        </Link>
+                        <a
+                            href="https://ye-ro.com/iletisim"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-2 bg-[#ccff00] text-black px-6 py-3 font-black uppercase text-sm hover:brightness-110 transition-all shrink-0"
+                        >
+                            Yero ile İletişime Geç <ArrowUpRight size={16} />
+                        </a>
                     </div>
                 </section>
             </div>
