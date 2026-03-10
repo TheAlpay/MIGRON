@@ -87,6 +87,9 @@ const translations = {
         map_placeholder_desc: "Haritadan şehre tıkla",
         map_legend: "şehir · Tıkla",
         ticker_live: "CANLI",
+        ticker_market: "MARKET",
+        market_gold: "Altın",
+        market_silver: "Gümüş",
 
         // Footer
         footer_nav: "Navigasyon",
@@ -208,6 +211,9 @@ const translations = {
         map_placeholder_desc: "Click a city on the map",
         map_legend: "cities · Click",
         ticker_live: "LIVE",
+        ticker_market: "MARKET",
+        market_gold: "Gold",
+        market_silver: "Silver",
 
         // Footer
         footer_nav: "Navigation",

@@ -42,11 +42,30 @@ const COST_ITEMS = {
 
 const fetchRates = async () => {
     try {
-        const res = await fetch('https://api.frankfurter.app/latest?from=AUD&to=TRY,USD,EUR');
-        if (!res.ok) throw new Error('API error');
-        const data = await res.json();
-        return data.rates;
-    } catch {
+        const [fxRes, cryptoRes, goldRes, silverRes] = await Promise.all([
+            fetch('https://api.frankfurter.app/latest?from=AUD&to=TRY,USD,EUR'),
+            fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana&vs_currencies=usd'),
+            fetch('https://api.gold-api.com/price/XAU'),
+            fetch('https://api.gold-api.com/price/XAG')
+        ]);
+
+        const [fxData, cryptoData, goldData, silverData] = await Promise.all([
+            fxRes.json(),
+            cryptoRes.json(),
+            goldRes.json(),
+            silverRes.json()
+        ]);
+
+        return {
+            ...fxData.rates,
+            crypto: cryptoData,
+            metals: {
+                XAU: goldData.price,
+                XAG: silverData.price
+            }
+        };
+    } catch (err) {
+        console.error("Ticker fetch error:", err);
         return null;
     }
 };
@@ -114,8 +133,21 @@ const LiveTicker = () => {
         { key: 'EUR', label: '1 AUD → EUR', value: rates.EUR?.toFixed(4), trend: trend('EUR'), live: true, color: '#a78bfa' },
     ] : [];
 
+    const cryptoItems = rates?.crypto ? [
+        { key: 'BTC', label: 'Bitcoin', value: `$${rates.crypto.bitcoin.usd.toLocaleString()}`, live: true, color: '#f7931a', market: true },
+        { key: 'ETH', label: 'Ethereum', value: `$${rates.crypto.ethereum.usd.toLocaleString()}`, live: true, color: '#627eea', market: true },
+        { key: 'SOL', label: 'Solana', value: `$${rates.crypto.solana.usd.toLocaleString()}`, live: true, color: '#14f195', market: true },
+    ] : [];
+
+    const metalItems = rates?.metals ? [
+        { key: 'XAU', label: t('market_gold'), value: `$${rates.metals.XAU.toFixed(2)}`, live: true, color: '#ffd700', market: true },
+        { key: 'XAG', label: t('market_silver'), value: `$${rates.metals.XAG.toFixed(2)}`, live: true, color: '#c0c0c0', market: true },
+    ] : [];
+
     const allItems = [
         ...rateItems,
+        ...cryptoItems,
+        ...metalItems,
         ...costItems.map(i => ({ ...i, live: false, color: '#ffffff' })),
     ];
 
@@ -147,7 +179,7 @@ const LiveTicker = () => {
                             {item.live && (
                                 <span className="text-[9px] font-black px-1.5 py-0.5 uppercase tracking-widest"
                                     style={{ backgroundColor: `${item.color}20`, color: item.color }}>
-                                    {t('ticker_live')}
+                                    {item.market ? t('ticker_market') : t('ticker_live')}
                                 </span>
                             )}
                             {item.city && !item.live && (
