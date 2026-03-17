@@ -92,17 +92,38 @@ const ArticlePage = () => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        const normalizeSlug = (s) =>
+            s.toLowerCase()
+             .replace(/[çÇ]/g, 'c').replace(/[ğĞ]/g, 'g').replace(/[ıİ]/g, 'i')
+             .replace(/[öÖ]/g, 'o').replace(/[şŞ]/g, 's').replace(/[üÜ]/g, 'u')
+             .replace(/[^a-z0-9\s-]/g, '')
+             .replace(/\s+/g, '-')
+             .replace(/-+/g, '-')
+             .trim();
+
         const fetchArticle = async () => {
             try {
-                const q = query(
-                    collection(db, 'articles'),
-                    where('slug', '==', slug),
-                    where('status', '==', 'published')
-                );
-                const snapshot = await getDocs(q);
-                if (!snapshot.empty) {
-                    setArticle({ id: snapshot.docs[0].id, ...snapshot.docs[0].data() });
+                // Try exact slug match first, then normalized slug
+                const slugsToTry = [...new Set([slug, normalizeSlug(slug)])];
+                let found = null;
+
+                for (const s of slugsToTry) {
+                    // Try published first, then any status
+                    const queries = [
+                        query(collection(db, 'articles'), where('slug', '==', s), where('status', '==', 'published')),
+                        query(collection(db, 'articles'), where('slug', '==', s)),
+                    ];
+                    for (const q of queries) {
+                        const snapshot = await getDocs(q);
+                        if (!snapshot.empty) {
+                            found = { id: snapshot.docs[0].id, ...snapshot.docs[0].data() };
+                            break;
+                        }
+                    }
+                    if (found) break;
                 }
+
+                setArticle(found);
             } catch (err) {
                 console.error('Error fetching article:', err);
             }
