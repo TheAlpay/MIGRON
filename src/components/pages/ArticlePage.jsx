@@ -166,6 +166,36 @@ const ArticlePage = () => {
                 console.warn('[ArticlePage] full scan failed:', err.message);
             }
 
+            // 4. Slider description fallback
+            // Eğer hala makale bulunamadıysa, "sliders" tablosunda slider'a atanmış bir articleSlug var mı diye bakarız.
+            // Varsa, slider'ın açıklamasını makale içeriği gibi ekrana basarız.
+            try {
+                const slidersSnap = await getDocs(collection(db, 'sliders'));
+                const lowerNorm = normalized.toLowerCase();
+                const match = slidersSnap.docs.find(d => {
+                    const data = d.data();
+                    const docSlug = (data.articleSlug || '').toLowerCase();
+                    const normDocSlug = normalizeSlug(data.articleSlug || '').toLowerCase();
+                    return docSlug === slug.toLowerCase() || docSlug === lowerNorm || normDocSlug === lowerNorm;
+                });
+                if (match) {
+                    const data = match.data();
+                    setArticle({ 
+                        id: match.id, 
+                        title: data.title,
+                        content: data.description, // Kullanıcının slider alanına yazdığı MD içeriği
+                        coverImage: data.image,
+                        category: data.tags && data.tags.length > 0 ? data.tags[0].toLowerCase() : 'genel',
+                        createdAt: data.createdAt || data.updatedAt,
+                        excerpt: '' 
+                    });
+                    setLoading(false);
+                    return;
+                }
+            } catch (err) {
+                console.warn('[ArticlePage] slider scan failed:', err.message);
+            }
+
             setArticle(null);
             setLoading(false);
         };
@@ -226,7 +256,7 @@ const ArticlePage = () => {
                     </div>
                 )}
 
-                <article className="max-w-3xl mx-auto px-6 pb-24" style={{ marginTop: article.coverImage ? '-4rem' : '4rem' }}>
+                <article className="max-w-3xl mx-auto px-6 pb-24 pt-10">
 
                     {/* Back link */}
                     <Link
