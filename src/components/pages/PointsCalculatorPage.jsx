@@ -48,7 +48,7 @@ const NOMINATION = [
 ];
 const AUS_STUDY = [
     { label: 'Yok', points: 0 },
-    { label: "Avustralya'da 2 yıl üniversite okutum", points: 5 },
+    { label: "Avustralya'da 2 yıl üniversite okudum", points: 5 },
 ];
 const NAATI = [
     { label: 'Yok', points: 0 },
