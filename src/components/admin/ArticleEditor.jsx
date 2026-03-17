@@ -1,9 +1,13 @@
 import React, { useState } from 'react';
 import { collection, addDoc, updateDoc, doc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../config/firebase';
-import { Save, X, Eye } from 'lucide-react';
-import Markdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
+import { Save, X, Eye, EyeOff, Bold, Italic, List, ListOrdered, Quote, Minus, Undo2, Redo2, Link2, Image, Table } from 'lucide-react';
+import { useEditor, EditorContent } from '@tiptap/react';
+import StarterKit from '@tiptap/starter-kit';
+import TiptapLink from '@tiptap/extension-link';
+import TiptapImage from '@tiptap/extension-image';
+import TextAlign from '@tiptap/extension-text-align';
+import { Table as TiptapTable, TableRow, TableCell, TableHeader } from '@tiptap/extension-table';
 
 const categories = [
     { value: 'hukuk', label: 'Hukuk Sistemi' },
@@ -13,11 +17,147 @@ const categories = [
     { value: 'program-turleri', label: 'Program Türleri' },
 ];
 
+const ToolbarBtn = ({ onClick, active, title, children, danger }) => (
+    <button
+        type="button"
+        onMouseDown={(e) => { e.preventDefault(); onClick(); }}
+        title={title}
+        className={`px-2 py-1.5 text-xs font-bold transition-all border ${
+            active
+                ? 'bg-[#ccff00] text-black border-[#ccff00]'
+                : danger
+                ? 'border-white/10 text-red-400 hover:border-red-400 hover:text-red-300'
+                : 'border-white/10 text-white/60 hover:border-[#ccff00] hover:text-[#ccff00]'
+        }`}
+    >
+        {children}
+    </button>
+);
+
+const Divider = () => <span className="w-px h-5 bg-white/10 mx-1 self-center" />;
+
+const Toolbar = ({ editor }) => {
+    if (!editor) return null;
+
+    const addLink = () => {
+        const url = window.prompt('Link URL:');
+        if (url) editor.chain().focus().setLink({ href: url, target: '_blank' }).run();
+    };
+
+    const addImage = () => {
+        const url = window.prompt('Görsel URL:');
+        if (url) editor.chain().focus().setImage({ src: url }).run();
+    };
+
+    const insertTable = () => {
+        editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run();
+    };
+
+    return (
+        <div className="flex flex-wrap items-center gap-1 p-2 bg-[#0a0a0a] border border-white/10 border-b-0">
+            {/* History */}
+            <ToolbarBtn onClick={() => editor.chain().focus().undo().run()} title="Geri al (Ctrl+Z)">
+                <Undo2 size={13} />
+            </ToolbarBtn>
+            <ToolbarBtn onClick={() => editor.chain().focus().redo().run()} title="Yinele (Ctrl+Y)">
+                <Redo2 size={13} />
+            </ToolbarBtn>
+
+            <Divider />
+
+            {/* Text style */}
+            <ToolbarBtn onClick={() => editor.chain().focus().toggleBold().run()} active={editor.isActive('bold')} title="Kalın (Ctrl+B)">
+                <Bold size={13} />
+            </ToolbarBtn>
+            <ToolbarBtn onClick={() => editor.chain().focus().toggleItalic().run()} active={editor.isActive('italic')} title="İtalik (Ctrl+I)">
+                <Italic size={13} />
+            </ToolbarBtn>
+
+            <Divider />
+
+            {/* Headings */}
+            <ToolbarBtn onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()} active={editor.isActive('heading', { level: 1 })} title="Başlık 1">
+                H1
+            </ToolbarBtn>
+            <ToolbarBtn onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()} active={editor.isActive('heading', { level: 2 })} title="Başlık 2">
+                H2
+            </ToolbarBtn>
+            <ToolbarBtn onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()} active={editor.isActive('heading', { level: 3 })} title="Başlık 3">
+                H3
+            </ToolbarBtn>
+
+            <Divider />
+
+            {/* Lists */}
+            <ToolbarBtn onClick={() => editor.chain().focus().toggleBulletList().run()} active={editor.isActive('bulletList')} title="Madde listesi">
+                <List size={13} />
+            </ToolbarBtn>
+            <ToolbarBtn onClick={() => editor.chain().focus().toggleOrderedList().run()} active={editor.isActive('orderedList')} title="Numaralı liste">
+                <ListOrdered size={13} />
+            </ToolbarBtn>
+
+            <Divider />
+
+            {/* Block */}
+            <ToolbarBtn onClick={() => editor.chain().focus().toggleBlockquote().run()} active={editor.isActive('blockquote')} title="Alıntı">
+                <Quote size={13} />
+            </ToolbarBtn>
+            <ToolbarBtn onClick={() => editor.chain().focus().toggleCode().run()} active={editor.isActive('code')} title="Kod (satır içi)">
+                {'</>'}
+            </ToolbarBtn>
+            <ToolbarBtn onClick={() => editor.chain().focus().toggleCodeBlock().run()} active={editor.isActive('codeBlock')} title="Kod bloğu">
+                {'{ }'}
+            </ToolbarBtn>
+            <ToolbarBtn onClick={() => editor.chain().focus().setHorizontalRule().run()} title="Yatay çizgi">
+                <Minus size={13} />
+            </ToolbarBtn>
+
+            <Divider />
+
+            {/* Link & Image */}
+            <ToolbarBtn onClick={addLink} active={editor.isActive('link')} title="Link ekle">
+                <Link2 size={13} />
+            </ToolbarBtn>
+            <ToolbarBtn onClick={addImage} title="Görsel ekle (URL)">
+                <Image size={13} />
+            </ToolbarBtn>
+
+            <Divider />
+
+            {/* Table */}
+            <ToolbarBtn onClick={insertTable} title="Tablo ekle (3x3)">
+                <Table size={13} />
+            </ToolbarBtn>
+            {editor.isActive('table') && (
+                <>
+                    <ToolbarBtn onClick={() => editor.chain().focus().addColumnBefore().run()} title="Sütun ekle (sol)">↤S</ToolbarBtn>
+                    <ToolbarBtn onClick={() => editor.chain().focus().addColumnAfter().run()} title="Sütun ekle (sağ)">S↦</ToolbarBtn>
+                    <ToolbarBtn onClick={() => editor.chain().focus().deleteColumn().run()} title="Sütun sil" danger>-S</ToolbarBtn>
+                    <ToolbarBtn onClick={() => editor.chain().focus().addRowBefore().run()} title="Satır ekle (üst)">↤R</ToolbarBtn>
+                    <ToolbarBtn onClick={() => editor.chain().focus().addRowAfter().run()} title="Satır ekle (alt)">R↦</ToolbarBtn>
+                    <ToolbarBtn onClick={() => editor.chain().focus().deleteRow().run()} title="Satır sil" danger>-R</ToolbarBtn>
+                    <ToolbarBtn onClick={() => editor.chain().focus().deleteTable().run()} title="Tabloyu sil" danger>
+                        Tablo Sil
+                    </ToolbarBtn>
+                    <ToolbarBtn onClick={() => editor.chain().focus().toggleHeaderRow().run()} title="Başlık satırı">
+                        Başlık
+                    </ToolbarBtn>
+                    <ToolbarBtn onClick={() => editor.chain().focus().mergeCells().run()} title="Hücre birleştir">
+                        Birleştir
+                    </ToolbarBtn>
+                    <ToolbarBtn onClick={() => editor.chain().focus().splitCell().run()} title="Hücre böl">
+                        Böl
+                    </ToolbarBtn>
+                </>
+            )}
+        </div>
+    );
+};
+
 const ArticleEditor = ({ article, onSave, onCancel }) => {
     const [title, setTitle] = useState(article?.title || '');
     const [slug, setSlug] = useState(article?.slug || '');
     const [excerpt, setExcerpt] = useState(article?.excerpt || '');
-    const [content, setContent] = useState(article?.content || '');
     const [category, setCategory] = useState(article?.category || 'hukuk');
     const [lang, setLang] = useState(article?.lang || 'tr');
     const [status, setStatus] = useState(article?.status || 'draft');
@@ -25,8 +165,37 @@ const ArticleEditor = ({ article, onSave, onCancel }) => {
     const [showPreview, setShowPreview] = useState(false);
     const [saving, setSaving] = useState(false);
 
-    const generateSlug = (text) => {
-        return text
+    // Detect if existing content is markdown (for backwards compat display)
+    const initialContent = (() => {
+        const c = article?.content || '';
+        if (!c) return '<p></p>';
+        // If it looks like HTML, use as-is; if markdown, wrap in a paragraph note
+        if (c.trim().startsWith('<')) return c;
+        // Convert simple markdown to basic HTML for legacy articles
+        return `<p>${c.replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>')}</p>`;
+    })();
+
+    const editor = useEditor({
+        extensions: [
+            StarterKit.configure({ codeBlock: { languageClassPrefix: 'language-' } }),
+            TiptapLink.configure({ openOnClick: false }),
+            TiptapImage.configure({ inline: false }),
+            TextAlign.configure({ types: ['heading', 'paragraph'] }),
+            TiptapTable.configure({ resizable: true }),
+            TableRow,
+            TableHeader,
+            TableCell,
+        ],
+        content: initialContent,
+        editorProps: {
+            attributes: {
+                class: 'outline-none min-h-[500px] text-white/80 font-medium leading-relaxed',
+            },
+        },
+    });
+
+    const generateSlug = (text) =>
+        text
             .toLowerCase()
             .replace(/[çÇ]/g, 'c').replace(/[ğĞ]/g, 'g').replace(/[ıİ]/g, 'i')
             .replace(/[öÖ]/g, 'o').replace(/[şŞ]/g, 's').replace(/[üÜ]/g, 'u')
@@ -34,21 +203,18 @@ const ArticleEditor = ({ article, onSave, onCancel }) => {
             .replace(/\s+/g, '-')
             .replace(/-+/g, '-')
             .trim();
-    };
 
     const handleTitleChange = (value) => {
         setTitle(value);
-        if (!article) {
-            setSlug(generateSlug(value));
-        }
+        if (!article) setSlug(generateSlug(value));
     };
 
     const handleSave = async () => {
-        if (!title.trim() || !content.trim()) {
+        const content = editor?.getHTML() || '';
+        if (!title.trim() || !content || content === '<p></p>') {
             alert('Başlık ve içerik zorunludur.');
             return;
         }
-
         setSaving(true);
         try {
             const articleData = {
@@ -62,14 +228,12 @@ const ArticleEditor = ({ article, onSave, onCancel }) => {
                 coverImage: coverImage.trim() || null,
                 updatedAt: serverTimestamp(),
             };
-
             if (article?.id) {
                 await updateDoc(doc(db, 'articles', article.id), articleData);
             } else {
                 articleData.createdAt = serverTimestamp();
                 await addDoc(collection(db, 'articles'), articleData);
             }
-
             onSave();
         } catch (err) {
             console.error('Error saving article:', err);
@@ -89,7 +253,8 @@ const ArticleEditor = ({ article, onSave, onCancel }) => {
                     </h2>
                     <div className="flex gap-3">
                         <button onClick={() => setShowPreview(!showPreview)} className="flex items-center gap-2 px-4 py-2 border border-white/20 text-white/60 hover:border-[#ccff00] hover:text-[#ccff00] transition-all text-sm font-bold">
-                            <Eye size={16} /> {showPreview ? 'Editör' : 'Önizleme'}
+                            {showPreview ? <EyeOff size={16} /> : <Eye size={16} />}
+                            {showPreview ? 'Editör' : 'Önizleme'}
                         </button>
                         <button onClick={onCancel} className="flex items-center gap-2 px-4 py-2 border border-white/20 text-white/40 hover:text-white transition-all text-sm font-bold">
                             <X size={16} /> İptal
@@ -104,44 +269,25 @@ const ArticleEditor = ({ article, onSave, onCancel }) => {
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
                     <div className="md:col-span-2">
                         <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest block mb-2">Başlık</label>
-                        <input
-                            value={title}
-                            onChange={(e) => handleTitleChange(e.target.value)}
-                            className="w-full bg-[#111] border border-white/10 p-3 text-white outline-none focus:border-[#ccff00] transition-colors"
-                            placeholder="Makale başlığı..."
-                        />
+                        <input value={title} onChange={(e) => handleTitleChange(e.target.value)} className="w-full bg-[#111] border border-white/10 p-3 text-white outline-none focus:border-[#ccff00] transition-colors" placeholder="Makale başlığı..." />
                     </div>
                     <div>
                         <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest block mb-2">Kategori</label>
-                        <select
-                            value={category}
-                            onChange={(e) => setCategory(e.target.value)}
-                            className="w-full bg-[#111] border border-white/10 p-3 text-white outline-none focus:border-[#ccff00]"
-                        >
-                            {categories.map(c => (
-                                <option key={c.value} value={c.value}>{c.label}</option>
-                            ))}
+                        <select value={category} onChange={(e) => setCategory(e.target.value)} className="w-full bg-[#111] border border-white/10 p-3 text-white outline-none focus:border-[#ccff00]">
+                            {categories.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
                         </select>
                     </div>
                     <div className="flex gap-4">
                         <div className="flex-1">
                             <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest block mb-2">Dil</label>
-                            <select
-                                value={lang}
-                                onChange={(e) => setLang(e.target.value)}
-                                className="w-full bg-[#111] border border-white/10 p-3 text-white outline-none focus:border-[#ccff00]"
-                            >
+                            <select value={lang} onChange={(e) => setLang(e.target.value)} className="w-full bg-[#111] border border-white/10 p-3 text-white outline-none focus:border-[#ccff00]">
                                 <option value="tr">Türkçe</option>
                                 <option value="en">English</option>
                             </select>
                         </div>
                         <div className="flex-1">
                             <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest block mb-2">Durum</label>
-                            <select
-                                value={status}
-                                onChange={(e) => setStatus(e.target.value)}
-                                className="w-full bg-[#111] border border-white/10 p-3 text-white outline-none focus:border-[#ccff00]"
-                            >
+                            <select value={status} onChange={(e) => setStatus(e.target.value)} className="w-full bg-[#111] border border-white/10 p-3 text-white outline-none focus:border-[#ccff00]">
                                 <option value="draft">Taslak</option>
                                 <option value="published">Yayında</option>
                             </select>
@@ -151,24 +297,14 @@ const ArticleEditor = ({ article, onSave, onCancel }) => {
 
                 <div className="mb-6">
                     <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest block mb-2">URL Slug</label>
-                    <input
-                        value={slug}
-                        onChange={(e) => setSlug(e.target.value)}
-                        className="w-full bg-[#111] border border-white/10 p-3 text-white/60 outline-none focus:border-[#ccff00] text-sm font-mono"
-                        placeholder="makale-url-slug"
-                    />
+                    <input value={slug} onChange={(e) => setSlug(e.target.value)} className="w-full bg-[#111] border border-white/10 p-3 text-white/60 outline-none focus:border-[#ccff00] text-sm font-mono" placeholder="makale-url-slug" />
                 </div>
 
                 <div className="mb-6">
                     <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest block mb-2">Kapak Görseli URL (İsteğe Bağlı)</label>
-                    <input
-                        value={coverImage}
-                        onChange={(e) => setCoverImage(e.target.value)}
-                        className="w-full bg-[#111] border border-white/10 p-3 text-white/60 outline-none focus:border-[#ccff00] text-sm font-mono"
-                        placeholder="https://images.unsplash.com/... veya başka bir görsel URL'si"
-                    />
+                    <input value={coverImage} onChange={(e) => setCoverImage(e.target.value)} className="w-full bg-[#111] border border-white/10 p-3 text-white/60 outline-none focus:border-[#ccff00] text-sm font-mono" placeholder="https://images.unsplash.com/..." />
                     {coverImage && (
-                        <div className="mt-2 relative">
+                        <div className="mt-2">
                             <img src={coverImage} alt="Kapak önizleme" className="w-full max-h-40 object-cover opacity-60" onError={(e) => e.target.style.display = 'none'} />
                         </div>
                     )}
@@ -176,42 +312,27 @@ const ArticleEditor = ({ article, onSave, onCancel }) => {
 
                 <div className="mb-6">
                     <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest block mb-2">Kısa Özet</label>
-                    <input
-                        value={excerpt}
-                        onChange={(e) => setExcerpt(e.target.value)}
-                        className="w-full bg-[#111] border border-white/10 p-3 text-white outline-none focus:border-[#ccff00]"
-                        placeholder="Makale kısaca ne hakkında..."
-                    />
+                    <input value={excerpt} onChange={(e) => setExcerpt(e.target.value)} className="w-full bg-[#111] border border-white/10 p-3 text-white outline-none focus:border-[#ccff00]" placeholder="Makale kısaca ne hakkında..." />
                 </div>
 
-                {/* Content Editor / Preview */}
-                {showPreview ? (
-                    <div className="bg-[#111] border border-white/10 p-8 min-h-[500px] prose prose-invert prose-headings:text-[#ccff00] prose-a:text-[#ccff00] prose-strong:text-white max-w-none">
-                        <Markdown remarkPlugins={[remarkGfm]}>{content}</Markdown>
-                    </div>
-                ) : (
-                    <div>
-                        <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest block mb-2">
-                            İçerik (Markdown destekler)
-                        </label>
-                        <textarea
-                            value={content}
-                            onChange={(e) => setContent(e.target.value)}
-                            className="w-full bg-[#111] border border-white/10 p-4 text-white outline-none focus:border-[#ccff00] font-mono text-sm leading-relaxed min-h-[500px] resize-y"
-                            placeholder="Makale içeriğini buraya yazın... Markdown formatı desteklenir.
+                {/* Editor / Preview */}
+                <div className="mb-6">
+                    <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest block mb-2">İçerik</label>
 
-# Başlık
-## Alt Başlık
-
-**Kalın metin**, *italik metin*
-
-- Liste öğesi 1
-- Liste öğesi 2
-
-> Alıntı bloğu"
+                    {showPreview ? (
+                        <div
+                            className="bg-[#111] border border-white/10 p-8 min-h-[500px] article-content"
+                            dangerouslySetInnerHTML={{ __html: editor?.getHTML() || '' }}
                         />
-                    </div>
-                )}
+                    ) : (
+                        <div className="border border-white/10 bg-[#0d0d0d]">
+                            <Toolbar editor={editor} />
+                            <div className="p-6 tiptap-editor">
+                                <EditorContent editor={editor} />
+                            </div>
+                        </div>
+                    )}
+                </div>
             </div>
         </div>
     );

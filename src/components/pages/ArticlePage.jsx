@@ -206,7 +206,7 @@ const ArticlePage = () => {
     if (loading) {
         return (
             <div className="min-h-screen bg-[#050505] text-[#e0e0e0] pt-32 flex items-center justify-center">
-                <div className="text-[#ccff00] animate-pulse font-bold tracking-widest">YÜKLENİYOR...</div>
+                <div className="text-[#ccff00] animate-pulse font-bold tracking-widest">{t('loading_text')}</div>
             </div>
         );
     }
@@ -215,7 +215,7 @@ const ArticlePage = () => {
         return (
             <div className="min-h-screen bg-[#050505] text-[#e0e0e0] pt-32 px-6">
                 <div className="max-w-3xl mx-auto text-center">
-                    <h1 className="text-4xl font-black mb-4">Makale Bulunamadı</h1>
+                    <h1 className="text-4xl font-black mb-4">{t('article_not_found')}</h1>
                     <Link to="/" className="text-[#ccff00] hover:underline">{t('page_back_home')}</Link>
                 </div>
             </div>
@@ -223,7 +223,13 @@ const ArticlePage = () => {
     }
 
     const categoryPaths  = { hukuk: '/hukuk', egitim: '/egitim', sosyal: '/sosyal', sss: '/sss', 'program-turleri': '/program-turleri' };
-    const categoryLabels = { hukuk: 'Hukuk Sistemi', egitim: 'Eğitim', sosyal: 'Sosyal', sss: 'SSS', 'program-turleri': 'Program Türleri' };
+    const categoryLabels = {
+        hukuk: t('nav_legal'),
+        egitim: t('nav_education'),
+        sosyal: t('nav_social'),
+        sss: t('nav_faq'),
+        'program-turleri': t('nav_program'),
+    };
     const categoryColors = { hukuk: '#ccff00', egitim: '#00d4ff', sosyal: '#ff6b6b', sss: '#ccff00', 'program-turleri': '#a78bfa' };
 
     const formatDate = (timestamp) => {
@@ -296,11 +302,18 @@ const ArticlePage = () => {
                     {/* Divider */}
                     <hr className="border-white/10 mb-10" />
 
-                    {/* Markdown body */}
+                    {/* Article body — HTML (TipTap) or Markdown (legacy) */}
                     <div>
-                        <Markdown remarkPlugins={[remarkGfm]} components={MD_COMPONENTS}>
-                            {article.content}
-                        </Markdown>
+                        {article.content?.trim().startsWith('<') ? (
+                            <div
+                                className="article-content"
+                                dangerouslySetInnerHTML={{ __html: article.content }}
+                            />
+                        ) : (
+                            <Markdown remarkPlugins={[remarkGfm]} components={MD_COMPONENTS}>
+                                {article.content}
+                            </Markdown>
+                        )}
                     </div>
 
                 </article>

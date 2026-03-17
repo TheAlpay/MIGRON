@@ -15,8 +15,8 @@ const Footer = () => {
     ];
 
     const toolLinks = [
-        { label: 'Puan Hesaplama', path: '/puan-hesapla' },
-        { label: 'Vize Kontrol Listesi', path: '/vize-kontrol-listesi' },
+        { label: t('nav_points_calc'), path: '/puan-hesapla' },
+        { label: t('nav_visa_checklist'), path: '/vize-kontrol-listesi' },
     ];
 
     return (
@@ -51,8 +51,8 @@ const Footer = () => {
 
                         {/* Tools */}
                         <div>
-                            <h5 className="text-[10px] font-black text-[#ccff00] uppercase tracking-[0.3em] mb-6">ARAÇLAR</h5>
-                            <nav aria-label="Footer Araçlar">
+                            <h5 className="text-[10px] font-black text-[#ccff00] uppercase tracking-[0.3em] mb-6">{t('nav_tools')}</h5>
+                            <nav aria-label={t('nav_tools')}>
                                 <ul className="space-y-4 text-xs font-bold text-white/60">
                                     {toolLinks.map(item => (
                                         <li key={item.label}>

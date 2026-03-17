@@ -1,1 +1,66 @@
 @import "tailwindcss";
+
+/* ── TipTap editor styles ───────────────────────────────────────────────────── */
+.tiptap-editor .ProseMirror {
+    outline: none;
+    min-height: 500px;
+}
+
+.tiptap-editor .ProseMirror p { margin-bottom: 0.75rem; color: rgba(224,224,224,0.75); line-height: 1.7; }
+.tiptap-editor .ProseMirror h1 { font-size: 1.75rem; font-weight: 900; text-transform: uppercase; letter-spacing: -0.03em; color: #fff; margin: 2rem 0 1rem; font-style: italic; }
+.tiptap-editor .ProseMirror h2 { font-size: 1.25rem; font-weight: 900; text-transform: uppercase; letter-spacing: -0.02em; color: #ccff00; margin: 1.75rem 0 0.75rem; }
+.tiptap-editor .ProseMirror h3 { font-size: 1rem; font-weight: 900; text-transform: uppercase; color: rgba(255,255,255,0.8); margin: 1.5rem 0 0.5rem; }
+.tiptap-editor .ProseMirror strong { color: #fff; font-weight: 900; }
+.tiptap-editor .ProseMirror em { color: rgba(255,255,255,0.5); }
+.tiptap-editor .ProseMirror ul { list-style: disc inside; margin-bottom: 1rem; color: rgba(224,224,224,0.75); }
+.tiptap-editor .ProseMirror ol { list-style: decimal inside; margin-bottom: 1rem; color: rgba(224,224,224,0.75); }
+.tiptap-editor .ProseMirror li { margin-bottom: 0.25rem; line-height: 1.6; }
+.tiptap-editor .ProseMirror blockquote { border-left: 2px solid #ccff00; padding-left: 1.25rem; margin: 1.5rem 0; color: rgba(255,255,255,0.45); font-style: italic; }
+.tiptap-editor .ProseMirror code { background: rgba(255,255,255,0.07); color: #ccff00; padding: 0.15rem 0.4rem; border-radius: 3px; font-family: monospace; font-size: 0.85em; }
+.tiptap-editor .ProseMirror pre { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 1rem; margin: 1.5rem 0; overflow-x: auto; border-radius: 2px; }
+.tiptap-editor .ProseMirror pre code { background: none; padding: 0; color: #ccff00; }
+.tiptap-editor .ProseMirror hr { border: none; border-top: 1px solid rgba(255,255,255,0.1); margin: 2rem 0; }
+.tiptap-editor .ProseMirror a { color: #ccff00; text-decoration: underline; text-underline-offset: 2px; }
+.tiptap-editor .ProseMirror img { max-width: 100%; margin: 1.5rem 0; }
+
+/* Tiptap table */
+.tiptap-editor .ProseMirror table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; }
+.tiptap-editor .ProseMirror th { background: rgba(204,255,0,0.1); color: #ccff00; font-weight: 900; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; padding: 0.6rem 0.75rem; border: 1px solid rgba(255,255,255,0.1); text-align: left; }
+.tiptap-editor .ProseMirror td { padding: 0.6rem 0.75rem; border: 1px solid rgba(255,255,255,0.08); color: rgba(224,224,224,0.75); font-size: 0.875rem; vertical-align: top; }
+.tiptap-editor .ProseMirror tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
+.tiptap-editor .ProseMirror .selectedCell { background: rgba(204,255,0,0.08) !important; }
+.tiptap-editor .ProseMirror .column-resize-handle { background: #ccff00; width: 2px; }
+
+/* Tiptap focus ring */
+.tiptap-editor .ProseMirror p.is-editor-empty:first-child::before {
+    content: attr(data-placeholder);
+    float: left;
+    color: rgba(255,255,255,0.2);
+    pointer-events: none;
+    height: 0;
+}
+
+/* ── Article HTML content (rendered on article page + editor preview) ───────── */
+.article-content { color: rgba(224,224,224,0.75); line-height: 1.7; }
+.article-content p { margin-bottom: 0.75rem; }
+.article-content h1 { font-size: 1.75rem; font-weight: 900; text-transform: uppercase; letter-spacing: -0.03em; color: #fff; margin: 2rem 0 1rem; font-style: italic; }
+.article-content h2 { font-size: 1.25rem; font-weight: 900; text-transform: uppercase; letter-spacing: -0.02em; color: #ccff00; margin: 1.75rem 0 0.75rem; }
+.article-content h3 { font-size: 1rem; font-weight: 900; text-transform: uppercase; color: rgba(255,255,255,0.8); margin: 1.5rem 0 0.5rem; }
+.article-content strong { color: #fff; font-weight: 900; }
+.article-content em { color: rgba(255,255,255,0.5); }
+.article-content ul { list-style: disc inside; margin-bottom: 1rem; }
+.article-content ol { list-style: decimal inside; margin-bottom: 1rem; }
+.article-content li { margin-bottom: 0.25rem; line-height: 1.6; }
+.article-content blockquote { border-left: 2px solid #ccff00; padding-left: 1.25rem; margin: 1.5rem 0; color: rgba(255,255,255,0.45); font-style: italic; }
+.article-content code { background: rgba(255,255,255,0.07); color: #ccff00; padding: 0.15rem 0.4rem; border-radius: 3px; font-family: monospace; font-size: 0.85em; }
+.article-content pre { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 1rem; margin: 1.5rem 0; overflow-x: auto; border-radius: 2px; }
+.article-content pre code { background: none; padding: 0; color: #ccff00; }
+.article-content hr { border: none; border-top: 1px solid rgba(255,255,255,0.1); margin: 2rem 0; }
+.article-content a { color: #ccff00; text-decoration: underline; text-underline-offset: 2px; }
+.article-content img { max-width: 100%; margin: 1.5rem 0; display: block; }
+
+/* Article tables */
+.article-content table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; }
+.article-content th { background: rgba(204,255,0,0.1); color: #ccff00; font-weight: 900; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; padding: 0.6rem 0.75rem; border: 1px solid rgba(255,255,255,0.1); text-align: left; }
+.article-content td { padding: 0.6rem 0.75rem; border: 1px solid rgba(255,255,255,0.08); color: rgba(224,224,224,0.75); font-size: 0.875rem; vertical-align: top; }
+.article-content tr:nth-child(even) td { background: rgba(255,255,255,0.02); }

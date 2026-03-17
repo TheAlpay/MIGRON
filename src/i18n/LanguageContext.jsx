@@ -128,6 +128,8 @@ const translations = {
         page_coming_soon: "İçerik yakında eklenecek.",
         page_back_home: "Anasayfaya Dön",
         page_email_label: "E-posta",
+        loading_text: "YÜKLENİYOR...",
+        article_not_found: "Makale Bulunamadı",
     },
     en: {
         // Navbar
@@ -252,6 +254,8 @@ const translations = {
         page_coming_soon: "Content coming soon.",
         page_back_home: "Back to Home",
         page_email_label: "Email",
+        loading_text: "LOADING...",
+        article_not_found: "Article Not Found",
     }
 };
 
