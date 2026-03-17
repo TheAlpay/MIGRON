@@ -11,6 +11,7 @@ import LiveTicker from './components/home/LiveTicker';
 import AustraliaMap from './components/home/AustraliaMap';
 import AustraliaNewsSlider from './components/home/AustraliaNewsSlider';
 import CurrencyWidget from './components/home/CurrencyWidget';
+import LiveCamera from './components/home/LiveCamera';
 import AiTerminal from './components/chat/AiTerminal';
 import SubPage from './components/pages/SubPage';
 import ArticlePage from './components/pages/ArticlePage';
@@ -33,6 +34,7 @@ const HomePage = () => (
       <LiveTicker />
       <AustraliaNewsSlider />
       <BentoGrid />
+      <LiveCamera />
       <AustraliaMap />
     </main>
   </>

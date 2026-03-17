@@ -10,16 +10,12 @@ export default defineConfig({
   },
   server: {
     proxy: {
-      // Proxy /api/* to a local Express-like handler during dev.
-      // Since Vercel serverless functions don't run natively in vite dev,
-      // we proxy to vercel dev server on port 3000 if running, otherwise
-      // the request will hit the vite server (404) and the catch block
-      // in AiTerminal.jsx will show the actual error message.
+      // All /api/* routes → vercel dev server (port 3000)
+      // Run `vercel dev` alongside `npm run dev` for full functionality.
+      // Without vercel dev, camera widget falls back to YouTube streams.
       '/api': {
         target: 'http://localhost:3000',
         changeOrigin: true,
-        // Only active if you run `vercel dev` alongside `npm run dev`
-        // Otherwise the AI widget shows the actual error in the chat.
       }
     }
   }
