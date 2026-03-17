@@ -10,7 +10,6 @@ import BentoGrid from './components/home/BentoGrid';
 import LiveTicker from './components/home/LiveTicker';
 import AustraliaMap from './components/home/AustraliaMap';
 import AustraliaNewsSlider from './components/home/AustraliaNewsSlider';
-import PoliceRadio from './components/home/PoliceRadio';
 import CurrencyWidget from './components/home/CurrencyWidget';
 import AiTerminal from './components/chat/AiTerminal';
 import SubPage from './components/pages/SubPage';
@@ -34,7 +33,6 @@ const HomePage = () => (
       <LiveTicker />
       <AustraliaNewsSlider />
       <BentoGrid />
-      <PoliceRadio />
       <AustraliaMap />
     </main>
   </>
