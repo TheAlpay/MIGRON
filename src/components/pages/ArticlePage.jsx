@@ -102,33 +102,33 @@ const ArticlePage = () => {
              .trim();
 
         const fetchArticle = async () => {
-            try {
-                // Try exact slug match first, then normalized slug
-                const slugsToTry = [...new Set([slug, normalizeSlug(slug)])];
-                let found = null;
+            // Deduplicated list: exact slug first, then normalized version
+            const slugsToTry = [...new Set([slug, normalizeSlug(slug)])];
 
-                for (const s of slugsToTry) {
-                    // Try published first, then any status
-                    const queries = [
-                        query(collection(db, 'articles'), where('slug', '==', s), where('status', '==', 'published')),
-                        query(collection(db, 'articles'), where('slug', '==', s)),
-                    ];
-                    for (const q of queries) {
-                        const snapshot = await getDocs(q);
-                        if (!snapshot.empty) {
-                            found = { id: snapshot.docs[0].id, ...snapshot.docs[0].data() };
-                            break;
-                        }
+            for (const s of slugsToTry) {
+                try {
+                    // Single-field query only — no composite index needed
+                    const snapshot = await getDocs(
+                        query(collection(db, 'articles'), where('slug', '==', s))
+                    );
+                    if (!snapshot.empty) {
+                        // Prefer published; fall back to first result (draft/etc.)
+                        const pub = snapshot.docs.find(d => d.data().status === 'published');
+                        const docSnap = pub || snapshot.docs[0];
+                        setArticle({ id: docSnap.id, ...docSnap.data() });
+                        setLoading(false);
+                        return;
                     }
-                    if (found) break;
+                } catch (err) {
+                    console.warn('[ArticlePage] query failed for slug:', s, err.message);
                 }
-
-                setArticle(found);
-            } catch (err) {
-                console.error('Error fetching article:', err);
             }
+
+            // Nothing found
+            setArticle(null);
             setLoading(false);
         };
+
         fetchArticle();
     }, [slug]);
 
