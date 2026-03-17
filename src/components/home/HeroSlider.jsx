@@ -85,22 +85,15 @@ const HeroSlider = () => {
                             {slide.title}
                         </h2>
                         <div className="flex gap-4">
-                            {slide.slug ? (
+                            {slide.articleSlug ? (
                                 <Link
-                                    to={`/makale/${slide.slug}`}
+                                    to={`/makale/${slide.articleSlug}`}
                                     className="bg-white text-black px-10 py-4 font-black uppercase text-sm hover:bg-[#ccff00] transition-colors flex items-center gap-2 group"
                                     aria-label={`${slide.title} detaylarını gör`}
                                 >
                                     {t('btn_open_file')} <ArrowUpRight className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
                                 </Link>
-                            ) : (
-                                <button
-                                    className="bg-white text-black px-10 py-4 font-black uppercase text-sm hover:bg-[#ccff00] transition-colors flex items-center gap-2 group"
-                                    aria-label={`${slide.title} detaylarını gör`}
-                                >
-                                    {t('btn_open_file')} <ArrowUpRight className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
-                                </button>
-                            )}
+                            ) : null}
                         </div>
                     </div>
                 </div>

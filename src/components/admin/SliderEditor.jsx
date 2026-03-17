@@ -9,6 +9,7 @@ const SliderEditor = ({ slide, onSave, onCancel }) => {
     const [tag2, setTag2] = useState(slide?.tags?.[1] || '');
     const [description, setDescription] = useState(slide?.description || '');
     const [image, setImage] = useState(slide?.image || '');
+    const [articleSlug, setArticleSlug] = useState(slide?.articleSlug || '');
     const [order, setOrder] = useState(slide?.order ?? 0);
     const [saving, setSaving] = useState(false);
 
@@ -21,6 +22,7 @@ const SliderEditor = ({ slide, onSave, onCancel }) => {
                 tags: [tag1.trim(), tag2.trim()].filter(Boolean),
                 description: description.trim(),
                 image: image.trim(),
+                articleSlug: articleSlug.trim(),
                 order: Number(order),
                 updatedAt: serverTimestamp(),
             };
@@ -109,6 +111,21 @@ const SliderEditor = ({ slide, onSave, onCancel }) => {
                         <div className="mt-2">
                             <img src={image} alt="Önizleme" className="w-full max-h-32 object-cover opacity-50" onError={e => e.target.style.display = 'none'} />
                         </div>
+                    )}
+                </div>
+
+                <div className="mb-6">
+                    <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest block mb-2">
+                        Makale Slug <span className="text-white/20 normal-case">(opsiyonel — "Dosyayı Aç" butonu için)</span>
+                    </label>
+                    <input
+                        value={articleSlug}
+                        onChange={e => setArticleSlug(e.target.value)}
+                        className="w-full bg-[#111] border border-white/10 p-3 text-white/60 outline-none focus:border-[#ccff00] text-sm font-mono"
+                        placeholder="avustralya-goc-reformu-2026"
+                    />
+                    {articleSlug.trim() && (
+                        <p className="text-[10px] text-white/30 mt-1 font-mono">→ /makale/{articleSlug.trim()}</p>
                     )}
                 </div>
 
