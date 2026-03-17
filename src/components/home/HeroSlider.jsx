@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, ArrowUpRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { useLanguage } from '../../i18n/LanguageContext';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../../config/firebase';
@@ -80,16 +81,26 @@ const HeroSlider = () => {
                                 <span key={tag} className="px-3 py-1 bg-[#ccff00] text-black text-[10px] font-black uppercase tracking-widest">{tag}</span>
                             ))}
                         </div>
-                        <h2 className="text-5xl md:text-8xl font-black leading-[0.9] tracking-tighter mb-6 uppercase italic">
+                        <h2 className="text-5xl md:text-8xl font-black leading-[0.9] tracking-tighter mb-8 uppercase italic">
                             {slide.title}
                         </h2>
-                        <p className="text-xl text-white/60 max-w-xl mb-8 font-medium border-l-4 border-[#ccff00] pl-6 uppercase tracking-tight">
-                            {slide.description}
-                        </p>
                         <div className="flex gap-4">
-                            <button className="bg-white text-black px-10 py-4 font-black uppercase text-sm hover:bg-[#ccff00] transition-colors flex items-center gap-2 group" aria-label={`${slide.title} detaylarını gör`}>
-                                {t('btn_open_file')} <ArrowUpRight className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
-                            </button>
+                            {slide.slug ? (
+                                <Link
+                                    to={`/makale/${slide.slug}`}
+                                    className="bg-white text-black px-10 py-4 font-black uppercase text-sm hover:bg-[#ccff00] transition-colors flex items-center gap-2 group"
+                                    aria-label={`${slide.title} detaylarını gör`}
+                                >
+                                    {t('btn_open_file')} <ArrowUpRight className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+                                </Link>
+                            ) : (
+                                <button
+                                    className="bg-white text-black px-10 py-4 font-black uppercase text-sm hover:bg-[#ccff00] transition-colors flex items-center gap-2 group"
+                                    aria-label={`${slide.title} detaylarını gör`}
+                                >
+                                    {t('btn_open_file')} <ArrowUpRight className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+                                </button>
+                            )}
                         </div>
                     </div>
                 </div>
