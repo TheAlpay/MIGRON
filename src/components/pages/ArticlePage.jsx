@@ -91,6 +91,40 @@ const ArticlePage = () => {
     const [article, setArticle] = useState(null);
     const [loading, setLoading] = useState(true);
 
+    // Inject BlogPosting JSON-LD when article loads
+    useEffect(() => {
+        if (!article) return;
+        const script = document.createElement('script');
+        script.type = 'application/ld+json';
+        script.id = 'article-jsonld';
+        const datePublished = article.createdAt
+            ? (article.createdAt.toDate ? article.createdAt.toDate() : new Date(article.createdAt)).toISOString()
+            : new Date().toISOString();
+        const dateModified = article.updatedAt
+            ? (article.updatedAt.toDate ? article.updatedAt.toDate() : new Date(article.updatedAt)).toISOString()
+            : datePublished;
+        script.textContent = JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'BlogPosting',
+            headline: article.title,
+            description: article.excerpt || article.title,
+            image: article.coverImage || 'https://migron.mtive.tech/migron.webp',
+            datePublished,
+            dateModified,
+            author: { '@type': 'Organization', name: 'MIGRON', url: 'https://migron.mtive.tech' },
+            publisher: {
+                '@type': 'Organization',
+                name: 'MIGRON',
+                logo: { '@type': 'ImageObject', url: 'https://migron.mtive.tech/migron.webp' },
+            },
+            mainEntityOfPage: { '@type': 'WebPage', '@id': `https://migron.mtive.tech/makale/${slug}` },
+            inLanguage: 'tr',
+        });
+        document.getElementById('article-jsonld')?.remove();
+        document.head.appendChild(script);
+        return () => document.getElementById('article-jsonld')?.remove();
+    }, [article, slug]);
+
     useEffect(() => {
         const normalizeSlug = (s) =>
             s.toLowerCase()

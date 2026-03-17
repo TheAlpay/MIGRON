@@ -105,6 +105,26 @@ const SSSPage = () => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        if (loading) return;
+        const allQA = faqData.flatMap(section => section.questions);
+        const script = document.createElement('script');
+        script.type = 'application/ld+json';
+        script.id = 'faq-jsonld';
+        script.textContent = JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'FAQPage',
+            mainEntity: allQA.map(item => ({
+                '@type': 'Question',
+                name: item.q,
+                acceptedAnswer: { '@type': 'Answer', text: item.a },
+            })),
+        });
+        document.getElementById('faq-jsonld')?.remove();
+        document.head.appendChild(script);
+        return () => document.getElementById('faq-jsonld')?.remove();
+    }, [faqData, loading]);
+
+    useEffect(() => {
         const fetchFAQ = async () => {
             try {
                 const snapshot = await getDocs(collection(db, 'faqItems'));
