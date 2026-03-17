@@ -38,14 +38,14 @@ const NewsCard = ({ article, isActive, onClick }) => {
     const color = SOURCE_COLORS[article.source] || '#ccff00';
 
     return (
-        <a
-            href={article.link}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={onClick}
+        <article
+            onClick={() => {
+                window.open(article.link, '_blank', 'noopener,noreferrer');
+                if (onClick) onClick();
+            }}
             className={`
                 flex-shrink-0 w-full md:w-[calc(33.333%-11px)] cursor-pointer
-                border transition-all duration-500 group block
+                border transition-all duration-500 group
                 ${isActive
                     ? 'border-[#ccff00]/60 bg-[#0f0f0f]'
                     : 'border-white/5 bg-[#080808] hover:border-white/20 hover:bg-[#0f0f0f]'}
@@ -99,7 +99,7 @@ const NewsCard = ({ article, isActive, onClick }) => {
                     {lang === 'tr' ? 'OKU' : 'READ'} <ExternalLink size={9} />
                 </span>
             </div>
-        </a>
+        </article>
     );
 };
 
