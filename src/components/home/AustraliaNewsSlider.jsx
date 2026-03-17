@@ -38,11 +38,14 @@ const NewsCard = ({ article, isActive, onClick }) => {
     const color = SOURCE_COLORS[article.source] || '#ccff00';
 
     return (
-        <article
+        <a
+            href={article.link}
+            target="_blank"
+            rel="noopener noreferrer"
             onClick={onClick}
             className={`
                 flex-shrink-0 w-full md:w-[calc(33.333%-11px)] cursor-pointer
-                border transition-all duration-500 group
+                border transition-all duration-500 group block
                 ${isActive
                     ? 'border-[#ccff00]/60 bg-[#0f0f0f]'
                     : 'border-white/5 bg-[#080808] hover:border-white/20 hover:bg-[#0f0f0f]'}
@@ -92,17 +95,11 @@ const NewsCard = ({ article, isActive, onClick }) => {
                         {article.description}
                     </p>
                 )}
-                <a
-                    href={article.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={e => e.stopPropagation()}
-                    className="inline-flex items-center gap-1 mt-3 text-[10px] font-black uppercase tracking-widest text-white/30 hover:text-[#ccff00] transition-colors"
-                >
+                <span className="inline-flex items-center gap-1 mt-3 text-[10px] font-black uppercase tracking-widest text-white/30 group-hover:text-[#ccff00] transition-colors">
                     {lang === 'tr' ? 'OKU' : 'READ'} <ExternalLink size={9} />
-                </a>
+                </span>
             </div>
-        </article>
+        </a>
     );
 };
 
