@@ -102,17 +102,17 @@ const ArticlePage = () => {
              .trim();
 
         const fetchArticle = async () => {
-            // Deduplicated list: exact slug first, then normalized version
-            const slugsToTry = [...new Set([slug, normalizeSlug(slug)])];
+            const normalized = normalizeSlug(slug);
+            // Try exact slug, normalized slug (deduped)
+            const slugsToTry = [...new Set([slug, normalized])];
 
+            // 1. Slug-based queries
             for (const s of slugsToTry) {
                 try {
-                    // Single-field query only — no composite index needed
                     const snapshot = await getDocs(
                         query(collection(db, 'articles'), where('slug', '==', s))
                     );
                     if (!snapshot.empty) {
-                        // Prefer published; fall back to first result (draft/etc.)
                         const pub = snapshot.docs.find(d => d.data().status === 'published');
                         const docSnap = pub || snapshot.docs[0];
                         setArticle({ id: docSnap.id, ...docSnap.data() });
@@ -120,11 +120,52 @@ const ArticlePage = () => {
                         return;
                     }
                 } catch (err) {
-                    console.warn('[ArticlePage] query failed for slug:', s, err.message);
+                    console.warn('[ArticlePage] slug query failed:', s, err.message);
                 }
             }
 
-            // Nothing found
+            // 2. Title-based fallback — handles cases where slug field is missing/different
+            try {
+                const titleVariants = [...new Set([
+                    slug,                                             // "Göç Reformu Makale"
+                    slug.replace(/-/g, ' '),                         // dashes → spaces
+                    normalized.replace(/-/g, ' '),                   // "goc reformu makale"
+                ])];
+                for (const titleVal of titleVariants) {
+                    const snapshot = await getDocs(
+                        query(collection(db, 'articles'), where('title', '==', titleVal))
+                    );
+                    if (!snapshot.empty) {
+                        const pub = snapshot.docs.find(d => d.data().status === 'published');
+                        const docSnap = pub || snapshot.docs[0];
+                        setArticle({ id: docSnap.id, ...docSnap.data() });
+                        setLoading(false);
+                        return;
+                    }
+                }
+            } catch (err) {
+                console.warn('[ArticlePage] title query failed:', err.message);
+            }
+
+            // 3. Last resort: scan all articles, match slug or title loosely
+            try {
+                const allSnap = await getDocs(collection(db, 'articles'));
+                const lowerNorm = normalized.toLowerCase();
+                const match = allSnap.docs.find(d => {
+                    const data = d.data();
+                    const docSlug = (data.slug || '').toLowerCase();
+                    const docTitle = normalizeSlug(data.title || '').toLowerCase();
+                    return docSlug === lowerNorm || docTitle === lowerNorm;
+                });
+                if (match) {
+                    setArticle({ id: match.id, ...match.data() });
+                    setLoading(false);
+                    return;
+                }
+            } catch (err) {
+                console.warn('[ArticlePage] full scan failed:', err.message);
+            }
+
             setArticle(null);
             setLoading(false);
         };
