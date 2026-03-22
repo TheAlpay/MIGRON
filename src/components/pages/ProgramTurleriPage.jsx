@@ -240,7 +240,10 @@ const ProgramTurleriPage = () => {
     const [loading, setLoading] = useState(true);
     const [selected, setSelected] = useState(null);
 
-    const programs = firebasePrograms || (lang === 'en' ? defaultProgramsEn : defaultProgramsTr);
+    // In English mode always use English defaults (Firestore data is Turkish-only)
+    const programs = lang === 'en'
+        ? defaultProgramsEn
+        : (firebasePrograms || defaultProgramsTr);
 
     useEffect(() => {
         const fetchPrograms = async () => {

@@ -177,9 +177,11 @@ const SSSPage = () => {
     const [faqData, setFaqData] = useState(null);
     const [loading, setLoading] = useState(true);
 
-    // Select defaults based on lang (only when no Firebase data)
+    // In English mode always use English defaults (Firestore data is Turkish-only)
     const [firebaseData, setFirebaseData] = useState(null);
-    const activeFaqData = firebaseData || (lang === 'en' ? defaultFaqDataEn : defaultFaqDataTr);
+    const activeFaqData = lang === 'en'
+        ? defaultFaqDataEn
+        : (firebaseData || defaultFaqDataTr);
 
     useEffect(() => {
         if (!loading) {
