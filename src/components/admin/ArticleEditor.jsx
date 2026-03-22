@@ -154,43 +154,61 @@ const Toolbar = ({ editor }) => {
     );
 };
 
+// Helper: content string → TipTap-compatible HTML
+const toEditorContent = (raw) => {
+    if (!raw) return '<p></p>';
+    if (raw.trim().startsWith('<')) return raw;
+    return `<p>${raw.replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>')}</p>`;
+};
+
 const ArticleEditor = ({ article, onSave, onCancel }) => {
-    const [title, setTitle] = useState(article?.title || '');
+    const [activeLangTab, setActiveLangTab] = useState('tr'); // 'tr' | 'en'
+
+    // TR fields
+    const [titleTr, setTitleTr] = useState(article?.title_tr || article?.title || '');
+    const [excerptTr, setExcerptTr] = useState(article?.excerpt_tr || article?.excerpt || '');
+
+    // EN fields
+    const [titleEn, setTitleEn] = useState(article?.title_en || '');
+    const [excerptEn, setExcerptEn] = useState(article?.excerpt_en || '');
+
+    // Common fields
     const [slug, setSlug] = useState(article?.slug || '');
-    const [excerpt, setExcerpt] = useState(article?.excerpt || '');
     const [category, setCategory] = useState(article?.category || 'hukuk');
-    const [lang, setLang] = useState(article?.lang || 'tr');
     const [status, setStatus] = useState(article?.status || 'draft');
     const [coverImage, setCoverImage] = useState(article?.coverImage || '');
     const [showPreview, setShowPreview] = useState(false);
     const [saving, setSaving] = useState(false);
 
-    // Detect if existing content is markdown (for backwards compat display)
-    const initialContent = (() => {
-        const c = article?.content || '';
-        if (!c) return '<p></p>';
-        // If it looks like HTML, use as-is; if markdown, wrap in a paragraph note
-        if (c.trim().startsWith('<')) return c;
-        // Convert simple markdown to basic HTML for legacy articles
-        return `<p>${c.replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>')}</p>`;
-    })();
-
-    const editor = useEditor({
+    // TR Editor
+    const editorTr = useEditor({
         extensions: [
             StarterKit.configure({ codeBlock: { languageClassPrefix: 'language-' } }),
             TiptapLink.configure({ openOnClick: false }),
             TiptapImage.configure({ inline: false }),
             TextAlign.configure({ types: ['heading', 'paragraph'] }),
             TiptapTable.configure({ resizable: true }),
-            TableRow,
-            TableHeader,
-            TableCell,
+            TableRow, TableHeader, TableCell,
         ],
-        content: initialContent,
+        content: toEditorContent(article?.content_tr || article?.content || ''),
         editorProps: {
-            attributes: {
-                class: 'outline-none min-h-[500px] text-white/80 font-medium leading-relaxed',
-            },
+            attributes: { class: 'outline-none min-h-[500px] text-white/80 font-medium leading-relaxed' },
+        },
+    });
+
+    // EN Editor
+    const editorEn = useEditor({
+        extensions: [
+            StarterKit.configure({ codeBlock: { languageClassPrefix: 'language-' } }),
+            TiptapLink.configure({ openOnClick: false }),
+            TiptapImage.configure({ inline: false }),
+            TextAlign.configure({ types: ['heading', 'paragraph'] }),
+            TiptapTable.configure({ resizable: true }),
+            TableRow, TableHeader, TableCell,
+        ],
+        content: toEditorContent(article?.content_en || ''),
+        editorProps: {
+            attributes: { class: 'outline-none min-h-[500px] text-white/80 font-medium leading-relaxed' },
         },
     });
 
@@ -204,26 +222,36 @@ const ArticleEditor = ({ article, onSave, onCancel }) => {
             .replace(/-+/g, '-')
             .trim();
 
-    const handleTitleChange = (value) => {
-        setTitle(value);
+    const handleTitleTrChange = (value) => {
+        setTitleTr(value);
         if (!article) setSlug(generateSlug(value));
     };
 
     const handleSave = async () => {
-        const content = editor?.getHTML() || '';
-        if (!title.trim() || !content || content === '<p></p>') {
-            alert('Başlık ve içerik zorunludur.');
+        const contentTr = editorTr?.getHTML() || '';
+        const contentEn = editorEn?.getHTML() || '';
+        if (!titleTr.trim() || !contentTr || contentTr === '<p></p>') {
+            alert('Türkçe başlık ve içerik zorunludur.');
             return;
         }
         setSaving(true);
         try {
             const articleData = {
-                title,
-                slug: slug || generateSlug(title),
-                excerpt,
-                content,
+                // Multilingual fields
+                title_tr: titleTr,
+                title_en: titleEn,
+                excerpt_tr: excerptTr,
+                excerpt_en: excerptEn,
+                content_tr: contentTr,
+                content_en: contentEn,
+                // Legacy / fallback fields (keep for backward compat & slug)
+                title: titleTr,
+                excerpt: excerptTr,
+                content: contentTr,
+                // Common fields
+                slug: slug || generateSlug(titleTr),
                 category,
-                lang,
+                lang: 'tr', // default lang kept for compat
                 status,
                 coverImage: coverImage.trim() || null,
                 updatedAt: serverTimestamp(),
@@ -242,6 +270,8 @@ const ArticleEditor = ({ article, onSave, onCancel }) => {
             setSaving(false);
         }
     };
+
+    const activeEditor = activeLangTab === 'tr' ? editorTr : editorEn;
 
     return (
         <div className="min-h-screen bg-[#050505] text-[#e0e0e0] pt-8 px-6">
@@ -265,39 +295,25 @@ const ArticleEditor = ({ article, onSave, onCancel }) => {
                     </div>
                 </div>
 
-                {/* Meta fields */}
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                    <div className="md:col-span-2">
-                        <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest block mb-2">Başlık</label>
-                        <input value={title} onChange={(e) => handleTitleChange(e.target.value)} className="w-full bg-[#111] border border-white/10 p-3 text-white outline-none focus:border-[#ccff00] transition-colors" placeholder="Makale başlığı..." />
-                    </div>
+                {/* Common meta fields */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                     <div>
                         <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest block mb-2">Kategori</label>
                         <select value={category} onChange={(e) => setCategory(e.target.value)} className="w-full bg-[#111] border border-white/10 p-3 text-white outline-none focus:border-[#ccff00]">
                             {categories.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
                         </select>
                     </div>
-                    <div className="flex gap-4">
-                        <div className="flex-1">
-                            <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest block mb-2">Dil</label>
-                            <select value={lang} onChange={(e) => setLang(e.target.value)} className="w-full bg-[#111] border border-white/10 p-3 text-white outline-none focus:border-[#ccff00]">
-                                <option value="tr">Türkçe</option>
-                                <option value="en">English</option>
-                            </select>
-                        </div>
-                        <div className="flex-1">
-                            <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest block mb-2">Durum</label>
-                            <select value={status} onChange={(e) => setStatus(e.target.value)} className="w-full bg-[#111] border border-white/10 p-3 text-white outline-none focus:border-[#ccff00]">
-                                <option value="draft">Taslak</option>
-                                <option value="published">Yayında</option>
-                            </select>
-                        </div>
+                    <div>
+                        <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest block mb-2">Durum</label>
+                        <select value={status} onChange={(e) => setStatus(e.target.value)} className="w-full bg-[#111] border border-white/10 p-3 text-white outline-none focus:border-[#ccff00]">
+                            <option value="draft">Taslak</option>
+                            <option value="published">Yayında</option>
+                        </select>
                     </div>
-                </div>
-
-                <div className="mb-6">
-                    <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest block mb-2">URL Slug</label>
-                    <input value={slug} onChange={(e) => setSlug(e.target.value)} className="w-full bg-[#111] border border-white/10 p-3 text-white/60 outline-none focus:border-[#ccff00] text-sm font-mono" placeholder="makale-url-slug" />
+                    <div>
+                        <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest block mb-2">URL Slug</label>
+                        <input value={slug} onChange={(e) => setSlug(e.target.value)} className="w-full bg-[#111] border border-white/10 p-3 text-white/60 outline-none focus:border-[#ccff00] text-sm font-mono" placeholder="makale-url-slug" />
+                    </div>
                 </div>
 
                 <div className="mb-6">
@@ -310,27 +326,111 @@ const ArticleEditor = ({ article, onSave, onCancel }) => {
                     )}
                 </div>
 
-                <div className="mb-6">
-                    <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest block mb-2">Kısa Özet</label>
-                    <input value={excerpt} onChange={(e) => setExcerpt(e.target.value)} className="w-full bg-[#111] border border-white/10 p-3 text-white outline-none focus:border-[#ccff00]" placeholder="Makale kısaca ne hakkında..." />
+                {/* Language Tabs */}
+                <div className="flex gap-0 mb-0 mt-8">
+                    <button
+                        onClick={() => setActiveLangTab('tr')}
+                        className={`px-6 py-2.5 text-xs font-black uppercase tracking-widest border transition-all ${
+                            activeLangTab === 'tr'
+                                ? 'bg-[#ccff00] text-black border-[#ccff00]'
+                                : 'bg-[#111] text-white/40 border-white/10 hover:text-white hover:border-white/30'
+                        }`}
+                    >
+                        🇹🇷 Türkçe
+                    </button>
+                    <button
+                        onClick={() => setActiveLangTab('en')}
+                        className={`px-6 py-2.5 text-xs font-black uppercase tracking-widest border-t border-b border-r transition-all ${
+                            activeLangTab === 'en'
+                                ? 'bg-[#ccff00] text-black border-[#ccff00]'
+                                : 'bg-[#111] text-white/40 border-white/10 hover:text-white hover:border-white/30'
+                        }`}
+                    >
+                        🇬🇧 English
+                    </button>
+                    <div className="flex-1 border-b border-white/10" />
                 </div>
 
-                {/* Editor / Preview */}
-                <div className="mb-6">
-                    <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest block mb-2">İçerik</label>
-
-                    {showPreview ? (
-                        <div
-                            className="bg-[#111] border border-white/10 p-8 min-h-[500px] article-content"
-                            dangerouslySetInnerHTML={{ __html: editor?.getHTML() || '' }}
-                        />
-                    ) : (
-                        <div className="border border-white/10 bg-[#0d0d0d]">
-                            <Toolbar editor={editor} />
-                            <div className="p-6 tiptap-editor">
-                                <EditorContent editor={editor} />
+                {/* Tab Content */}
+                <div className="border border-t-0 border-white/10 bg-[#0a0a0a] p-6 mb-6">
+                    {activeLangTab === 'tr' ? (
+                        <>
+                            <div className="mb-4">
+                                <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest block mb-2">Başlık (TR)</label>
+                                <input
+                                    value={titleTr}
+                                    onChange={(e) => handleTitleTrChange(e.target.value)}
+                                    className="w-full bg-[#111] border border-white/10 p-3 text-white outline-none focus:border-[#ccff00] transition-colors"
+                                    placeholder="Makale başlığı (Türkçe)..."
+                                />
                             </div>
-                        </div>
+                            <div className="mb-4">
+                                <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest block mb-2">Kısa Özet (TR)</label>
+                                <input
+                                    value={excerptTr}
+                                    onChange={(e) => setExcerptTr(e.target.value)}
+                                    className="w-full bg-[#111] border border-white/10 p-3 text-white outline-none focus:border-[#ccff00]"
+                                    placeholder="Makale kısaca ne hakkında (Türkçe)..."
+                                />
+                            </div>
+                            <div>
+                                <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest block mb-2">İçerik (TR)</label>
+                                {showPreview ? (
+                                    <div
+                                        className="bg-[#111] border border-white/10 p-8 min-h-[500px] article-content"
+                                        dangerouslySetInnerHTML={{ __html: editorTr?.getHTML() || '' }}
+                                    />
+                                ) : (
+                                    <div className="border border-white/10 bg-[#0d0d0d]">
+                                        <Toolbar editor={editorTr} />
+                                        <div className="p-6 tiptap-editor">
+                                            <EditorContent editor={editorTr} />
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </>
+                    ) : (
+                        <>
+                            <div className="flex items-center gap-2 mb-4 p-3 bg-white/5 border border-white/10 text-xs text-white/40">
+                                <span>💡</span>
+                                <span>İngilizce içerik boş bırakılırsa site İngilizce'ye geçildiğinde Türkçe içerik gösterilmeye devam eder.</span>
+                            </div>
+                            <div className="mb-4">
+                                <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest block mb-2">Title (EN)</label>
+                                <input
+                                    value={titleEn}
+                                    onChange={(e) => setTitleEn(e.target.value)}
+                                    className="w-full bg-[#111] border border-white/10 p-3 text-white outline-none focus:border-[#ccff00] transition-colors"
+                                    placeholder="Article title (English)..."
+                                />
+                            </div>
+                            <div className="mb-4">
+                                <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest block mb-2">Short Excerpt (EN)</label>
+                                <input
+                                    value={excerptEn}
+                                    onChange={(e) => setExcerptEn(e.target.value)}
+                                    className="w-full bg-[#111] border border-white/10 p-3 text-white outline-none focus:border-[#ccff00]"
+                                    placeholder="Brief article description (English)..."
+                                />
+                            </div>
+                            <div>
+                                <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest block mb-2">Content (EN)</label>
+                                {showPreview ? (
+                                    <div
+                                        className="bg-[#111] border border-white/10 p-8 min-h-[500px] article-content"
+                                        dangerouslySetInnerHTML={{ __html: editorEn?.getHTML() || '' }}
+                                    />
+                                ) : (
+                                    <div className="border border-white/10 bg-[#0d0d0d]">
+                                        <Toolbar editor={editorEn} />
+                                        <div className="p-6 tiptap-editor">
+                                            <EditorContent editor={editorEn} />
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </>
                     )}
                 </div>
             </div>

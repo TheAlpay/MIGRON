@@ -91,6 +91,11 @@ const ArticlePage = () => {
     const [article, setArticle] = useState(null);
     const [loading, setLoading] = useState(true);
 
+    // Pick language-aware fields with fallback to legacy fields
+    const displayTitle   = article ? ((lang === 'en' ? article.title_en   : article.title_tr)   || article.title)   : '';
+    const displayContent = article ? ((lang === 'en' ? article.content_en : article.content_tr) || article.content) : '';
+    const displayExcerpt = article ? ((lang === 'en' ? article.excerpt_en : article.excerpt_tr) || article.excerpt) : '';
+
     // Inject BlogPosting JSON-LD when article loads
     useEffect(() => {
         if (!article) return;
@@ -277,8 +282,8 @@ const ArticlePage = () => {
     return (
         <>
             <SEOHead
-                title={article.title}
-                description={article.excerpt || article.title}
+                title={displayTitle}
+                description={displayExcerpt || displayTitle}
                 path={`/makale/${slug}`}
             />
             <div className="min-h-screen bg-[#050505] text-[#e0e0e0] pt-20">
@@ -288,7 +293,7 @@ const ArticlePage = () => {
                     <div className="relative w-full h-64 md:h-96 overflow-hidden">
                         <img
                             src={article.coverImage}
-                            alt={article.title}
+                            alt={displayTitle}
                             className="w-full h-full object-cover"
                             onError={(e) => e.target.parentElement.style.display = 'none'}
                         />
@@ -323,13 +328,13 @@ const ArticlePage = () => {
 
                     {/* Title */}
                     <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tighter italic leading-tight mb-6 text-white">
-                        {article.title}
+                        {displayTitle}
                     </h1>
 
                     {/* Excerpt / lead */}
-                    {article.excerpt && (
+                    {displayExcerpt && (
                         <p className="text-lg text-white/50 border-l-4 border-[#ccff00] pl-6 mb-10 font-medium leading-relaxed">
-                            {article.excerpt}
+                            {displayExcerpt}
                         </p>
                     )}
 
@@ -338,14 +343,14 @@ const ArticlePage = () => {
 
                     {/* Article body — HTML (TipTap) or Markdown (legacy) */}
                     <div>
-                        {article.content?.trim().startsWith('<') ? (
+                        {displayContent?.trim().startsWith('<') ? (
                             <div
                                 className="article-content"
-                                dangerouslySetInnerHTML={{ __html: article.content }}
+                                dangerouslySetInnerHTML={{ __html: displayContent }}
                             />
                         ) : (
                             <Markdown remarkPlugins={[remarkGfm]} components={MD_COMPONENTS}>
-                                {article.content}
+                                {displayContent}
                             </Markdown>
                         )}
                     </div>

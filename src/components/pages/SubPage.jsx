@@ -119,7 +119,10 @@ const SubPage = ({ pageId }) => {
                                 <div className="text-center text-white/40 py-12 animate-pulse">{t('loading_text')}</div>
                             ) : articles.length > 0 ? (
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    {articles.map(article => (
+                                    {articles.map(article => {
+                                        const cardTitle   = (lang === 'en' ? article.title_en   : article.title_tr)   || article.title;
+                                        const cardExcerpt = (lang === 'en' ? article.excerpt_en : article.excerpt_tr) || article.excerpt;
+                                        return (
                                         <Link
                                             key={article.id}
                                             to={`/makale/${article.slug}`}
@@ -136,16 +139,17 @@ const SubPage = ({ pageId }) => {
                                                 )}
                                             </div>
                                             <h3 className="text-xl font-black uppercase tracking-tight group-hover:text-[#ccff00] transition-colors mb-3">
-                                                {article.title}
+                                                {cardTitle}
                                             </h3>
-                                            {article.excerpt && (
-                                                <p className="text-sm text-white/40">{article.excerpt}</p>
+                                            {cardExcerpt && (
+                                                <p className="text-sm text-white/40">{cardExcerpt}</p>
                                             )}
                                             <div className="mt-4 flex items-center gap-1 text-xs font-bold uppercase tracking-wider opacity-0 group-hover:opacity-100 transition-opacity" style={{ color: config.accent }}>
                                                 {t('read_more')} <ArrowUpRight size={14} />
                                             </div>
                                         </Link>
-                                    ))}
+                                        );
+                                    })}
                                 </div>
                             ) : (
                                 <div className="bg-[#111] border border-white/5 p-12 text-center">
