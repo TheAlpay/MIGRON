@@ -87,7 +87,7 @@ const MD_COMPONENTS = {
 
 const ArticlePage = () => {
     const { slug } = useParams();
-    const { t } = useLanguage();
+    const { t, lang } = useLanguage();
     const [article, setArticle] = useState(null);
     const [loading, setLoading] = useState(true);
 
@@ -269,7 +269,7 @@ const ArticlePage = () => {
     const formatDate = (timestamp) => {
         if (!timestamp) return '';
         const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
-        return date.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' });
+        return date.toLocaleDateString(lang === 'tr' ? 'tr-TR' : 'en-AU', { day: 'numeric', month: 'long', year: 'numeric' });
     };
 
     const catColor = categoryColors[article.category] || '#ccff00';

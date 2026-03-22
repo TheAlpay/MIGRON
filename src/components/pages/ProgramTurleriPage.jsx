@@ -3,110 +3,162 @@ import { Link } from 'react-router-dom';
 import { ArrowLeft, Layers, ArrowUpRight, X, ChevronRight } from 'lucide-react';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../../config/firebase';
+import { useLanguage } from '../../i18n/LanguageContext';
 import SEOHead from '../seo/SEOHead';
 
 // ── Varsayılan Veriler (Firebase boşsa bunlar gösterilir) ────────────────────
-const defaultPrograms = [
+const defaultProgramsTr = [
     {
-        id: 'default-1',
-        color: "#ccff00",
-        tag: "SKILLED",
+        id: 'default-1', color: "#ccff00", tag: "SKILLED",
         title: "Skilled Independent (189)",
         subtitle: "Bağımsız Yetenekli Göçmen Vizesi",
         desc: "Herhangi bir eyalet veya bölgesel sponsor gerektirmeyen, puan testi tabanlı bağımsız göçmenlik vizesi. Avustralya'nın herhangi bir yerinde yaşayabilir ve çalışabilirsiniz.",
         requirements: ["Min. 65 EOI puanı", "Geçerli meslek değerlendirmesi", "Competent English (IELTS 6.0)", "Sağlık muayenesi"],
-        processingTime: "12-36 ay",
-        prDirect: true,
+        processingTime: "12-36 ay", prDirect: true,
         details: "189 vizesi, herhangi bir Avustralyalı işveren veya eyalet tarafından sponsor olmaksızın başvurulabilen bir skilled göçmenlik vizesidir. SkillSelect sistemi üzerinden EOI (Expression of Interest) verilmesi ve ardından davet beklenmesi gerekir. Davet puanları genellikle 65'in çok üzerinde seyretmektedir; bu nedenle ek puan toplamak kritik önem taşır."
     },
     {
-        id: 'default-2',
-        color: "#00d4ff",
-        tag: "SKILLED",
+        id: 'default-2', color: "#00d4ff", tag: "SKILLED",
         title: "Skilled Nominated (190)",
         subtitle: "Eyalet Nominasyonlu Vize",
         desc: "Bir eyalet veya bölge tarafından nomine edilmenizi gerektiren, 5 ekstra puan kazandıran skilled göçmenlik vizesi.",
         requirements: ["Min. 65 puan (+ 5 nominasyon bonusu)", "Eyalet nominasyonu", "Meslek değerlendirmesi", "Competent English"],
-        processingTime: "6-24 ay",
-        prDirect: true,
+        processingTime: "6-24 ay", prDirect: true,
         details: "190 vizesi, state/territory nominasyonu ile 5 ek puan kazandıran ve bu nedenle daha ulaşılabilir bir skilled vize seçeneğidir. Her eyaletin kendi nominasyon kriterleri ve quota'ları vardır. Eyalet nominasyonu aldıktan sonra ise ilgili eyalette 2 yıl yaşama ve çalışma yükümlülüğü bulunmaktadır."
     },
     {
-        id: 'default-3',
-        color: "#ff6b6b",
-        tag: "EMPLOYER",
+        id: 'default-3', color: "#ff6b6b", tag: "EMPLOYER",
         title: "Temporary Skill Shortage (482)",
         subtitle: "İşveren Sponsorlu Geçici Vize",
         desc: "Avustralyalı işverenler tarafından sponsor olunan çalışanlar için geçici çalışma vizesi. Belirli koşullar sağlandığında PR'a geçiş mümkündür.",
         requirements: ["Sponsor işveren", "Nominasyon onayı", "2 yıl deneyim", "English yeterliliği"],
-        processingTime: "1-6 ay",
-        prDirect: false,
+        processingTime: "1-6 ay", prDirect: false,
         details: "482 vizesi (TSS), short-term stream (2 yıl) ve medium-term stream (4 yıl) olmak üzere iki akıştan oluşur. Medium-term stream sahipleri, belirli koşullar sağlandığında 186 ya da 191 vizesiyle PR başvurusunda bulunabilir. İşveren değişikliği için yeni bir nominasyon gereklidir."
     },
     {
-        id: 'default-4',
-        color: "#a78bfa",
-        tag: "EMPLOYER",
+        id: 'default-4', color: "#a78bfa", tag: "EMPLOYER",
         title: "Employer Nomination Scheme (186)",
         subtitle: "İşveren Nominasyonu Kalıcı Vize",
         desc: "İşveren tarafından belirli bir pozisyona nomine edilen göçmenler için doğrudan PR imkânı sunan vize.",
         requirements: ["İşveren nominasyonu", "3 yıl deneyim", "Competent English", "Meslek değerlendirmesi"],
-        processingTime: "6-24 ay",
-        prDirect: true,
+        processingTime: "6-24 ay", prDirect: true,
         details: "186 vizesi, direct entry stream ve transition stream olmak üzere iki akışa sahiptir. Transition stream, en az 2 yıl 457 ya da 482 vizesiyle aynı işverende çalışmış kişiler içindir. Direct entry stream ise doğrudan işveren nominasyonuyla başvuru imkânı sunar."
     },
     {
-        id: 'default-5',
-        color: "#f59e0b",
-        tag: "REGIONAL",
+        id: 'default-5', color: "#f59e0b", tag: "REGIONAL",
         title: "Skilled Work Regional (491)",
         subtitle: "Bölgesel Çalışma Geçici Vizesi",
         desc: "Bölgesel alanlarda çalışmayı ve yaşamayı gerektiren, 15 bonus puan kazandıran geçici vize. 3 yılın sonunda 191 vizesiyle PR'a geçiş mümkündür.",
         requirements: ["Eyalet/bölge nominasyonu", "Bölgesel Avustralya'da ikamet", "Meslek değerlendirmesi", "Competent English"],
-        processingTime: "4-24 ay",
-        prDirect: false,
+        processingTime: "4-24 ay", prDirect: false,
         details: "491 vizesi, regional Avustralya'da yaşamak ve çalışmak isteyenler için 15 ek puan sunar. 3 yıl bölgede çalıştıktan ve bölgesel gelir eşiğini karşıladıktan sonra 191 (Permanent Residence via Regional) vizesiyle kalıcı oturuma geçiş mümkündür."
     },
     {
-        id: 'default-6',
-        color: "#10b981",
-        tag: "STUDENT",
+        id: 'default-6', color: "#10b981", tag: "STUDENT",
         title: "Student Visa (500)",
         subtitle: "Öğrenci Vizesi",
         desc: "Avustralya'da CRICOS kayıtlı bir kurumda tam zamanlı öğrenim için vize. Çalışma izni ile birlikte gelir (haftada 48 saat).",
         requirements: ["CRICOS kayıtlı kurum kabulü", "GTE (Genuine Temporary Entrant)", "English yeterliliği", "Mali yeterlilik"],
-        processingTime: "1-4 ay",
-        prDirect: false,
+        processingTime: "1-4 ay", prDirect: false,
         details: "500 vizesi, Avustralya'daki eğitim sonrası 485 (Graduate Visa) vizesi için kapı açan önemli bir adımdır. GTE (Genuine Temporary Entrant) koşulunu karşılamak kritiktir. 2024 itibarıyla haftada 48 saate çıkan çalışma hakkı, öğrencilere önemli gelir imkânı sunmaktadır."
     },
     {
-        id: 'default-7',
-        color: "#ec4899",
-        tag: "PARTNER",
+        id: 'default-7', color: "#ec4899", tag: "PARTNER",
         title: "Partner Visa (820/801)",
         subtitle: "Eş/Partner Vizesi",
         desc: "Avustralya vatandaşı veya PR sahibi biriyle ilişkisi olan kişiler için 2 aşamalı vize. İlk aşamada geçici, ikinci aşamada kalıcı oturum.",
         requirements: ["Avustralyalı sponsor", "İlişkinin kanıtlanması", "Sağlık muayenesi", "Karakter gereksinimi"],
-        processingTime: "12-30 ay",
-        prDirect: false,
+        processingTime: "12-30 ay", prDirect: false,
         details: "820 (onshore) ya da 309 (offshore) geçici partner vizesi ile başlayan süreç, 2 yıl sonra 801/100 kalıcı partner vizesiyle tamamlanır. İlişkinin gerçekliği; ortak banka hesabı, kira sözleşmesi, aile-arkadaş referansları ve fotoğraflar gibi belgelerle kanıtlanır."
     },
     {
-        id: 'default-8',
-        color: "#6366f1",
-        tag: "BUSINESS",
+        id: 'default-8', color: "#6366f1", tag: "BUSINESS",
         title: "Business Innovation & Investment (888)",
         subtitle: "İş İnovasyonu ve Yatırım Vizesi",
         desc: "Avustralya'da iş kurma veya yönetme ya da belirli yatırım faaliyetleri yürütme amacıyla verilen kalıcı oturum vizesi.",
         requirements: ["Başarılı iş geçmişi", "Minimum net değer", "Eyalet nominasyonu", "İngilizce gereksinimi yok (bazı akışlar)"],
-        processingTime: "12-48 ay",
-        prDirect: true,
+        processingTime: "12-48 ay", prDirect: true,
         details: "888 vizesi, genellikle 188 geçici iş vizesini tamamlayanlar için kalıcı oturum yoludur. Business Innovation stream (ciro ve işletme koşulları), Investor stream (yatırım miktarı koşulları) ve Significant Investor stream (5M AUD+) gibi farklı akışları mevcuttur."
     },
 ];
 
+const defaultProgramsEn = [
+    {
+        id: 'default-1', color: "#ccff00", tag: "SKILLED",
+        title: "Skilled Independent (189)",
+        subtitle: "Independent Skilled Migrant Visa",
+        desc: "A points-based independent migration visa that requires no state or regional sponsorship. You can live and work anywhere in Australia.",
+        requirements: ["Min. 65 EOI points", "Valid skills assessment", "Competent English (IELTS 6.0)", "Health examination"],
+        processingTime: "12–36 months", prDirect: true,
+        details: "The 189 visa is a skilled migration visa that can be applied for without sponsorship from an Australian employer or state government. An Expression of Interest (EOI) must be submitted through the SkillSelect system, after which you wait for an invitation. Invitation cut-offs are typically well above 65 points, so maximising your score is critical."
+    },
+    {
+        id: 'default-2', color: "#00d4ff", tag: "SKILLED",
+        title: "Skilled Nominated (190)",
+        subtitle: "State Nominated Visa",
+        desc: "A skilled migration visa that requires nomination by a state or territory and awards an additional 5 points.",
+        requirements: ["Min. 65 points (+ 5 nomination bonus)", "State nomination", "Skills assessment", "Competent English"],
+        processingTime: "6–24 months", prDirect: true,
+        details: "The 190 visa earns an additional 5 points through state/territory nomination, making it a more accessible skilled visa option. Each state has its own nomination criteria and quotas. After receiving state nomination, you are required to live and work in that state for 2 years."
+    },
+    {
+        id: 'default-3', color: "#ff6b6b", tag: "EMPLOYER",
+        title: "Temporary Skill Shortage (482)",
+        subtitle: "Employer-Sponsored Temporary Visa",
+        desc: "A temporary work visa for employees sponsored by an Australian employer. Transition to PR is possible under certain conditions.",
+        requirements: ["Sponsoring employer", "Nomination approval", "2 years' experience", "English proficiency"],
+        processingTime: "1–6 months", prDirect: false,
+        details: "The 482 visa (TSS) has two streams: short-term (2 years) and medium-term (4 years). Medium-term stream holders may apply for PR via a 186 or 191 visa once certain conditions are met. A new nomination is required when changing employers."
+    },
+    {
+        id: 'default-4', color: "#a78bfa", tag: "EMPLOYER",
+        title: "Employer Nomination Scheme (186)",
+        subtitle: "Employer Nomination Permanent Visa",
+        desc: "A visa offering direct PR to migrants nominated by an employer for a specific position.",
+        requirements: ["Employer nomination", "3 years' experience", "Competent English", "Skills assessment"],
+        processingTime: "6–24 months", prDirect: true,
+        details: "The 186 visa has two streams: Direct Entry and Transition. The Transition stream is for those who have worked with the same employer on a 457 or 482 visa for at least 2 years. The Direct Entry stream allows application directly through employer nomination."
+    },
+    {
+        id: 'default-5', color: "#f59e0b", tag: "REGIONAL",
+        title: "Skilled Work Regional (491)",
+        subtitle: "Skilled Work Regional Temporary Visa",
+        desc: "A temporary visa requiring work and residence in regional areas that earns 15 bonus points. Transition to PR via the 191 visa is possible after 3 years.",
+        requirements: ["State/territory nomination", "Residence in regional Australia", "Skills assessment", "Competent English"],
+        processingTime: "4–24 months", prDirect: false,
+        details: "The 491 visa offers 15 additional points for those willing to live and work in regional Australia. After 3 years of regional work and meeting the regional income threshold, transition to permanent residency is possible through the 191 (Permanent Residence via Regional) visa."
+    },
+    {
+        id: 'default-6', color: "#10b981", tag: "STUDENT",
+        title: "Student Visa (500)",
+        subtitle: "Student Visa",
+        desc: "A visa for full-time study at a CRICOS-registered institution in Australia. Includes work rights (48 hours per fortnight).",
+        requirements: ["Acceptance from a CRICOS-registered institution", "GTE (Genuine Temporary Entrant)", "English proficiency", "Financial capacity"],
+        processingTime: "1–4 months", prDirect: false,
+        details: "The 500 visa is an important stepping stone towards the 485 (Graduate Visa) after studying in Australia. Meeting the GTE (Genuine Temporary Entrant) requirement is critical. As of 2024, the 48-hour per fortnight work allowance provides students with significant income opportunities."
+    },
+    {
+        id: 'default-7', color: "#ec4899", tag: "PARTNER",
+        title: "Partner Visa (820/801)",
+        subtitle: "Partner Visa",
+        desc: "A two-stage visa for those in a relationship with an Australian citizen or permanent resident. Temporary residency in the first stage, permanent in the second.",
+        requirements: ["Australian sponsor", "Proof of relationship", "Health examination", "Character requirement"],
+        processingTime: "12–30 months", prDirect: false,
+        details: "The process begins with a temporary partner visa (820 onshore or 309 offshore) and is completed 2 years later with a permanent partner visa (801/100). The genuineness of the relationship is evidenced by joint bank accounts, lease agreements, family and friend references, and photographs."
+    },
+    {
+        id: 'default-8', color: "#6366f1", tag: "BUSINESS",
+        title: "Business Innovation & Investment (888)",
+        subtitle: "Business Innovation and Investment Visa",
+        desc: "A permanent residency visa granted for the purpose of establishing or managing a business in Australia or conducting specified investment activities.",
+        requirements: ["Successful business background", "Minimum net assets", "State nomination", "No English requirement (some streams)"],
+        processingTime: "12–48 months", prDirect: true,
+        details: "The 888 visa is typically the permanent residency pathway for those who have completed the 188 temporary business visa. It includes different streams: Business Innovation stream (turnover and business requirements), Investor stream (investment amount requirements) and Significant Investor stream (5M AUD+)."
+    },
+];
+
 // Modal bileşeni
-const ProgramModal = ({ program, onClose }) => {
+const ProgramModal = ({ program, onClose, t }) => {
     if (!program) return null;
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={onClose}>
@@ -131,7 +183,7 @@ const ProgramModal = ({ program, onClose }) => {
                         {program.tag}
                     </span>
                     {program.prDirect && (
-                        <span className="px-2 py-1 text-[9px] font-black uppercase tracking-widest bg-white/5 text-white/40">DOĞRUDAN PR</span>
+                        <span className="px-2 py-1 text-[9px] font-black uppercase tracking-widest bg-white/5 text-white/40">{t('program_direct_pr')}</span>
                     )}
                     {program.processingTime && (
                         <span className="text-[10px] text-white/30 font-bold ml-auto">~{program.processingTime}</span>
@@ -147,14 +199,14 @@ const ProgramModal = ({ program, onClose }) => {
 
                 {program.details && (
                     <div className="bg-black/30 border border-white/5 p-5 mb-6">
-                        <p className="text-[10px] font-black text-white/30 uppercase tracking-widest mb-3">Detaylı Bilgi</p>
+                        <p className="text-[10px] font-black text-white/30 uppercase tracking-widest mb-3">{t('program_details_label')}</p>
                         <p className="text-sm text-white/60 leading-relaxed">{program.details}</p>
                     </div>
                 )}
 
                 {program.requirements?.length > 0 && (
                     <div>
-                        <p className="text-[10px] text-white/30 uppercase tracking-widest font-black mb-3">Temel Gereksinimler</p>
+                        <p className="text-[10px] text-white/30 uppercase tracking-widest font-black mb-3">{t('program_requirements_label')}</p>
                         <ul className="space-y-2">
                             {program.requirements.map((req, j) => (
                                 <li key={j} className="flex items-center gap-3 text-sm text-white/60">
@@ -174,7 +226,7 @@ const ProgramModal = ({ program, onClose }) => {
                         onClick={onClose}
                         className="inline-flex items-center gap-2 bg-[#ccff00] text-black px-5 py-2.5 font-black uppercase text-sm hover:brightness-110 transition-all"
                     >
-                        Yero ile İletişime Geç <ArrowUpRight size={16} />
+                        {t('program_cta_btn')} <ArrowUpRight size={16} />
                     </a>
                 </div>
             </div>
@@ -183,9 +235,12 @@ const ProgramModal = ({ program, onClose }) => {
 };
 
 const ProgramTurleriPage = () => {
-    const [programs, setPrograms] = useState(defaultPrograms);
+    const { t, lang } = useLanguage();
+    const [firebasePrograms, setFirebasePrograms] = useState(null);
     const [loading, setLoading] = useState(true);
     const [selected, setSelected] = useState(null);
+
+    const programs = firebasePrograms || (lang === 'en' ? defaultProgramsEn : defaultProgramsTr);
 
     useEffect(() => {
         const fetchPrograms = async () => {
@@ -194,9 +249,8 @@ const ProgramTurleriPage = () => {
                 if (!snapshot.empty) {
                     const items = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
                     items.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
-                    setPrograms(items);
+                    setFirebasePrograms(items);
                 }
-                // If empty, defaultPrograms stays
             } catch (err) {
                 console.error('Error fetching programs:', err);
             }
@@ -208,8 +262,8 @@ const ProgramTurleriPage = () => {
     return (
         <>
             <SEOHead
-                title="Program Türleri"
-                description="Avustralya göçmenlik vize türleri: Skilled, Employer Sponsored, Partner, Student ve Business vize programlarının detaylı açıklamaları."
+                title={t('program_title')}
+                description={t('nav_program') + ' — ' + t('program_page_desc')}
                 path="/program-turleri"
             />
             <div className="min-h-screen bg-[#050505] text-[#e0e0e0] pt-20">
@@ -217,9 +271,9 @@ const ProgramTurleriPage = () => {
                     <div className="max-w-[1200px] mx-auto">
                         <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
                             <Link to="/" className="inline-flex items-center gap-2 text-white/40 hover:text-[#ccff00] transition-colors text-[10px] font-black uppercase tracking-[0.2em]">
-                                <ArrowLeft size={14} /> Anasayfaya Dön
+                                <ArrowLeft size={14} /> {t('page_back_home')}
                             </Link>
-                            <p className="text-[10px] text-white/40 uppercase font-black tracking-[0.2em]">Vize Kategorileri</p>
+                            <p className="text-[10px] text-white/40 uppercase font-black tracking-[0.2em]">{t('program_visa_categories')}</p>
                         </div>
                         <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
                             <div className="flex items-center gap-4">
@@ -227,12 +281,12 @@ const ProgramTurleriPage = () => {
                                     <Layers className="text-black" size={28} strokeWidth={3} />
                                 </div>
                                 <h1 className="text-4xl md:text-6xl font-black uppercase tracking-tighter italic text-[#ccff00]">
-                                    PROGRAM TÜRLERİ
+                                    {t('program_title')}
                                 </h1>
                             </div>
                             <div className="max-w-xl">
                                 <p className="text-sm md:text-base text-white/50 leading-relaxed font-medium">
-                                    Avustralya'ya göç için mevcut tüm vize programlarını keşfedin. Detaylar için karta tıklayın.
+                                    {t('program_page_desc')}
                                 </p>
                             </div>
                         </div>
@@ -241,7 +295,7 @@ const ProgramTurleriPage = () => {
 
                 <section className="max-w-[1200px] mx-auto px-6 py-12">
                     {loading ? (
-                        <div className="text-center text-white/40 py-12 animate-pulse">Yükleniyor...</div>
+                        <div className="text-center text-white/40 py-12 animate-pulse">{t('loading_text')}</div>
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             {programs.map((program) => (
@@ -249,7 +303,6 @@ const ProgramTurleriPage = () => {
                                     key={program.id}
                                     onClick={() => setSelected(program)}
                                     className="bg-[#111] border border-white/5 p-8 hover:border-white/30 transition-all group text-left w-full"
-                                    style={{ '--accent': program.color || '#ccff00' }}
                                 >
                                     <div className="flex items-start justify-between mb-6">
                                         <div className="flex items-center gap-3">
@@ -260,7 +313,7 @@ const ProgramTurleriPage = () => {
                                                 {program.tag}
                                             </span>
                                             {program.prDirect && (
-                                                <span className="px-2 py-1 text-[9px] font-black uppercase tracking-widest bg-white/5 text-white/40">DOĞRUDAN PR</span>
+                                                <span className="px-2 py-1 text-[9px] font-black uppercase tracking-widest bg-white/5 text-white/40">{t('program_direct_pr')}</span>
                                             )}
                                         </div>
                                         <span className="text-[10px] text-white/30 font-bold uppercase tracking-wider">
@@ -286,7 +339,7 @@ const ProgramTurleriPage = () => {
                                     )}
 
                                     <div className="flex items-center gap-1 text-xs font-bold uppercase tracking-wider opacity-0 group-hover:opacity-100 transition-opacity mt-2" style={{ color: program.color || '#ccff00' }}>
-                                        Detayları Gör <ChevronRight size={14} />
+                                        {t('program_view_details')} <ChevronRight size={14} />
                                     </div>
                                 </button>
                             ))}
@@ -295,8 +348,8 @@ const ProgramTurleriPage = () => {
 
                     <div className="mt-8 bg-[#111] border border-white/5 p-8 flex flex-col md:flex-row items-center justify-between gap-6">
                         <div>
-                            <p className="font-black text-lg uppercase">Hangi program size uygun?</p>
-                            <p className="text-white/40 text-sm mt-1">Uluslararası destek ortağımız Yero ile iletişime geçin.</p>
+                            <p className="font-black text-lg uppercase">{t('program_cta_title')}</p>
+                            <p className="text-white/40 text-sm mt-1">{t('program_cta_desc')}</p>
                         </div>
                         <a
                             href="https://ye-ro.com/iletisim"
@@ -304,14 +357,13 @@ const ProgramTurleriPage = () => {
                             rel="noopener noreferrer"
                             className="inline-flex items-center gap-2 bg-[#ccff00] text-black px-6 py-3 font-black uppercase text-sm hover:brightness-110 transition-all shrink-0"
                         >
-                            Yero ile İletişime Geç <ArrowUpRight size={16} />
+                            {t('program_cta_btn')} <ArrowUpRight size={16} />
                         </a>
                     </div>
                 </section>
             </div>
 
-            {/* Modal */}
-            {selected && <ProgramModal program={selected} onClose={() => setSelected(null)} />}
+            {selected && <ProgramModal program={selected} onClose={() => setSelected(null)} t={t} />}
         </>
     );
 };

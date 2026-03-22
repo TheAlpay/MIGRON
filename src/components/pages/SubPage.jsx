@@ -59,7 +59,7 @@ const SubPage = ({ pageId }) => {
     const formatDate = (timestamp) => {
         if (!timestamp) return '';
         const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
-        return date.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' });
+        return date.toLocaleDateString(lang === 'tr' ? 'tr-TR' : 'en-AU', { day: 'numeric', month: 'long', year: 'numeric' });
     };
 
     return (
@@ -116,7 +116,7 @@ const SubPage = ({ pageId }) => {
                     ) : (
                         <>
                             {loading ? (
-                                <div className="text-center text-white/40 py-12 animate-pulse">Yükleniyor...</div>
+                                <div className="text-center text-white/40 py-12 animate-pulse">{t('loading_text')}</div>
                             ) : articles.length > 0 ? (
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     {articles.map(article => (
@@ -142,7 +142,7 @@ const SubPage = ({ pageId }) => {
                                                 <p className="text-sm text-white/40">{article.excerpt}</p>
                                             )}
                                             <div className="mt-4 flex items-center gap-1 text-xs font-bold uppercase tracking-wider opacity-0 group-hover:opacity-100 transition-opacity" style={{ color: config.accent }}>
-                                                Devamını Oku <ArrowUpRight size={14} />
+                                                {t('read_more')} <ArrowUpRight size={14} />
                                             </div>
                                         </Link>
                                     ))}

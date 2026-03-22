@@ -3,10 +3,11 @@ import { Link } from 'react-router-dom';
 import { ArrowLeft, HelpCircle, ChevronDown, ChevronUp } from 'lucide-react';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../../config/firebase';
+import { useLanguage } from '../../i18n/LanguageContext';
 import SEOHead from '../seo/SEOHead';
 
 // ── Varsayılan Veriler (Firebase boşsa bunlar gösterilir) ────────────────────
-const defaultFaqData = [
+const defaultFaqDataTr = [
     {
         category: "VİZE & BAŞVURU",
         accent: "#ccff00",
@@ -77,6 +78,77 @@ const defaultFaqData = [
     }
 ];
 
+const defaultFaqDataEn = [
+    {
+        category: "VISA & APPLICATION",
+        accent: "#ccff00",
+        questions: [
+            {
+                q: "What visa types are available to migrate to Australia?",
+                a: "There are many visa options for migration to Australia: Skilled Independent (189), Skilled Nominated (190), Employer Sponsored (482/186), Partner, Student and Humanitarian visas are the main ones. It is recommended that you calculate your points score to determine which visa best suits your situation."
+            },
+            {
+                q: "What is the points test and how is it calculated?",
+                a: "The points test is a system used for skilled migration visas where applicants are awarded points based on factors such as age, English language level, work experience, education and other criteria. For the Skilled Independent (189) visa, a minimum of 65 points is typically required; however, invitation cut-offs are often much higher."
+            },
+            {
+                q: "What is an EOI (Expression of Interest)?",
+                a: "An EOI is a formal expression of interest submitted through the SkillSelect system. It is the stage where you enter the pool based on your points score and wait for an invitation. Once invited, you have 60 days to complete your visa application."
+            },
+            {
+                q: "How long does a visa application typically take?",
+                a: "Visa processing times vary significantly depending on the visa type and individual circumstances. For skilled visas, processing times can range from a few months to 2–3 years. Partner visas typically take around 12–24 months on average."
+            }
+        ]
+    },
+    {
+        category: "ENGLISH TESTING",
+        accent: "#00d4ff",
+        questions: [
+            {
+                q: "Should I take IELTS or PTE?",
+                a: "Both exams are accepted. PTE Academic generally delivers results faster and is entirely computer-based. IELTS is more widely recognised. We recommend choosing based on your strengths. For skilled visas, 'Competent English' (IELTS 6.0) may be sufficient for some occupations, while 'Superior English' (IELTS 8.0) may be required for extra points."
+            },
+            {
+                q: "How long are my test results valid for?",
+                a: "For visa applications, IELTS and PTE results are generally valid for 3 years. However, some state nomination programs may have different validity requirements."
+            }
+        ]
+    },
+    {
+        category: "SKILLS ASSESSMENT",
+        accent: "#ff6b6b",
+        questions: [
+            {
+                q: "What is a Skills Assessment?",
+                a: "For skilled migration to Australia, your occupation must be assessed by a relevant assessing authority. Each occupation has its own assessing body (e.g. Engineers Australia, VETASSESS, ACS, AHPRA). This assessment confirms that your skills and qualifications meet Australian standards."
+            },
+            {
+                q: "What documents do I need to submit to the assessing body?",
+                a: "Typically required documents include: your degree/transcripts, employment reference letters, identity documents and English language test results. Some bodies may also request additional documentation, a project portfolio or a technical interview."
+            },
+            {
+                q: "How long does the assessment process take?",
+                a: "Processing times vary depending on the body and their current workload, but are generally between 3–6 months. For Engineers Australia and some other bodies, it is advisable to be prepared for timelines of up to 8–12 months."
+            }
+        ]
+    },
+    {
+        category: "PERMANENT RESIDENCY & CITIZENSHIP",
+        accent: "#a78bfa",
+        questions: [
+            {
+                q: "When is PR (Permanent Residency) granted?",
+                a: "PR can be obtained directly from skilled visas (subclass 189, 190, 191). Some temporary visas (such as the 482) can lead to PR through a pathway. Transitioning from a temporary visa to PR generally requires a period of employment and lawful residence."
+            },
+            {
+                q: "How long do I need to wait to apply for citizenship?",
+                a: "For Australian citizenship, you must have lived in Australia for 4 years after receiving PR, with the last 12 months spent as a permanent resident, and must meet certain lawful residence requirements."
+            }
+        ]
+    }
+];
+
 const FAQItem = ({ question, answer, accent }) => {
     const [open, setOpen] = useState(false);
     return (
@@ -101,28 +173,34 @@ const FAQItem = ({ question, answer, accent }) => {
 };
 
 const SSSPage = () => {
-    const [faqData, setFaqData] = useState(defaultFaqData);
+    const { t, lang } = useLanguage();
+    const [faqData, setFaqData] = useState(null);
     const [loading, setLoading] = useState(true);
 
+    // Select defaults based on lang (only when no Firebase data)
+    const [firebaseData, setFirebaseData] = useState(null);
+    const activeFaqData = firebaseData || (lang === 'en' ? defaultFaqDataEn : defaultFaqDataTr);
+
     useEffect(() => {
-        if (loading) return;
-        const allQA = faqData.flatMap(section => section.questions);
-        const script = document.createElement('script');
-        script.type = 'application/ld+json';
-        script.id = 'faq-jsonld';
-        script.textContent = JSON.stringify({
-            '@context': 'https://schema.org',
-            '@type': 'FAQPage',
-            mainEntity: allQA.map(item => ({
-                '@type': 'Question',
-                name: item.q,
-                acceptedAnswer: { '@type': 'Answer', text: item.a },
-            })),
-        });
-        document.getElementById('faq-jsonld')?.remove();
-        document.head.appendChild(script);
-        return () => document.getElementById('faq-jsonld')?.remove();
-    }, [faqData, loading]);
+        if (!loading) {
+            const allQA = activeFaqData.flatMap(section => section.questions);
+            const script = document.createElement('script');
+            script.type = 'application/ld+json';
+            script.id = 'faq-jsonld';
+            script.textContent = JSON.stringify({
+                '@context': 'https://schema.org',
+                '@type': 'FAQPage',
+                mainEntity: allQA.map(item => ({
+                    '@type': 'Question',
+                    name: item.q,
+                    acceptedAnswer: { '@type': 'Answer', text: item.a },
+                })),
+            });
+            document.getElementById('faq-jsonld')?.remove();
+            document.head.appendChild(script);
+            return () => document.getElementById('faq-jsonld')?.remove();
+        }
+    }, [activeFaqData, loading]);
 
     useEffect(() => {
         const fetchFAQ = async () => {
@@ -131,19 +209,16 @@ const SSSPage = () => {
                 if (!snapshot.empty) {
                     const items = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
                     items.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
-                    // Group by category
                     const grouped = {};
                     items.forEach(item => {
                         const cat = item.category || 'GENEL';
                         if (!grouped[cat]) grouped[cat] = { category: cat, accent: item.accent || '#ccff00', questions: [] };
                         grouped[cat].questions.push({ q: item.question, a: item.answer });
                     });
-                    setFaqData(Object.values(grouped));
+                    setFirebaseData(Object.values(grouped));
                 }
-                // If snapshot is empty, defaultFaqData stays
             } catch (err) {
                 console.error('Error fetching FAQ:', err);
-                // On error, defaultFaqData stays
             }
             setLoading(false);
         };
@@ -153,8 +228,8 @@ const SSSPage = () => {
     return (
         <>
             <SEOHead
-                title="Sık Sorulan Sorular"
-                description="Avustralya göçmenliği, vize süreçleri ve yasal prosedürler hakkında en sık sorulan sorular ve cevapları."
+                title={t('sss_title')}
+                description={t('sss_desc')}
                 path="/sss"
             />
             <div className="min-h-screen bg-[#050505] text-[#e0e0e0] pt-20">
@@ -162,20 +237,20 @@ const SSSPage = () => {
                     <div className="max-w-[1200px] mx-auto">
                         <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
                             <Link to="/" className="inline-flex items-center gap-2 text-white/40 hover:text-[#ccff00] transition-colors text-[10px] font-black uppercase tracking-[0.2em]">
-                                <ArrowLeft size={14} /> Anasayfaya Dön
+                                <ArrowLeft size={14} /> {t('page_back_home')}
                             </Link>
-                            <p className="text-[10px] text-white/40 uppercase font-black tracking-[0.2em]">Göçmenlik Rehberi</p>
+                            <p className="text-[10px] text-white/40 uppercase font-black tracking-[0.2em]">{t('sss_guide')}</p>
                         </div>
                         <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
                             <div className="flex items-center gap-4">
                                 <div className="p-2.5 bg-[#ccff00]">
                                     <HelpCircle className="text-black" size={28} strokeWidth={3} />
                                 </div>
-                                <h1 className="text-4xl md:text-6xl font-black uppercase tracking-tighter italic text-[#ccff00]">SSS</h1>
+                                <h1 className="text-4xl md:text-6xl font-black uppercase tracking-tighter italic text-[#ccff00]">{t('sss_title')}</h1>
                             </div>
                             <div className="max-w-xl">
                                 <p className="text-sm md:text-base text-white/50 leading-relaxed font-medium">
-                                    Avustralya göçmenlik süreci hakkında en sık sorulan soruların cevapları. Güncel ve doğru bilgiye ulaşın.
+                                    {t('sss_desc')}
                                 </p>
                             </div>
                         </div>
@@ -184,9 +259,9 @@ const SSSPage = () => {
 
                 <section className="max-w-[1200px] mx-auto px-6 py-12">
                     {loading ? (
-                        <div className="text-center text-white/40 py-12 animate-pulse">Yükleniyor...</div>
+                        <div className="text-center text-white/40 py-12 animate-pulse">{t('loading_text')}</div>
                     ) : (
-                        faqData.map((section) => (
+                        activeFaqData.map((section) => (
                             <div key={section.category} className="mb-10">
                                 <h2
                                     className="text-[10px] font-black tracking-[0.3em] uppercase mb-4 inline-block px-3 py-1"
@@ -202,9 +277,9 @@ const SSSPage = () => {
                     )}
 
                     <div className="bg-[#111] border border-white/5 p-8 mt-8 text-center">
-                        <p className="text-white/30 text-sm font-bold uppercase tracking-widest mb-3">Sorunuz burada yok mu?</p>
+                        <p className="text-white/30 text-sm font-bold uppercase tracking-widest mb-3">{t('sss_question_missing')}</p>
                         <Link to="/iletisim" className="inline-flex items-center gap-2 bg-[#ccff00] text-black px-6 py-3 font-black uppercase text-sm hover:brightness-110 transition-all">
-                            Bize Ulaşın
+                            {t('sss_contact_us')}
                         </Link>
                     </div>
                 </section>

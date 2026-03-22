@@ -4,6 +4,8 @@ const LanguageContext = createContext();
 
 export const useLanguage = () => useContext(LanguageContext);
 
+const LANG_KEY = 'migron_lang';
+
 const translations = {
     tr: {
         // Navbar
@@ -130,6 +132,29 @@ const translations = {
         page_email_label: "E-posta",
         loading_text: "YÜKLENİYOR...",
         article_not_found: "Makale Bulunamadı",
+
+        // Generic UI
+        read_more: "Devamını Oku",
+        article_read: "makalesini oku",
+
+        // SSS Page
+        sss_title: "SSS",
+        sss_guide: "Göçmenlik Rehberi",
+        sss_desc: "Avustralya göçmenlik süreci hakkında en sık sorulan soruların cevapları. Güncel ve doğru bilgiye ulaşın.",
+        sss_question_missing: "Sorunuz burada yok mu?",
+        sss_contact_us: "Bize Ulaşın",
+
+        // Program Türleri Page
+        program_title: "PROGRAM TÜRLERİ",
+        program_visa_categories: "Vize Kategorileri",
+        program_page_desc: "Avustralya'ya göç için mevcut tüm vize programlarını keşfedin. Detaylar için karta tıklayın.",
+        program_direct_pr: "DOĞRUDAN PR",
+        program_details_label: "Detaylı Bilgi",
+        program_requirements_label: "Temel Gereksinimler",
+        program_cta_title: "Hangi program size uygun?",
+        program_cta_desc: "Uluslararası destek ortağımız Yero ile iletişime geçin.",
+        program_cta_btn: "Yero ile İletişime Geç",
+        program_view_details: "Detayları Gör",
     },
     en: {
         // Navbar
@@ -256,16 +281,45 @@ const translations = {
         page_email_label: "Email",
         loading_text: "LOADING...",
         article_not_found: "Article Not Found",
+
+        // Generic UI
+        read_more: "Read More",
+        article_read: "read article",
+
+        // SSS Page
+        sss_title: "FAQ",
+        sss_guide: "Immigration Guide",
+        sss_desc: "Answers to the most frequently asked questions about the Australian immigration process. Get up-to-date and accurate information.",
+        sss_question_missing: "Can't find your question?",
+        sss_contact_us: "Contact Us",
+
+        // Program Types Page
+        program_title: "PROGRAM TYPES",
+        program_visa_categories: "Visa Categories",
+        program_page_desc: "Explore all visa programs available for migrating to Australia. Click on a card for details.",
+        program_direct_pr: "DIRECT PR",
+        program_details_label: "Detailed Information",
+        program_requirements_label: "Key Requirements",
+        program_cta_title: "Which program suits you?",
+        program_cta_desc: "Get in touch with our international support partner Yero.",
+        program_cta_btn: "Contact Yero",
+        program_view_details: "View Details",
     }
 };
 
 export const LanguageProvider = ({ children }) => {
-    const [lang, setLang] = useState('tr');
+    const [lang, setLang] = useState(() => {
+        try { return localStorage.getItem(LANG_KEY) || 'tr'; } catch { return 'tr'; }
+    });
 
     const t = (key) => translations[lang]?.[key] || translations['tr']?.[key] || key;
 
     const toggleLanguage = () => {
-        setLang(prev => prev === 'tr' ? 'en' : 'tr');
+        setLang(prev => {
+            const next = prev === 'tr' ? 'en' : 'tr';
+            try { localStorage.setItem(LANG_KEY, next); } catch {}
+            return next;
+        });
     };
 
     return (
