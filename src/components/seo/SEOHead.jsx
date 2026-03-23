@@ -7,11 +7,11 @@ const SITE_URL = 'https://migron.mtive.tech';
  * SEOHead — Sets document title and meta tags dynamically per page.
  * Lightweight alternative to react-helmet, uses direct DOM manipulation.
  */
-const SEOHead = ({ title, description, path = '/', ogImage = null }) => {
+const SEOHead = ({ title, description, path = '/', ogImage = null, lang = 'tr' }) => {
     const fullTitle = title ? `${title} | MIGRON` : 'MIGRON | Göç & Hukuk Platformu';
     const fullUrl = `${SITE_URL}${path}`;
     const desc = description || 'MIGRON — Avustralya göçmenlik hukuku, vize danışmanlığı ve diaspora teknoloji platformu.';
-    const image = ogImage || `${SITE_URL}${Logo}`;
+    const image = ogImage || `${SITE_URL}/migron.webp`;
 
     useEffect(() => {
         // Title
@@ -55,7 +55,26 @@ const SEOHead = ({ title, description, path = '/', ogImage = null }) => {
         }
         canonical.setAttribute('href', fullUrl);
 
-    }, [fullTitle, desc, fullUrl, image]);
+        // hreflang — TR and EN alternates
+        const setHreflang = (hLang, hUrl) => {
+            const sel = `link[rel="alternate"][hreflang="${hLang}"]`;
+            let el = document.querySelector(sel);
+            if (!el) {
+                el = document.createElement('link');
+                el.setAttribute('rel', 'alternate');
+                el.setAttribute('hreflang', hLang);
+                document.head.appendChild(el);
+            }
+            el.setAttribute('href', hUrl);
+        };
+        setHreflang('tr', fullUrl);
+        setHreflang('en', fullUrl);
+        setHreflang('x-default', fullUrl);
+
+        // og:locale based on current lang
+        setMeta('property', 'og:locale', lang === 'en' ? 'en_AU' : 'tr_TR');
+
+    }, [fullTitle, desc, fullUrl, image, lang]);
 
     return null; // This component renders nothing
 };

@@ -33,7 +33,7 @@ function timeAgo(dateStr, lang) {
 }
 
 // ── Card ─────────────────────────────────────────────────────────────────────
-const NewsCard = ({ article, isActive, onClick }) => {
+const NewsCard = React.memo(({ article, isActive, onClick }) => {
     const { lang } = useLanguage();
     const color = SOURCE_COLORS[article.source] || '#ccff00';
 
@@ -101,7 +101,7 @@ const NewsCard = ({ article, isActive, onClick }) => {
             </div>
         </article>
     );
-};
+});
 
 // ── Main component ────────────────────────────────────────────────────────────
 const AustraliaNewsSlider = () => {
@@ -124,10 +124,8 @@ const AustraliaNewsSlider = () => {
         if (manual) setRefreshing(true);
         try {
             setError(null);
-            console.log('[AustraliaNewsSlider] Fetching /api/australia-news...');
             const res  = await fetch('/api/australia-news');
             const data = await res.json();
-            console.log('[AustraliaNewsSlider] Response:', res.status, data);
 
             if (!res.ok) throw new Error(data?.error || `HTTP ${res.status}`);
 
@@ -136,16 +134,12 @@ const AustraliaNewsSlider = () => {
                 setLastFetch(new Date());
                 setActiveIndex(0);
                 setProgressKey(k => k + 1);
-                console.log(`[AustraliaNewsSlider] Loaded ${data.articles.length} articles.`);
             } else {
-                // FIX: set a meaningful error when API succeeds but returns 0 articles
-                console.warn('[AustraliaNewsSlider] API returned 0 articles.', data);
                 setError(langRef.current === 'tr'
                     ? 'Şu anda haber bulunamadı.'
                     : 'No articles available right now.');
             }
         } catch (err) {
-            console.error('[AustraliaNewsSlider] Fetch error:', err);
             setError(langRef.current === 'tr' ? 'Haberler yüklenemedi.' : 'Could not load news.');
         } finally {
             setLoading(false);

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Calculator, CheckCircle, AlertCircle, Info } from 'lucide-react';
 import SEOHead from '../seo/SEOHead';
+import { useLanguage } from '../../i18n/LanguageContext';
 
 // ── Official Australian Skilled Migration Points Table ─────────────────────
 const AGE_POINTS = [
@@ -59,28 +60,21 @@ const PROF_YEAR = [
     { label: 'Professional Year tamamlandı', points: 5 },
 ];
 
-const SECTIONS = [
-    { key: 'age', label: 'Yaş', options: AGE_POINTS, icon: '🎂' },
-    { key: 'english', label: 'İngilizce Seviyesi', options: ENGLISH_POINTS, icon: '🗣️' },
-    { key: 'ausExp', label: "Avustralya'da İş Deneyimi", options: AUS_EXP_POINTS, icon: '🦘' },
-    { key: 'osExp', label: 'Yurt Dışı İş Deneyimi', options: OS_EXP_POINTS, icon: '🌍' },
-    { key: 'education', label: 'Eğitim Seviyesi', options: EDUCATION_POINTS, icon: '🎓' },
-    { key: 'partner', label: 'Partner Durumu', options: PARTNER_POINTS, icon: '💑' },
-    { key: 'nomination', label: 'Nominasyon', options: NOMINATION, icon: '📋' },
-    { key: 'ausStudy', label: "Avustralya'da Eğitim", options: AUS_STUDY, icon: '📚' },
-    { key: 'naati', label: 'NAATI Sertifikası', options: NAATI, icon: '🌐' },
-    { key: 'profYear', label: 'Professional Year', options: PROF_YEAR, icon: '💼' },
+const SECTION_KEYS = [
+    { key: 'age', tKey: 'points_sec_age', options: AGE_POINTS, icon: '🎂' },
+    { key: 'english', tKey: 'points_sec_english', options: ENGLISH_POINTS, icon: '🗣️' },
+    { key: 'ausExp', tKey: 'points_sec_aus_exp', options: AUS_EXP_POINTS, icon: '🦘' },
+    { key: 'osExp', tKey: 'points_sec_os_exp', options: OS_EXP_POINTS, icon: '🌍' },
+    { key: 'education', tKey: 'points_sec_education', options: EDUCATION_POINTS, icon: '🎓' },
+    { key: 'partner', tKey: 'points_sec_partner', options: PARTNER_POINTS, icon: '💑' },
+    { key: 'nomination', tKey: 'points_sec_nomination', options: NOMINATION, icon: '📋' },
+    { key: 'ausStudy', tKey: 'points_sec_aus_study', options: AUS_STUDY, icon: '📚' },
+    { key: 'naati', tKey: 'points_sec_naati', options: NAATI, icon: '🌐' },
+    { key: 'profYear', tKey: 'points_sec_prof_year', options: PROF_YEAR, icon: '💼' },
 ];
 
-const getResult = (total) => {
-    if (total >= 80) return { label: 'Mükemmel', color: '#ccff00', desc: 'Davet alma olasılığınız çok yüksek. Çoğu vize kategorisinde önceliklisiniz.' };
-    if (total >= 70) return { label: 'Güçlü', color: '#10b981', desc: '70+ puan ile davet alma olasılığınız yüksek. Özellikle 190/491 için uygunsunuz.' };
-    if (total >= 65) return { label: 'Yeterli', color: '#f59e0b', desc: '65 minimum eşiği karşılıyorsunuz. EOI açabilirsiniz ancak davet bekleme süresi uzun olabilir.' };
-    if (total >= 55) return { label: 'Yetersiz', color: '#ff6b6b', desc: "65 puana ulaşmak için ek puan almanız gerekiyor. İngilizce veya Avustralya deneyimi artırın." };
-    return { label: 'Düşük', color: '#ef4444', desc: 'Skilled göçmenlik için önce puan artırıcı adımlar atmanız gerekiyor.' };
-};
-
 const PointsCalculatorPage = () => {
+    const { t, lang } = useLanguage();
     const [selected, setSelected] = useState({
         age: 0, english: 0, ausExp: 0, osExp: 0, education: 0,
         partner: 0, nomination: 0, ausStudy: 0, naati: 0, profYear: 0,
@@ -88,6 +82,16 @@ const PointsCalculatorPage = () => {
     const [showResult, setShowResult] = useState(false);
 
     const total = Object.values(selected).reduce((a, b) => a + b, 0);
+
+    const getResult = (pts) => {
+        if (pts >= 80) return { label: t('points_result_excellent'), color: '#ccff00', desc: t('points_result_excellent_desc') };
+        if (pts >= 70) return { label: t('points_result_strong'), color: '#10b981', desc: t('points_result_strong_desc') };
+        if (pts >= 65) return { label: t('points_result_ok'), color: '#f59e0b', desc: t('points_result_ok_desc') };
+        if (pts >= 55) return { label: t('points_result_insufficient'), color: '#ff6b6b', desc: t('points_result_insufficient_desc') };
+        return { label: t('points_result_low'), color: '#ef4444', desc: t('points_result_low_desc') };
+    };
+
+    const SECTIONS = SECTION_KEYS.map(s => ({ ...s, label: t(s.tKey) }));
     const result = getResult(total);
 
     const handleSelect = (key, points) => {
@@ -107,7 +111,7 @@ const PointsCalculatorPage = () => {
                     <div className="max-w-[900px] mx-auto">
                         <div className="flex items-center justify-between mb-6">
                             <Link to="/" className="inline-flex items-center gap-2 text-white/40 hover:text-[#ccff00] transition-colors text-[10px] font-black uppercase tracking-[0.2em]">
-                                <ArrowLeft size={14} /> Anasayfa
+                                <ArrowLeft size={14} /> {t('page_back_home')}
                             </Link>
                         </div>
                         <div className="flex items-center gap-4">
@@ -116,9 +120,9 @@ const PointsCalculatorPage = () => {
                             </div>
                             <div>
                                 <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tighter italic text-[#ccff00]">
-                                    PUAN HESAPLA
+                                    {t('points_page_title')}
                                 </h1>
-                                <p className="text-sm text-white/40 mt-1">Avustralya Skilled Migration — Resmi Points Test</p>
+                                <p className="text-sm text-white/40 mt-1">{t('points_page_subtitle')}</p>
                             </div>
                         </div>
                     </div>
@@ -130,12 +134,12 @@ const PointsCalculatorPage = () => {
                         <div className="flex items-center gap-4">
                             <span className="text-5xl font-black" style={{ color: getResult(total).color }}>{total}</span>
                             <div>
-                                <p className="text-xs text-white/40 uppercase font-bold tracking-widest">Toplam Puan</p>
+                                <p className="text-xs text-white/40 uppercase font-bold tracking-widest">{t('points_total_score')}</p>
                                 <p className="text-sm font-black" style={{ color: getResult(total).color }}>{getResult(total).label}</p>
                             </div>
                         </div>
                         <div className="text-right hidden md:block">
-                            <p className="text-[9px] text-white/30 uppercase font-bold">Minimum Eşik</p>
+                            <p className="text-[9px] text-white/30 uppercase font-bold">{t('points_min_threshold')}</p>
                             <p className="text-2xl font-black text-white/20">65</p>
                         </div>
                         {/* Progress bar */}
@@ -151,7 +155,7 @@ const PointsCalculatorPage = () => {
                             onClick={() => setShowResult(true)}
                             className="bg-[#ccff00] text-black px-5 py-2 font-black uppercase text-xs hover:brightness-110 transition-all"
                         >
-                            Sonucu Gör
+                            {t('points_see_result')}
                         </button>
                     </div>
 
@@ -166,10 +170,10 @@ const PointsCalculatorPage = () => {
                                     {total >= 65 && (
                                         <div className="mt-4 flex gap-3">
                                             <Link to="/program-turleri" className="text-xs font-black uppercase text-black px-4 py-2 hover:brightness-110" style={{ backgroundColor: result.color }}>
-                                                Vize Türlerini Gör
+                                                {t('points_see_visa_types')}
                                             </Link>
                                             <Link to="/vize-kontrol-listesi" className="text-xs font-black uppercase border px-4 py-2 hover:bg-white/5 transition-colors" style={{ borderColor: result.color, color: result.color }}>
-                                                Kontrol Listesi
+                                                {t('points_checklist')}
                                             </Link>
                                         </div>
                                     )}
@@ -217,11 +221,11 @@ const PointsCalculatorPage = () => {
 
                     <div className="mt-8 bg-[#111] border border-white/5 p-4 text-xs text-white/30 leading-relaxed">
                         <Info size={12} className="inline mr-1" />
-                        Bu hesaplama, Avustralya İçişleri Bakanlığı'nın resmi puan tablosuna dayanmaktadır. Son doğrulama için{' '}
+                        {t('points_disclaimer')}{' '}
                         <a href="https://immi.homeaffairs.gov.au/points-test" target="_blank" rel="noopener noreferrer" className="text-[#ccff00] hover:underline">
-                            resmi siteyi
-                        </a>{' '}
-                        ziyaret edin.
+                            {t('points_official_site')}
+                        </a>
+                        {t('points_disclaimer_suffix')}
                     </div>
                 </section>
             </div>

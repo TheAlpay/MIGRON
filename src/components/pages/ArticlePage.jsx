@@ -6,6 +6,7 @@ import { ArrowLeft, Clock } from 'lucide-react';
 import { useLanguage } from '../../i18n/LanguageContext';
 import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import DOMPurify from 'dompurify';
 import SEOHead from '../seo/SEOHead';
 
 // Custom markdown renderers — no @tailwindcss/typography needed
@@ -346,7 +347,7 @@ const ArticlePage = () => {
                         {displayContent?.trim().startsWith('<') ? (
                             <div
                                 className="article-content"
-                                dangerouslySetInnerHTML={{ __html: displayContent }}
+                                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(displayContent) }}
                             />
                         ) : (
                             <Markdown remarkPlugins={[remarkGfm]} components={MD_COMPONENTS}>

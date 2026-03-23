@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import ErrorBoundary from './components/ErrorBoundary';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from './config/firebase';
 import { LanguageProvider } from './i18n/LanguageContext';
@@ -66,6 +67,7 @@ const App = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
+    <ErrorBoundary>
     <LanguageProvider>
       <BrowserRouter>
         <a
@@ -99,6 +101,7 @@ const App = () => {
         </Routes>
       </BrowserRouter>
     </LanguageProvider>
+    </ErrorBoundary>
   );
 };
 

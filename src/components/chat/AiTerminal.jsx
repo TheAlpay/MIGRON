@@ -2,33 +2,6 @@ import React, { useState, useRef, useEffect } from 'react';
 import { MessageSquare, Send, X } from 'lucide-react';
 import { useLanguage } from '../../i18n/LanguageContext';
 
-// Local dev fallback — calls Groq directly from browser when /api/chat isn't available
-const VITE_GROQ_KEY = import.meta.env.VITE_GROQ_API_KEY;
-
-const callGroqDirect = async (message) => {
-    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${VITE_GROQ_KEY}`
-        },
-        body: JSON.stringify({
-            model: 'llama-3.3-70b-versatile',
-            messages: [
-                {
-                    role: 'system',
-                    content: 'Sen MIGRON platformunun yapay zeka asistanısın. Avustralya göçmenlik hukuku, vize süreçleri ve yasal prosedürler konusunda uzmanlaşmış, profesyonel ve kısa yanıtlar veren bir hukuki asistansın. Türkçe veya İngilizce soruları anlayıp Türkçe yanıt ver.'
-                },
-                { role: 'user', content: message }
-            ],
-            max_tokens: 800,
-            temperature: 0.7
-        })
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data?.error?.message || 'Groq API error');
-    return data.choices?.[0]?.message?.content || 'Yanıt alınamadı.';
-};
 
 const AiTerminal = () => {
     const { t } = useLanguage();
@@ -63,13 +36,6 @@ const AiTerminal = () => {
             if (response.ok) {
                 const data = await response.json();
                 setChatHistory(prev => [...prev, { role: 'assistant', text: data.text }]);
-                return;
-            }
-
-            // 2nd: fallback — direct Groq call (local dev)
-            if (VITE_GROQ_KEY) {
-                const text = await callGroqDirect(messageText);
-                setChatHistory(prev => [...prev, { role: 'assistant', text }]);
                 return;
             }
 

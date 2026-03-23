@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Shield, Zap, ArrowUpRight, Clock } from 'lucide-react';
-import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
+import { collection, query, where, getDocs, doc, getDoc, orderBy, limit } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { useLanguage } from '../../i18n/LanguageContext';
 
@@ -15,15 +15,15 @@ const BentoGrid = () => {
         const fetchAll = async () => {
             try {
                 // Articles
-                const q = query(collection(db, 'articles'), where('status', '==', 'published'));
+                const q = query(
+                    collection(db, 'articles'),
+                    where('status', '==', 'published'),
+                    orderBy('createdAt', 'desc'),
+                    limit(20)
+                );
                 const snapshot = await getDocs(q);
                 const fetched = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-                fetched.sort((a, b) => {
-                    const dateA = a.createdAt?.toDate?.() || new Date(0);
-                    const dateB = b.createdAt?.toDate?.() || new Date(0);
-                    return dateB - dateA;
-                });
-                setArticles(fetched.slice(0, 20));
+                setArticles(fetched);
 
                 // Bento cards
                 const [riskSnap, auSnap] = await Promise.all([
