@@ -24,6 +24,8 @@ import SertifikalarPage from './components/pages/SertifikalarPage';
 import VergiVeSuperPage from './components/pages/VergiVeSuperPage';
 import BelgeSablonlariPage from './components/pages/BelgeSablonlariPage';
 import CentrelinkPage from './components/pages/CentrelinkPage';
+import MaasRehberiPage from './components/pages/MaasRehberiPage';
+import PrYolHaritasiPage from './components/pages/PrYolHaritasiPage';
 import AdminLogin from './components/admin/AdminLogin';
 import AdminDashboard from './components/admin/AdminDashboard';
 import SEOHead from './components/seo/SEOHead';

@@ -8,6 +8,7 @@ import FAQEditor from './FAQEditor';
 import ProgramEditor from './ProgramEditor';
 import SliderEditor from './SliderEditor';
 import BentoEditor from './BentoEditor';
+import ContentEditor from './ContentEditor';
 
 // ── Varsayılan SSS Verileri ──────────────────────────────────────────────────
 const DEFAULT_FAQ = [
@@ -158,6 +159,7 @@ const AdminDashboard = ({ user, onLogout }) => {
         { id: 'programs', label: 'Programlar', icon: Layers, count: programs.length },
         { id: 'sliders', label: 'Slider', icon: Image, count: sliders.length },
         { id: 'bento', label: 'Bento', icon: LayoutGrid, count: 2 },
+        { id: 'icerik', label: 'İçerik', icon: Edit3, count: null },
     ];
 
     return (
@@ -183,7 +185,7 @@ const AdminDashboard = ({ user, onLogout }) => {
                                 className={`flex items-center gap-2 px-4 py-3 text-sm font-black uppercase tracking-wider transition-all border-b-2 -mb-[2px] whitespace-nowrap ${activeTab === tab.id ? 'border-[#ccff00] text-[#ccff00]' : 'border-transparent text-white/40 hover:text-white'}`}
                             >
                                 <Icon size={15} /> {tab.label}
-                                <span className="text-[10px] bg-white/10 px-1.5 py-0.5 font-bold">{tab.count}</span>
+                                {tab.count !== null && <span className="text-[10px] bg-white/10 px-1.5 py-0.5 font-bold">{tab.count}</span>}
                             </button>
                         );
                     })}
@@ -357,6 +359,10 @@ const AdminDashboard = ({ user, onLogout }) => {
                         </div>
                     </>
                 )}
+
+                {/* ── İçerik Yönetimi ── */}
+                {activeTab === 'icerik' && <ContentEditor />}
+
             </div>
         </div>
     );

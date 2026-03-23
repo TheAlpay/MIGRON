@@ -1,8 +1,9 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Globe, ChevronDown, Calculator, ClipboardList, FileText } from 'lucide-react';
+import { Menu, X, Globe, ChevronDown, Calculator, ClipboardList, FileText, Search } from 'lucide-react';
 import { SITE_NAME } from '../../config/constants';
 import { useLanguage } from '../../i18n/LanguageContext';
+import SearchModal from '../search/SearchModal';
 import Logo from '../../assets/migron.webp';
 
 const Navbar = ({ isMenuOpen, setIsMenuOpen }) => {
@@ -11,9 +12,12 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }) => {
     const [toolsOpen, setToolsOpen] = useState(false);
     const [sosyalOpen, setSosyalOpen] = useState(false);
     const [egitimOpen, setEgitimOpen] = useState(false);
+    const [programOpen, setProgramOpen] = useState(false);
+    const [searchOpen, setSearchOpen] = useState(false);
     const toolsRef = useRef(null);
     const sosyalRef = useRef(null);
     const egitimRef = useRef(null);
+    const programRef = useRef(null);
 
     // Close dropdowns on outside click
     useEffect(() => {
@@ -21,18 +25,27 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }) => {
             if (toolsRef.current && !toolsRef.current.contains(e.target)) setToolsOpen(false);
             if (sosyalRef.current && !sosyalRef.current.contains(e.target)) setSosyalOpen(false);
             if (egitimRef.current && !egitimRef.current.contains(e.target)) setEgitimOpen(false);
+            if (programRef.current && !programRef.current.contains(e.target)) setProgramOpen(false);
         };
         document.addEventListener('mousedown', handler);
         return () => document.removeEventListener('mousedown', handler);
     }, []);
 
+    // Ctrl+K to open search
+    useEffect(() => {
+        const handler = (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                e.preventDefault();
+                setSearchOpen(o => !o);
+            }
+        };
+        document.addEventListener('keydown', handler);
+        return () => document.removeEventListener('keydown', handler);
+    }, []);
+
     // Lock body scroll when mobile menu is open
     useEffect(() => {
-        if (isMenuOpen) {
-            document.body.style.overflow = 'hidden';
-        } else {
-            document.body.style.overflow = '';
-        }
+        document.body.style.overflow = isMenuOpen ? 'hidden' : '';
         return () => { document.body.style.overflow = ''; };
     }, [isMenuOpen]);
 
@@ -42,13 +55,19 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }) => {
         setToolsOpen(false);
         setSosyalOpen(false);
         setEgitimOpen(false);
+        setProgramOpen(false);
     }, [location.pathname]);
 
-    const isSosyalActive = ['/sosyal', '/ilk-48-saat', '/centrelink'].includes(location.pathname);
+    const isSosyalActive = ['/sosyal', '/ilk-48-saat', '/centrelink', '/maas-rehberi'].includes(location.pathname);
     const isEgitimActive = ['/egitim', '/sertifikalar', '/vergi-ve-super'].includes(location.pathname);
+    const isProgramActive = ['/program-turleri', '/pr-yol-haritasi'].includes(location.pathname);
+
+    const closeAll = () => { setToolsOpen(false); setSosyalOpen(false); setEgitimOpen(false); setProgramOpen(false); };
 
     return (
         <>
+            <SearchModal open={searchOpen} onClose={() => setSearchOpen(false)} />
+
             <nav className="fixed top-0 w-full z-50 bg-black/80 backdrop-blur-xl border-b border-white/10" aria-label="Ana navigasyon">
                 <div className="max-w-[1600px] mx-auto px-6 h-20 flex items-center justify-between">
                     <Link to="/" className="flex items-center hover:opacity-80 transition-opacity" aria-label="MIGRON Anasayfa">
@@ -74,7 +93,7 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }) => {
                         {/* EĞİTİM dropdown */}
                         <div className="relative" ref={egitimRef}>
                             <button
-                                onClick={() => { setEgitimOpen(o => !o); setSosyalOpen(false); setToolsOpen(false); }}
+                                onClick={() => { setEgitimOpen(o => !o); closeAll(); setEgitimOpen(o => !o); }}
                                 className={`flex items-center gap-1 hover:text-[#ccff00] transition-colors relative group ${isEgitimActive ? 'text-[#ccff00]' : ''}`}
                             >
                                 {t('nav_education')}
@@ -99,7 +118,7 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }) => {
                         {/* SOSYAL dropdown */}
                         <div className="relative" ref={sosyalRef}>
                             <button
-                                onClick={() => { setSosyalOpen(o => !o); setEgitimOpen(false); setToolsOpen(false); }}
+                                onClick={() => { closeAll(); setSosyalOpen(o => !o); }}
                                 className={`flex items-center gap-1 hover:text-[#ccff00] transition-colors relative group ${isSosyalActive ? 'text-[#ccff00]' : ''}`}
                             >
                                 {t('nav_social')}
@@ -114,6 +133,9 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }) => {
                                     <Link to="/ilk-48-saat" onClick={() => setSosyalOpen(false)} className="flex items-center gap-3 px-4 py-4 text-[11px] font-bold tracking-wider hover:bg-[#ccff00]/10 hover:text-[#ccff00] transition-colors border-b border-white/5">
                                         {lang === 'en' ? 'First 48 Hours' : 'İlk 48 Saat'}
                                     </Link>
+                                    <Link to="/maas-rehberi" onClick={() => setSosyalOpen(false)} className="flex items-center gap-3 px-4 py-4 text-[11px] font-bold tracking-wider hover:bg-[#ccff00]/10 hover:text-[#ccff00] transition-colors border-b border-white/5">
+                                        {lang === 'en' ? 'Salary Guide' : 'Maaş Rehberi'}
+                                    </Link>
                                     <Link to="/centrelink" onClick={() => setSosyalOpen(false)} className="flex items-center gap-3 px-4 py-4 text-[11px] font-bold tracking-wider hover:bg-[#ccff00]/10 hover:text-[#ccff00] transition-colors">
                                         Centrelink
                                     </Link>
@@ -121,9 +143,29 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }) => {
                             )}
                         </div>
 
-                        {/* Static nav items */}
+                        {/* PROGRAM TÜRLERİ dropdown */}
+                        <div className="relative" ref={programRef}>
+                            <button
+                                onClick={() => { closeAll(); setProgramOpen(o => !o); }}
+                                className={`flex items-center gap-1 hover:text-[#ccff00] transition-colors relative group ${isProgramActive ? 'text-[#ccff00]' : ''}`}
+                            >
+                                {t('nav_program')}
+                                <ChevronDown size={12} className={`transition-transform ${programOpen ? 'rotate-180' : ''}`} />
+                                <span className={`absolute -bottom-1 left-0 h-[2px] bg-[#ccff00] transition-all ${isProgramActive ? 'w-full' : 'w-0 group-hover:w-full'}`}></span>
+                            </button>
+                            {programOpen && (
+                                <div className="absolute top-full left-0 bg-black border border-white/10 min-w-[220px] shadow-xl z-[100]">
+                                    <Link to="/program-turleri" onClick={() => setProgramOpen(false)} className="flex items-center gap-3 px-4 py-4 text-[11px] font-bold tracking-wider hover:bg-[#a78bfa]/10 hover:text-[#a78bfa] transition-colors border-b border-white/5">
+                                        {lang === 'en' ? 'All Visa Programs' : 'Tüm Vize Programları'}
+                                    </Link>
+                                    <Link to="/pr-yol-haritasi" onClick={() => setProgramOpen(false)} className="flex items-center gap-3 px-4 py-4 text-[11px] font-bold tracking-wider hover:bg-[#ccff00]/10 hover:text-[#ccff00] transition-colors">
+                                        {lang === 'en' ? 'PR Roadmap' : 'PR Yol Haritası'}
+                                    </Link>
+                                </div>
+                            )}
+                        </div>
+
                         {[
-                            { label: t('nav_program'), path: '/program-turleri' },
                             { label: t('nav_faq'), path: '/sss' },
                             { label: t('nav_contact'), path: '/iletisim' },
                         ].map(item => (
@@ -140,7 +182,7 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }) => {
                         {/* Araçlar dropdown */}
                         <div className="relative" ref={toolsRef}>
                             <button
-                                onClick={() => { setToolsOpen(o => !o); setSosyalOpen(false); setEgitimOpen(false); }}
+                                onClick={() => { closeAll(); setToolsOpen(o => !o); }}
                                 className={`flex items-center gap-1 hover:text-[#ccff00] transition-colors ${toolsOpen ? 'text-[#ccff00]' : ''}`}
                             >
                                 {t('nav_tools')} <ChevronDown size={12} className={`transition-transform ${toolsOpen ? 'rotate-180' : ''}`} />
@@ -160,6 +202,17 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }) => {
                             )}
                         </div>
 
+                        {/* Search button */}
+                        <button
+                            onClick={() => setSearchOpen(true)}
+                            className="flex items-center gap-1.5 px-3 py-1.5 border border-white/10 hover:border-[#ccff00]/50 hover:text-[#ccff00] transition-all text-white/50"
+                            aria-label={lang === 'en' ? 'Search (Ctrl+K)' : 'Ara (Ctrl+K)'}
+                            title="Ctrl+K"
+                        >
+                            <Search size={13} />
+                            <span className="text-[9px] font-mono text-white/25">Ctrl+K</span>
+                        </button>
+
                         <button
                             onClick={toggleLanguage}
                             className="flex items-center gap-1.5 px-3 py-1.5 border border-white/20 hover:border-[#ccff00] hover:text-[#ccff00] transition-all"
@@ -171,6 +224,13 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }) => {
                     </div>
 
                     <div className="flex items-center gap-3 lg:hidden">
+                        <button
+                            onClick={() => setSearchOpen(true)}
+                            className="p-2 text-white/50 hover:text-[#ccff00] transition-colors"
+                            aria-label="Ara"
+                        >
+                            <Search size={20} />
+                        </button>
                         <button
                             onClick={toggleLanguage}
                             className="p-2 text-[#ccff00]"
@@ -233,12 +293,21 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }) => {
                             <div className="flex flex-col gap-3 pl-2">
                                 <Link to="/sosyal" onClick={() => setIsMenuOpen(false)} className="text-lg font-black uppercase text-white/70 hover:text-white transition-colors">{lang === 'en' ? 'All Articles' : 'Tüm Makaleler'}</Link>
                                 <Link to="/ilk-48-saat" onClick={() => setIsMenuOpen(false)} className="text-lg font-black uppercase text-white/70 hover:text-[#ccff00] transition-colors">{lang === 'en' ? 'First 48 Hours' : 'İlk 48 Saat'}</Link>
+                                <Link to="/maas-rehberi" onClick={() => setIsMenuOpen(false)} className="text-lg font-black uppercase text-white/70 hover:text-[#ccff00] transition-colors">{lang === 'en' ? 'Salary Guide' : 'Maaş Rehberi'}</Link>
                                 <Link to="/centrelink" onClick={() => setIsMenuOpen(false)} className="text-lg font-black uppercase text-white/70 hover:text-[#ccff00] transition-colors">Centrelink</Link>
                             </div>
                         </div>
 
+                        {/* PROGRAM TÜRLERİ group */}
+                        <div className="border-t border-white/5 pt-4">
+                            <p className="text-[9px] font-black text-white/30 uppercase tracking-[0.3em] mb-3">{t('nav_program')}</p>
+                            <div className="flex flex-col gap-3 pl-2">
+                                <Link to="/program-turleri" onClick={() => setIsMenuOpen(false)} className="text-lg font-black uppercase text-white/70 hover:text-white transition-colors">{lang === 'en' ? 'All Visa Programs' : 'Tüm Vize Programları'}</Link>
+                                <Link to="/pr-yol-haritasi" onClick={() => setIsMenuOpen(false)} className="text-lg font-black uppercase text-white/70 hover:text-[#ccff00] transition-colors">{lang === 'en' ? 'PR Roadmap' : 'PR Yol Haritası'}</Link>
+                            </div>
+                        </div>
+
                         {[
-                            { label: t('nav_program'), path: '/program-turleri' },
                             { label: t('nav_faq'), path: '/sss' },
                             { label: t('nav_contact'), path: '/iletisim' },
                         ].map(item => (

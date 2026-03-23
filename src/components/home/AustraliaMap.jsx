@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
-import { MapPin, Briefcase, Home, DollarSign, Users, X } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { MapPin, Briefcase, Home, DollarSign, Users, X, RefreshCw } from 'lucide-react';
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from '../../config/firebase';
 import { useLanguage } from '../../i18n/LanguageContext';
 
 // SVG coordinate mapping: viewBox "0 0 100 83"
@@ -166,7 +168,33 @@ const TAS_PATH = "M 83,77 L 86,76 L 88,79 L 86,82 L 83,82 Z";
 
 const AustraliaMap = () => {
     const [selected, setSelected] = useState(null);
+    const [cityOverrides, setCityOverrides] = useState({});
     const { t, lang } = useLanguage();
+
+    // Firestore'dan kira/maaş verilerini çek (24h cache via sessionStorage)
+    useEffect(() => {
+        const CACHE_KEY = 'migron_city_data';
+        const CACHE_TTL = 24 * 60 * 60 * 1000; // 24 saat
+        try {
+            const cached = sessionStorage.getItem(CACHE_KEY);
+            if (cached) {
+                const { data, ts } = JSON.parse(cached);
+                if (Date.now() - ts < CACHE_TTL) { setCityOverrides(data); return; }
+            }
+        } catch { }
+        const fetch = async () => {
+            try {
+                const snap = await getDocs(collection(db, 'cities'));
+                const data = {};
+                snap.forEach(d => { data[d.id] = d.data(); });
+                if (Object.keys(data).length > 0) {
+                    setCityOverrides(data);
+                    try { sessionStorage.setItem(CACHE_KEY, JSON.stringify({ data, ts: Date.now() })); } catch { }
+                }
+            } catch { /* Firestore yoksa hardcoded veriler kullanılır */ }
+        };
+        fetch();
+    }, []);
 
     return (
         <section className="max-w-[1600px] mx-auto px-6 py-24">
@@ -293,12 +321,15 @@ const AustraliaMap = () => {
                                 {selected.desc[lang] || selected.desc.en}
                             </p>
                             <div className="grid grid-cols-2 gap-3 mb-6">
-                                {[
-                                    { icon: Users, label: t('map_stat_population'), value: selected.population },
-                                    { icon: Home, label: t('map_stat_rent'), value: selected.avgRent },
-                                    { icon: DollarSign, label: t('map_stat_salary'), value: selected.avgSalary },
-                                    { icon: MapPin, label: t('map_stat_cost'), value: selected.costIndex[lang] || selected.costIndex.en },
-                                ].map(({ icon: Icon, label, value }) => (
+                                {(() => {
+                                    const ov = cityOverrides[selected.id] || {};
+                                    return [
+                                        { icon: Users, label: t('map_stat_population'), value: selected.population },
+                                        { icon: Home, label: t('map_stat_rent'), value: ov.rent || selected.avgRent },
+                                        { icon: DollarSign, label: t('map_stat_salary'), value: ov.salary || selected.avgSalary },
+                                        { icon: MapPin, label: t('map_stat_cost'), value: selected.costIndex[lang] || selected.costIndex.en },
+                                    ];
+                                })().map(({ icon: Icon, label, value }) => (
                                     <div key={label} className="bg-black/30 p-3">
                                         <div className="flex items-center gap-1 mb-1">
                                             <Icon size={10} style={{ color: selected.color }} />
@@ -308,6 +339,17 @@ const AustraliaMap = () => {
                                     </div>
                                 ))}
                             </div>
+                            {cityOverrides[selected.id]?.updatedAt && (
+                                <p className="text-[8px] text-white/15 flex items-center gap-1 mb-4">
+                                    <RefreshCw size={7} />
+                                    {lang === 'en' ? 'Data updated:' : 'Veri güncellendi:'}{' '}
+                                    {(() => {
+                                        const ts = cityOverrides[selected.id].updatedAt;
+                                        const d = ts?.toDate ? ts.toDate() : new Date(ts);
+                                        return d.toLocaleDateString(lang === 'en' ? 'en-AU' : 'tr-TR', { month: 'short', year: 'numeric' });
+                                    })()}
+                                </p>
+                            )}
                             <div>
                                 <div className="flex items-center gap-2 mb-3">
                                     <Briefcase size={12} style={{ color: selected.color }} />
