@@ -6,6 +6,8 @@ import { db } from '../../config/firebase';
 import { SITE_EMAIL } from '../../config/constants';
 import { useLanguage } from '../../i18n/LanguageContext';
 import SEOHead from '../seo/SEOHead';
+import YouTubeBox from '../shared/YouTubeBox';
+import LiveExperimentBand from '../shared/LiveExperimentBand';
 
 const pageConfig = {
     hukuk: { icon: Scale, accent: '#ccff00', titleKey: 'page_legal_title', subtitleKey: 'page_legal_subtitle', descKey: 'page_legal_desc', category: 'hukuk' },
@@ -104,6 +106,8 @@ const SubPage = ({ pageId }) => {
                 {/* Content Section */}
                 <section className="max-w-[1200px] mx-auto px-6 py-8">
 
+                    {pageId !== 'iletisim' && <LiveExperimentBand />}
+
                     {pageId === 'iletisim' ? (
                         <div className="bg-[#111] border border-white/5 p-12">
                             <h3 className="text-[10px] font-black tracking-[0.3em] uppercase mb-3" style={{ color: config.accent }}>
@@ -158,6 +162,7 @@ const SubPage = ({ pageId }) => {
                                     </p>
                                 </div>
                             )}
+                            <YouTubeBox />
                         </>
                     )}
                 </section>

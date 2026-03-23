@@ -5,6 +5,7 @@ import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { useLanguage } from '../../i18n/LanguageContext';
 import SEOHead from '../seo/SEOHead';
+import YouTubeBox from '../shared/YouTubeBox';
 
 // ── Varsayılan Veriler (Firebase boşsa bunlar gösterilir) ────────────────────
 const defaultFaqDataTr = [
@@ -73,6 +74,36 @@ const defaultFaqDataTr = [
             {
                 q: "Vatandaşlık başvurusu için ne kadar süre gereklidir?",
                 a: "Avustralya vatandaşlığı için PR aldıktan sonra 4 yıl boyunca Avustralya'da ikamet etmeniz, son 12 ayını PR olarak geçirmiş olmanız ve belirli yasallık koşullarını sağlamanız gerekmektedir."
+            }
+        ]
+    },
+    {
+        category: "ÇALIŞMA & GÜNLÜK HAYAT",
+        accent: "#00ff88",
+        questions: [
+            {
+                q: "Öğrenci vizesiyle Avustralya'da çalışabilir miyim?",
+                a: "Evet. 2023 değişikliğiyle haftada 48 saate kadar çalışılabiliyor. Eski limit haftada 40 saatti. Çalışma hakkın vize izin belgeni (grant notice) kontrol ederek öğrenebilirsin."
+            },
+            {
+                q: "TFN olmadan çalışmaya başlayabilir miyim?",
+                a: "Yasal olarak başlayabilirsin ama işveren %47 vergi keser. TFN başvurusunu hemen yap — ato.gov.au üzerinden online, posta ile 1-2 haftada geliyor. Gelene kadar işverenle koordineli ol."
+            },
+            {
+                q: "Avustralya'da yeni biri için en kolay iş hangi sektörde bulunur?",
+                a: "Hospitality (kafe/restoran), inşaat yardımcılığı, temizlik ve lojistik. RSA + White Card + Barista sertifikasıyla ilk haftada iş bulmak mümkün. Sertifikalar sayfamıza göz at."
+            },
+            {
+                q: "Brisbane mi, Sydney mi, Melbourne mi — yeni gelen için hangisi daha iyi?",
+                a: "Brisbane: Daha düşük kira, 2032 Olimpiyatları nedeniyle büyüyen ekonomi, daha az kalabalık. Sydney: Daha fazla iş imkânı ama çok yüksek yaşam maliyeti. Melbourne: Kültür ve eğitim merkezi, orta maliyet. Yeni gelen ve bütçe odaklı biri için Brisbane öne çıkıyor."
+            },
+            {
+                q: "Dil okulu bittikten sonra ne yapabilirim?",
+                a: "Başka bir kursa (TAFE, üniversite) kayıt olarak vize uzatabilirsin. İş deneyimi kazandıktan sonra employer sponsorluğu (482) arayabilirsin. PR yolculuğu için puan hesaplama aracımızı kullanabilirsin."
+            },
+            {
+                q: "Avustralya'da en çok hangi meslekler aranıyor?",
+                a: "İnşaat mühendisi, hemşire, elektrikçi, yazılım geliştirici, kaynak ustası en çok aranan meslekler arasında. Şehre göre farklılık var — haritamızdan şehir bazlı talepleri görebilirsin."
             }
         ]
     }
@@ -144,6 +175,36 @@ const defaultFaqDataEn = [
             {
                 q: "How long do I need to wait to apply for citizenship?",
                 a: "For Australian citizenship, you must have lived in Australia for 4 years after receiving PR, with the last 12 months spent as a permanent resident, and must meet certain lawful residence requirements."
+            }
+        ]
+    },
+    {
+        category: "WORK & DAILY LIFE",
+        accent: "#00ff88",
+        questions: [
+            {
+                q: "Can I work in Australia on a student visa?",
+                a: "Yes. As of 2023, you can work up to 48 hours per week. The previous limit was 40 hours. Check your visa grant notice to confirm your specific work conditions."
+            },
+            {
+                q: "Can I start work without a TFN?",
+                a: "Legally, yes — but your employer must withhold 47% tax. Apply for a TFN immediately at ato.gov.au (online, arrives by post in 1–2 weeks). Coordinate with your employer in the meantime."
+            },
+            {
+                q: "Which sector is easiest for a newcomer to find work in Australia?",
+                a: "Hospitality (café/restaurant), construction labour, cleaning and logistics. With RSA + White Card + Barista certificate, finding work in the first week is very achievable. Check our Certificates page."
+            },
+            {
+                q: "Brisbane, Sydney or Melbourne — which is better for a newcomer?",
+                a: "Brisbane: Lower rent, growing economy due to the 2032 Olympics, less crowded. Sydney: More job opportunities but very high cost of living. Melbourne: Cultural and education hub, moderate cost. For newcomers on a budget, Brisbane stands out."
+            },
+            {
+                q: "What can I do after my language school finishes?",
+                a: "You can extend your visa by enrolling in another course (TAFE, university). After gaining work experience, you can look for employer sponsorship (482). Use our points calculator to plan your PR journey."
+            },
+            {
+                q: "Which occupations are most in demand in Australia?",
+                a: "Civil engineers, nurses, electricians, software developers, and welders are among the most in-demand. Demand varies by city — check the interactive map on our homepage for city-specific data."
             }
         ]
     }
@@ -284,6 +345,8 @@ const SSSPage = () => {
                             {t('sss_contact_us')}
                         </Link>
                     </div>
+
+                    <YouTubeBox />
                 </section>
             </div>
         </>

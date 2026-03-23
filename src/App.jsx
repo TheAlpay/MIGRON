@@ -19,6 +19,11 @@ import SSSPage from './components/pages/SSSPage';
 import ProgramTurleriPage from './components/pages/ProgramTurleriPage';
 import PointsCalculatorPage from './components/pages/PointsCalculatorPage';
 import VisaChecklistPage from './components/pages/VisaChecklistPage';
+import Ilk48SaatPage from './components/pages/Ilk48SaatPage';
+import SertifikalarPage from './components/pages/SertifikalarPage';
+import VergiVeSuperPage from './components/pages/VergiVeSuperPage';
+import BelgeSablonlariPage from './components/pages/BelgeSablonlariPage';
+import CentrelinkPage from './components/pages/CentrelinkPage';
 import AdminLogin from './components/admin/AdminLogin';
 import AdminDashboard from './components/admin/AdminDashboard';
 import SEOHead from './components/seo/SEOHead';
@@ -92,6 +97,11 @@ const App = () => {
                 <Route path="/puan-hesapla" element={<PointsCalculatorPage />} />
                 <Route path="/vize-kontrol-listesi" element={<VisaChecklistPage />} />
                 <Route path="/iletisim" element={<SubPage pageId="iletisim" />} />
+                <Route path="/ilk-48-saat" element={<Ilk48SaatPage />} />
+                <Route path="/sertifikalar" element={<SertifikalarPage />} />
+                <Route path="/vergi-ve-super" element={<VergiVeSuperPage />} />
+                <Route path="/belge-sablonlari" element={<BelgeSablonlariPage />} />
+                <Route path="/centrelink" element={<CentrelinkPage />} />
                 <Route path="/makale/:slug" element={<ArticlePage />} />
               </Routes>
               <AiTerminal />
