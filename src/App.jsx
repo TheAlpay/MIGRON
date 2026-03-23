@@ -104,6 +104,8 @@ const App = () => {
                 <Route path="/vergi-ve-super" element={<VergiVeSuperPage />} />
                 <Route path="/belge-sablonlari" element={<BelgeSablonlariPage />} />
                 <Route path="/centrelink" element={<CentrelinkPage />} />
+                <Route path="/maas-rehberi" element={<MaasRehberiPage />} />
+                <Route path="/pr-yol-haritasi" element={<PrYolHaritasiPage />} />
                 <Route path="/makale/:slug" element={<ArticlePage />} />
               </Routes>
               <AiTerminal />

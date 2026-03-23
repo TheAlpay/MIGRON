@@ -31,9 +31,14 @@ MIGRON, Avustralya'ya göçü düşünen Türkçe konuşan kullanıcılar için 
 - Groq LLM (llama-3.3-70b) destekli yapay zeka hukuk asistanı
 - Canlı Avustralya haberleri (ABC News, The Guardian, SBS)
 - Gerçek zamanlı döviz kurları (AUD → TRY / USD / EUR)
-- İnteraktif Avustralya haritası (7 şehir, kira/maaş verileri)
+- Kripto ve kıymetli maden fiyatları (Bitcoin, Ethereum, Solana, Altın, Gümüş)
+- İnteraktif Avustralya haritası (8 şehir, Firestore'dan güncellenebilir kira/maaş verileri)
 - Becerili göçmen puan hesaplayıcısı
 - Vize kontrol listesi
+- PR Yol Haritası (5 göç yolu, görsel flowchart)
+- Maaş Rehberi (8 sektör, 40+ pozisyon, Fair Work minimum ücret)
+- Site geneli Fuse.js arama (Ctrl+K)
+- İndirilebilir belge şablonları (.docx)
 - Firebase CMS ile yönetilebilir içerik
 
 ---
@@ -53,6 +58,8 @@ MIGRON, Avustralya'ya göçü düşünen Türkçe konuşan kullanıcılar için 
 | Döviz | Frankfurter API (ücretsiz) |
 | Kripto / Metaller | CoinGecko API + Gold-API |
 | Haberler | RSS (ABC News, The Guardian, SBS) |
+| Arama | Fuse.js 7.1.0 (istemci tarafı fuzzy search) |
+| Belge Şablonları | docx npm paketi (Node.js script ile üretilir) |
 | İkonlar | Lucide React 0.575.0 |
 | Markdown | react-markdown + remark-gfm |
 
@@ -62,21 +69,33 @@ MIGRON, Avustralya'ya göçü düşünen Türkçe konuşan kullanıcılar için 
 
 ```
 migron/
-├── api/                        # Vercel Serverless Functions
-│   ├── chat.js                 # Groq AI chat endpoint
-│   ├── australia-news.js       # RSS haber aggregatörü
+├── api/                          # Vercel Serverless Functions
+│   ├── chat.js                   # Groq AI chat endpoint
+│   └── australia-news.js         # RSS haber aggregatörü
+│
+├── public/
+│   ├── sitemap.xml               # SEO sitemap (17 URL)
+│   └── templates/                # İndirilebilir .docx şablonlar (5 dosya)
+│       ├── gte-beyan-mektubu.docx
+│       ├── 482-sponsor-mektubu.docx
+│       ├── avustralya-cv.docx
+│       ├── cover-letter.docx
+│       └── referans-mektubu.docx
+│
+├── scripts/
+│   └── generate-templates.mjs    # .docx dosyalarını üretir (npm run generate-templates)
 │
 ├── src/
 │   ├── components/
-│   │   ├── home/               # Ana sayfa bileşenleri
+│   │   ├── home/
 │   │   │   ├── HeroSlider.jsx
 │   │   │   ├── LiveTicker.jsx
 │   │   │   ├── AustraliaNewsSlider.jsx
 │   │   │   ├── BentoGrid.jsx
-│   │   │   │   │   ├── AustraliaMap.jsx
+│   │   │   ├── AustraliaMap.jsx      # Firestore'dan kira/maaş, 8 şehir
 │   │   │   └── CurrencyWidget.jsx
 │   │   ├── layout/
-│   │   │   ├── Navbar.jsx
+│   │   │   ├── Navbar.jsx            # Arama (Ctrl+K), tüm dropdown'lar
 │   │   │   └── Footer.jsx
 │   │   ├── pages/
 │   │   │   ├── SubPage.jsx
@@ -84,7 +103,14 @@ migron/
 │   │   │   ├── SSSPage.jsx
 │   │   │   ├── ProgramTurleriPage.jsx
 │   │   │   ├── PointsCalculatorPage.jsx
-│   │   │   └── VisaChecklistPage.jsx
+│   │   │   ├── VisaChecklistPage.jsx
+│   │   │   ├── Ilk48SaatPage.jsx
+│   │   │   ├── SertifikalarPage.jsx  # 7 kategori, 24 sertifika, vize badge
+│   │   │   ├── VergiVeSuperPage.jsx
+│   │   │   ├── BelgeSablonlariPage.jsx  # 8 şablon, .docx indirme
+│   │   │   ├── CentrelinkPage.jsx
+│   │   │   ├── MaasRehberiPage.jsx   # 8 sektör, Firestore fair work
+│   │   │   └── PrYolHaritasiPage.jsx # 5 yol flowchart, PR süre tablosu
 │   │   ├── admin/
 │   │   │   ├── AdminLogin.jsx
 │   │   │   ├── AdminDashboard.jsx
@@ -92,24 +118,30 @@ migron/
 │   │   │   ├── FAQEditor.jsx
 │   │   │   ├── ProgramEditor.jsx
 │   │   │   ├── SliderEditor.jsx
-│   │   │   └── BentoEditor.jsx
+│   │   │   ├── BentoEditor.jsx
+│   │   │   └── ContentEditor.jsx     # Şehir kira/maaş, Fair Work, PR süreler
 │   │   ├── chat/
 │   │   │   └── AiTerminal.jsx
+│   │   ├── search/
+│   │   │   └── SearchModal.jsx       # Fuse.js modal (Ctrl+K)
+│   │   ├── shared/
+│   │   │   ├── LiveExperimentBand.jsx
+│   │   │   └── YouTubeBox.jsx
 │   │   └── seo/
 │   │       └── SEOHead.jsx
 │   ├── config/
-│   │   ├── firebase.js         # Firebase bağlantı yapılandırması
-│   │   └── constants.js        # Site geneli sabitler
+│   │   ├── firebase.js
+│   │   └── constants.js
 │   ├── i18n/
-│   │   └── LanguageContext.jsx # TR/EN dil sistemi (React Context)
+│   │   └── LanguageContext.jsx       # TR/EN dil sistemi (250+ anahtar)
 │   ├── data/
-│   │   └── content.js          # Firebase fallback statik veriler
-│   ├── App.jsx                 # Root bileşen, rotalar
+│   │   ├── content.js                # Firebase fallback statik veriler
+│   │   └── searchIndex.js            # Fuse.js site geneli arama indeksi (40+ öğe)
+│   ├── App.jsx
 │   ├── main.jsx
-│   └── index.css               # Tailwind import
+│   └── index.css
 │
-├── public/
-├── .env                        # Ortam değişkenleri (git'e eklenmemeli)
+├── .env
 ├── .env.example
 ├── vite.config.js
 ├── vercel.json
@@ -133,11 +165,14 @@ npm run dev
 # Production build
 npm run build
 
+# .docx şablonlarını yeniden üret
+npm run generate-templates
+
 # Build önizleme
 npm run preview
 ```
 
-> **Not:** API route'larını lokal test etmek için `vercel dev` komutunu kullanın. `npm run dev` ile sadece frontend çalışır, `/api/*` endpoint'lerine erişilemez.
+> **Not:** API route'larını lokal test etmek için `vercel dev` komutunu kullanın.
 
 ---
 
@@ -154,8 +189,6 @@ cp .env.example .env
 | `GROQ_API_KEY` | Groq API anahtarı (sunucu tarafı, `/api/chat.js`) | Evet |
 | `VITE_GROQ_API_KEY` | Aynı anahtar, geliştirme fallback'i için (istemci) | Hayır |
 
-> **Güvenlik:** `GROQ_API_KEY` yalnızca sunucu tarafında kullanılmalıdır. `VITE_` prefix'li değişkenler production build'e dahil olur; production'da bu değişkeni tanımlamayın.
-
 ---
 
 ## Sayfalar ve Rotalar
@@ -167,138 +200,73 @@ cp .env.example .env
 | `/egitim` | `SubPage` | Eğitim kategorisi makaleleri |
 | `/sosyal` | `SubPage` | Sosyal yaşam makaleleri |
 | `/program-turleri` | `ProgramTurleriPage` | 8 vize programı |
+| `/pr-yol-haritasi` | `PrYolHaritasiPage` | PR yol haritası — 5 göç yolu flowchart |
 | `/sss` | `SSSPage` | Sıkça sorulan sorular |
 | `/puan-hesapla` | `PointsCalculatorPage` | Becerili göçmen puan hesaplayıcısı |
 | `/vize-kontrol-listesi` | `VisaChecklistPage` | Vize başvuru kontrol listesi |
+| `/ilk-48-saat` | `Ilk48SaatPage` | Avustralya'ya varış rehberi |
+| `/sertifikalar` | `SertifikalarPage` | 24 sertifika, 7 kategori, vize badge |
+| `/vergi-ve-super` | `VergiVeSuperPage` | Vergi ve süperannuation rehberi |
+| `/belge-sablonlari` | `BelgeSablonlariPage` | 8 belge şablonu, .docx indirme |
+| `/centrelink` | `CentrelinkPage` | Centrelink rehberi |
+| `/maas-rehberi` | `MaasRehberiPage` | 8 sektör maaş rehberi, Fair Work |
 | `/iletisim` | `SubPage` | İletişim sayfası |
 | `/makale/:slug` | `ArticlePage` | Tekil makale görünümü |
-| `/admin` | `AdminPage` | CMS admin paneli (auth korumalı) |
+| `/admin` | `AdminPage` | CMS admin paneli (Firebase Auth korumalı) |
 
 ---
 
 ## Bileşenler
 
-### Ana Sayfa Bileşenleri (`src/components/home/`)
+### AustraliaMap
+- 8 şehir: Darwin, Perth, Adelaide, Melbourne, Canberra, Sydney, Brisbane, Hobart
+- Kira/maaş verileri Firestore `cities/{cityId}` koleksiyonundan çekilir
+- 24h sessionStorage cache — her sayfa yüklemesinde Firestore'a gitmez
+- Admin paneli `İçerik` sekmesinden güncellenebilir
+- Güncelleme tarihi şehir kartında gösterilir
+- Firestore boşsa hardcoded fallback veriler kullanılır
 
-#### HeroSlider
-- Firebase `sliders` koleksiyonundan içerik çeker (fallback: statik veri)
-- 3 slayt, 6 saniyede bir otomatik geçiş
-- Tag badge'leri, başlık, açıklama, CTA butonu
-- Elle ileri/geri navigasyon
+### MaasRehberiPage (`/maas-rehberi`)
+- 8 sektör, 40+ pozisyon: saatlik ve haftalık ücret aralıkları (2025–2026)
+- Sektör filtresi (buton grupları)
+- Fair Work minimum ücret: Firestore `fairwork/minimum_wage`'den çekilir, fallback hardcoded
+- "Son güncelleme" tarihi gösterimi
+- TR/EN tam çeviri
 
-#### LiveTicker
-- Yatay kayan yaşam maliyeti bantı
-- 15 veri kalemi: kira (4 şehir), market, benzin, ulaşım, yemek, faturalar, asgari ücret, maaş, kahve, bira, gym, üniversite
-- Gerçek zamanlı döviz kurları (Frankfurter API, 30 dk'da bir yenilenir)
-- Bitcoin, Ethereum, Solana fiyatları (CoinGecko)
-- Altın ve gümüş fiyatları (Gold-API)
-- Hover'da durur, sekme gizlenince duraklar
-- Kaynak: ABS + Numbeo
+### PrYolHaritasiPage (`/pr-yol-haritasi`)
+- 5 göç yolu: WHV 417, Öğrenci 500, TSS 482, Skilled 189/190, Bölgesel 491
+- Her yol accordion formatında genişletilebilir flowchart
+- PR adımları yeşil ✓ işaretiyle işaretli
+- PR süre tablosu: Firestore `pr_yollari/sureler`'den çekilir
+- Puan hesaplayıcıya CTA butonu
+- TR/EN tam çeviri
 
-#### AustraliaNewsSlider
-- 3 sütunlu haber kartı carousel'i (mobilde 1)
-- `/api/australia-news` endpoint'inden veri çeker
-- Kaynaklar: ABC News (turuncu), The Guardian (mavi), SBS (mor)
-- Saatte bir otomatik yenileme, 6 saniyede bir slayt geçişi
-- CSS `@keyframes` progress bar animasyonu
-- Karta tıklama → `window.open` ile yeni sekmede açılır
-- Hata ve boş durum yönetimi
+### SearchModal (`src/components/search/SearchModal.jsx`)
+- Fuse.js 7.1.0 ile fuzzy full-text arama
+- Tetikleyici: Navbar'daki Search ikonu veya Ctrl+K
+- İndeks: 40+ öğe — sayfalar, vizeler, sertifikalar, belgeler (`src/data/searchIndex.js`)
+- Kategori renk badge'leri
+- Klavye navigasyonu: ↑↓ gezin, Enter aç, Esc kapat
+- Boş durum: migron@mtive.tech yönlendirmesi
 
-#### BentoGrid
-- Masonry-stil kart gridi (1–4 sütun)
-- 2 statik kart: Risk Analizi, Avustralya İstatistikleri
-- Firestore'dan dinamik makale kartları (en fazla 20)
-- Kategori renkleri: hukuk (lime), eğitim (cyan), sosyal (kırmızı), program-turleri (mor)
-
-#### AustraliaMap
-- Etkileşimli SVG Avustralya haritası
-- 7 şehir: Darwin, Perth, Adelaide, Melbourne, Canberra, Sydney, Brisbane
-- Her şehir için: nüfus, ortalama kira, ortalama maaş, yaşam maliyeti endeksi, iklim, top 5 meslek
-- Tıklama ile modal popup
-
-#### CurrencyWidget
-- Sol kenarda sabit sidebar (mobilde gizli)
-- AUD → TRY, USD, EUR anlık kurlar
-- Yükselen/düşen trend okları (yeşil/kırmızı)
-- Frankfurter API, 30 dk'da bir güncellenir
-
-### Layout (`src/components/layout/`)
-
-#### Navbar
-- Sayfa üstüne sabitlenmiş, blur arka plan
-- Logo (migron.webp)
-- 7 navigasyon öğesi
-- "Araçlar" dropdown menüsü (Puan Hesaplayıcı, Vize Kontrol Listesi)
-- TR/EN dil değiştirici
-- Mobil hamburger menü, rota değişiminde kapanır
-
-#### Footer
-- 8px lime üst kenarlık
-- 3 sütun: logo + tagline, site linkleri, araçlar + iletişim
-- Slogan: "STAY RADICAL / STAY LEGAL"
-
-### Yapay Zeka Sohbet (`src/components/chat/`)
-
-#### AiTerminal
-- Sağ altta yüzen chat widget (360×520px)
-- Model: Groq `llama-3.3-70b-versatile`
-- Sistem rolü: Türkçe Avustralya göçmenlik hukuku uzmanı
-- Çift fallback: önce `/api/chat`, sonra doğrudan Groq API (geliştirme modu)
-- Enter ile gönder, Shift+Enter ile yeni satır
-- Otomatik scroll, mesaj geçmişi
-
-### SEO (`src/components/seo/`)
-
-#### SEOHead
-- `document.title` dinamik güncelleme
-- Meta etiketleri: description, Open Graph (og:title/description/url/image/type/locale), Twitter Card
-- Canonical URL oluşturma: `https://migron.mtive.tech`
-- DOM çıktısı yok (null döndürür)
+### ContentEditor (`src/components/admin/ContentEditor.jsx`)
+- **Şehir Verileri:** 8 şehir için kira/maaş → Firestore `cities/{cityId}`
+- **Fair Work:** Saatlik/haftalık/tarih → Firestore `fairwork/minimum_wage`
+- **PR Süre Tablosu:** Satır ekle/sil → Firestore `pr_yollari/sureler`
+- Toast bildirimleri ile kaydetme geri bildirimi
+- Admin paneli `İçerik` sekmesinden erişilir
 
 ---
 
 ## API Rotaları
 
-Tüm API route'ları `api/` klasöründe Vercel Serverless Function olarak çalışır.
-
 ### `POST /api/chat`
-
-Groq AI ile sohbet endpoint'i.
-
-**İstek:**
-```json
-{ "message": "string (max 500 karakter)" }
-```
-
-**Yanıt:**
-```json
-{ "text": "AI yanıtı..." }
-```
-
-- Model: `llama-3.3-70b-versatile`
-- Temperature: 0.7 | Max Tokens: 800
-- Sistem prompt: Türkçe Avustralya göçmenlik hukuku uzmanı
-
----
+Groq AI ile sohbet.
+- Model: `llama-3.3-70b-versatile` · Temperature: 0.7 · Max Tokens: 800
 
 ### `GET /api/australia-news`
-
-Avustralya haber RSS feed'lerini server-side çeker ve parse eder.
-
-**Yanıt:**
-```json
-{
-  "articles": [...],
-  "fetchedAt": "ISO timestamp",
-  "count": 15
-}
-```
-
-- Cache: `s-maxage=3600, stale-while-revalidate=600`
-- Kaynaklar: ABC News, The Guardian Australia, SBS News
-- XML/CDATA parse (harici paket kullanılmaz)
-- Görsel çıkarma: `media:thumbnail`, `media:content`, `<enclosure>`, `<img>`
-- En yeni 15 makale döndürülür
+RSS aggregatör. Cache: `s-maxage=3600`.
+- Kaynaklar: ABC News · The Guardian Australia · SBS News
 
 ---
 
@@ -306,33 +274,19 @@ Avustralya haber RSS feed'lerini server-side çeker ve parse eder.
 
 Firebase projesi: `migron-32348`
 
-| Koleksiyon | İçerik | Alan Adları |
-|------------|--------|-------------|
-| `articles` | Makaleler | title, slug, content (markdown), category, status, createdAt |
-| `faqItems` | SSS soruları | category, question, answer, order |
-| `programs` | Vize programları | title, subtitle, description, requirements, processingTime, prDirect |
-| `sliders` | Hero slaytları | title, tags, description, imageUrl, order |
-| `bentoCards` | Bento kart içerikleri | id, fields (değişken) |
+| Koleksiyon | İçerik |
+|------------|--------|
+| `articles` | Makaleler (title, slug, content, category, status) |
+| `faqItems` | SSS soruları (category, question, answer, order) |
+| `programs` | Vize programları (title, requirements, processingTime) |
+| `sliders` | Hero slaytları (title, tags, imageUrl, order) |
+| `bentoCards` | Bento kart içerikleri |
+| `cities/{cityId}` | Şehir kira/maaş (rent, salary, updatedAt) |
+| `fairwork/minimum_wage` | Fair Work asgari ücret (hourly, weekly, effective_date) |
+| `pr_yollari/sureler` | PR süre tablosu (rows array, updatedAt) |
+| `maas_rehberi/meta` | Maaş rehberi güncelleme tarihi |
 
-### Vize Programları
-
-| Vize | Ad |
-|------|----|
-| 189 | Skilled Independent |
-| 190 | Skilled Nominated |
-| 482 | Temporary Skill Shortage |
-| 186 | Employer Nomination Scheme |
-| 491 | Skilled Work Regional |
-| 500 | Student Visa |
-| 820/801 | Partner Visa |
-| 888 | Business Innovation |
-
-### Admin Seed Verileri
-
-Admin dashboard'dan "Seed" butonuyla şu veriler varsayılan olarak yüklenir:
-- 11 adet SSS sorusu (VİZE, İNGİLİZCE, MESLEK, KALICI OTURUM kategorilerinde)
-- 8 vize programı
-- 2 bento kartı
+**Şehir ID'leri:** `darwin` · `perth` · `adelaide` · `melbourne` · `canberra` · `sydney` · `brisbane` · `hobart`
 
 ---
 
@@ -340,19 +294,14 @@ Admin dashboard'dan "Seed" butonuyla şu veriler varsayılan olarak yüklenir:
 
 **Dosya:** `src/i18n/LanguageContext.jsx`
 
-- React Context API tabanlı
-- Desteklenen diller: Türkçe (`tr`) — varsayılan, İngilizce (`en`)
-- 250+ çeviri anahtarı
-- Navbar'daki butonla anlık dil geçişi
-- `useLanguage()` hook'u ile her bileşenden erişilir:
+- React Context API tabanlı, 250+ çeviri anahtarı
+- TR (varsayılan) / EN
+- Navbar Globe ikonu ile anlık geçiş
+- Tüm yeni sayfalar (MaasRehberi, PrYolHaritasi, SearchModal, ContentEditor) tam TR/EN desteklidir
 
 ```jsx
 const { lang, t } = useLanguage();
-
-// Doğrudan karşılaştırma
 {lang === 'tr' ? 'Türkçe metin' : 'English text'}
-
-// t() fonksiyonu ile anahtar bazlı çeviri
 {t('hero_subtitle')}
 ```
 
@@ -360,22 +309,21 @@ const { lang, t } = useLanguage();
 
 ## Admin Paneli
 
-**Rota:** `/admin`
-**Auth:** Firebase Email/Password
-
-### Sekmeler
+**Rota:** `/admin` · **Auth:** Firebase Email/Password (tek kullanıcı)
 
 | Sekme | Koleksiyon | İşlemler |
 |-------|------------|----------|
-| Makaleler | `articles` | Oluştur, düzenle, sil, yayınla/taslağa al |
-| SSS | `faqItems` | Oluştur, düzenle, sil, sırala |
-| Programlar | `programs` | Oluştur, düzenle, sil |
-| Slaytlar | `sliders` | Oluştur, düzenle, sil, sırala |
-| Bento Kartlar | `bentoCards` | İçerik düzenle |
+| Makaleler | `articles` | CRUD + yayınla/taslak |
+| SSS | `faqItems` | CRUD + sırala |
+| Programlar | `programs` | CRUD |
+| Slider | `sliders` | CRUD + sırala |
+| Bento | `bentoCards` | Düzenle |
+| **İçerik** | `cities`, `fairwork`, `pr_yollari` | Şehir kira/maaş · Fair Work · PR süreler |
 
-### Makale Editörü
-- Başlık, slug (URL), içerik (Markdown), kategori, durum (taslak/yayında)
-- Kategori seçenekleri: hukuk, egitim, sosyal, program-turleri, iletisim
+### ContentEditor Kullanımı
+- **Şehir Verileri:** Kira + haftalık maaş girip Kaydet. Harita kartında anında güncellenir.
+- **Fair Work:** Saatlik, haftalık, geçerlilik tarihi (TR+EN). Her Temmuz güncelle.
+- **PR Süre Tablosu:** Satır ekle/sil. `/pr-yol-haritasi` sayfasında gösterilir.
 
 ---
 
@@ -383,83 +331,72 @@ const { lang, t } = useLanguage();
 
 ### Renk Paleti
 
-| Değişken | HEX | Kullanım |
-|----------|-----|---------|
-| Accent / Lime | `#ccff00` | Birincil vurgu, başlıklar, butonlar |
-| Cyan | `#00d4ff` | USD kuru, eğitim kategorisi |
-| Kırmızı | `#ff6b6b` | Sosyal kategori |
+| Renk | HEX | Kullanım |
+|------|-----|---------|
+| Lime / Accent | `#ccff00` | Birincil vurgu, başlıklar, CTA butonlar |
+| Cyan | `#00d4ff` | USD kuru, eğitim, 500 vizesi badge |
+| Kırmızı | `#ff6b6b` | Sosyal kategori, zorunlu badge |
 | Mor | `#a78bfa` | Programlar, EUR kuru |
-| Amber | `#f59e0b` | Uyarılar |
-| ABC Turuncu | `#ff6b35` | ABC News badge |
-| Guardian Mavi | `#05A0E8` | The Guardian badge |
-| SBS Mor | `#8b5cf6` | SBS News badge |
+| Turuncu | `#ff9500` | 482 vizesi badge |
+| Yeşil neon | `#00ff88` | 189/190 badge, PR ✓ işareti |
+| Amber | `#f59e0b` | Uyarı kutuları |
 
 ### Arka Plan Hiyerarşisi
 
 ```
-#050505 → Sayfa arka planı
-#060606 → Section arka planı
-#080808 → Kart arka planı
-#0a0a0a → İkincil kart / footer panel
-#111111 → Görsel arka planı
+#050505 → Sayfa zemin
+#111111 → Kart / panel
+#0a0a0a → İkincil panel
 ```
 
-### Tipografi Kuralları
+### Tipografi
 
-- Başlıklar: `font-black uppercase tracking-tighter italic`
-- Etiketler: `font-black uppercase tracking-widest text-[9px]`
+- Başlık: `font-black uppercase tracking-tighter italic`
+- Etiket: `font-black uppercase tracking-widest text-[9px]`
 - Gövde: `font-medium text-white/70`
-- Kenarlık: `border-white/5` (ince), `border-white/10` (orta), `border-white/20` (belirgin)
 
-### Bileşen Stilleri
+---
 
-- Kart kenarlıkları: 1px `white/5` → hover `white/20`
-- Aktif durum: `border-l-2 border-l-[#ccff00]` + `bg-[#ccff00]/5`
-- Buton stili: `border border-white/10 hover:border-white/30`
-- Gölge (floating): `6px 6px 0px rgba(0,0,0,0.5)`
+## Belge Şablonları
+
+`public/templates/` klasöründe 5 `.docx` dosyası:
+
+| Dosya | Şablon |
+|-------|--------|
+| `gte-beyan-mektubu.docx` | GTE beyan mektubu (öğrenci vizesi) |
+| `482-sponsor-mektubu.docx` | 482 TSS işveren sponsor mektubu |
+| `avustralya-cv.docx` | Avustralya CV formatı |
+| `cover-letter.docx` | İngilizce kapak mektubu |
+| `referans-mektubu.docx` | İşveren referans mektubu |
+
+Şablonları yeniden üretmek:
+```bash
+npm run generate-templates
+```
 
 ---
 
 ## Dağıtım (Vercel)
 
 ### vercel.json
-
 ```json
 {
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api/$1" },
-    { "source": "/(.*)",     "destination": "/" }
+    { "source": "/(.*)", "destination": "/" }
   ]
 }
 ```
 
-- `/api/*` → Serverless functions
-- Diğer tüm rotalar → `index.html` (SPA fallback)
+### Adımlar
+1. Vercel Dashboard'a git, repository'yi bağla
+2. Environment Variables: `GROQ_API_KEY`
+3. Deploy — Vercel otomatik `npm run build` çalıştırır
 
-### Dağıtım Adımları
-
-1. [Vercel Dashboard](https://vercel.com)'a git ve bu repository'yi bağla
-2. **Environment Variables** bölümüne ekle:
-   - `GROQ_API_KEY` → Groq console'dan alınan API anahtarı
-3. Deploy et — Vercel otomatik olarak `npm run build` çalıştırır
-
-### Production URL
-
-```
-https://migron.mtive.tech
-```
-
-### Vercel Logs ile Hata Ayıklama
-
-API route'larından detaylı loglara ulaşmak için:
-```
-Vercel Dashboard → Project → Functions → Log Drains
-```
-
-`australia-news.js` ve `chat.js` her adımda `console.log` yazar; haber kaynaklarının durumu buradan izlenebilir.
+**Production URL:** `https://migron.mtive.tech`
 
 ---
 
 ## Lisans
 
-© 2025 MIGRON — MTIVE TECH LEGAL. Tüm hakları saklıdır.
+© 2025–2026 MIGRON — MTIVE TECH LEGAL. Tüm hakları saklıdır.
