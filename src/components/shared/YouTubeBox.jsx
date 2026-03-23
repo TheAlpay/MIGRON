@@ -15,8 +15,8 @@ const YouTubeBox = () => {
                 </p>
                 <p className="text-sm text-white/50 leading-relaxed">
                     {lang === 'en'
-                        ? "Alpay is living this process firsthand in Brisbane and sharing it on the ALPAY AU YouTube channel."
-                        : "Alpay bu süreci Brisbane'de bizzat yaşıyor ve ALPAY AU YouTube kanalında anlatıyor."}
+                        ? "Alpay is living the Australian immigration process firsthand and sharing it on the ALPAY AU YouTube channel."
+                        : "Alpay bu süreci Avustralya'da bizzat yaşıyor ve ALPAY AU YouTube kanalında anlatıyor."}
                 </p>
             </div>
             <a

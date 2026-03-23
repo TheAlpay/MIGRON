@@ -44,13 +44,13 @@ const sections = [
         steps: [
             {
                 id: 'airtrain',
-                text: 'Airtrain veya otobüs — Brisbane havalimanından şehir merkezine Airtrain en hızlı yol (~$20 AUD). Otobüs daha ucuz ama yavaş.',
-                textEn: 'Airtrain or bus — Airtrain is the fastest way from Brisbane airport to the city (~$20 AUD). Bus is cheaper but slower.',
+                text: 'Havalimanından şehre ulaşım — her şehrin havalimanı treni veya ekspres otobüsü var. Bilet fiyatları şehre göre değişir, havalimanı ulaşım tabelalarını takip et. Büyük şehirlerde genellikle $10–25 AUD arası.',
+                textEn: 'Airport to city transport — every major city has an airport train or express bus. Prices vary by city, follow airport transport signs. Generally $10–25 AUD in major cities.',
             },
             {
                 id: 'gocard',
-                text: 'Go Card al — Brisbane\'in toplu taşıma kartı. Tren istasyonunda veya convenience store\'larda satılıyor. Nakit yerine Go Card kullanmak %30 daha ucuz. İlk yükleme: min $10 AUD.',
-                textEn: 'Get a Go Card — Brisbane\'s public transport card. Available at train stations or convenience stores. Go Card is 30% cheaper than paying cash. Initial top-up: min $10 AUD.',
+                text: 'Şehrin ulaşım kartını al — her eyaletin kendine özgü toplu taşıma kartı var (Opal kart — NSW, Myki — VIC, Go Card — QLD, SmartRider — WA). Havalimanı veya yakın istasyondan temin edilebilir. Nakit yerine kart kullanmak %20–30 daha ucuz.',
+                textEn: 'Get your city\'s transit card — each state has its own public transport card (Opal — NSW, Myki — VIC, Go Card — QLD, SmartRider — WA). Available at the airport or nearby stations. Using a card is 20–30% cheaper than paying cash.',
             },
         ],
     },
@@ -157,10 +157,10 @@ const Ilk48SaatPage = () => {
     return (
         <>
             <SEOHead
-                title={lang === 'en' ? "First 48 Hours Guide" : "İlk 48 Saat Rehberi"}
+                title={lang === 'en' ? "First 48 Hours in Australia — Arrival Guide" : "Avustralya'ya İndim, Şimdi Ne Yapacağım?"}
                 description={lang === 'en'
-                    ? "Step-by-step guide for your first 48 hours in Brisbane. Follow along on your phone."
-                    : "Brisbane'e yeni inen birinin ilk 48 saatte adım adım yapması gerekenler. Telefona bakarak takip et."}
+                    ? "Step-by-step checklist for your first 48 hours in Australia. Follow along on your phone."
+                    : "Avustralya'ya yeni gelen birinin ilk 48 saatte adım adım yapması gerekenler. Telefona bakarak takip et."}
                 path="/ilk-48-saat"
             />
             <div className="min-h-screen bg-[#050505] text-[#e0e0e0] pt-20">
@@ -188,8 +188,8 @@ const Ilk48SaatPage = () => {
                         </div>
                         <p className="text-sm md:text-base text-white/50 leading-relaxed font-medium">
                             {lang === 'en'
-                                ? "Just landed in Brisbane? Follow this step-by-step checklist on your phone. Tap each item as you complete it."
-                                : "Brisbane'e yeni indin mi? Bu listeyi telefona bakarak adım adım takip et. Her adımı tamamladıkça işaretle."}
+                                ? "Just landed in Australia? Follow this step-by-step checklist on your phone. Tap each item as you complete it."
+                                : "Avustralya'ya yeni indin mi? Bu listeyi telefona bakarak adım adım takip et. Her adımı tamamladıkça işaretle."}
                         </p>
                     </div>
                 </section>
@@ -225,7 +225,7 @@ const Ilk48SaatPage = () => {
                         </div>
                         {progress === 100 && (
                             <p className="text-xs font-black text-[#ccff00] uppercase tracking-widest mt-3 text-center">
-                                {lang === 'en' ? '🎉 All done! Welcome to Brisbane.' : '🎉 Tamamlandı! Brisbane\'e hoş geldin.'}
+                                {lang === 'en' ? '🎉 All done! Welcome to Australia.' : '🎉 Tamamlandı! Avustralya\'ya hoş geldin.'}
                             </p>
                         )}
                     </div>

@@ -16,8 +16,8 @@ const LiveExperimentBand = () => {
             </div>
             <p className="text-[11px] text-white/35 leading-relaxed">
                 {lang === 'en'
-                    ? `Some of this content is written by Alpay as he lives it firsthand in Brisbane. — ${today}`
-                    : `Bu içeriklerin bir kısmı Alpay tarafından Brisbane'de bizzat yaşanarak yazılıyor. — ${today}`}
+                    ? `Some of this content is written by Alpay as he lives the Australian immigration process firsthand. — ${today}`
+                    : `Bu içeriklerin bir kısmı Alpay tarafından Avustralya'da bizzat yaşanarak yazılıyor. — ${today}`}
             </p>
         </div>
     );
