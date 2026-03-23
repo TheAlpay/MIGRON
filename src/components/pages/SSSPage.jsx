@@ -341,9 +341,9 @@ const SSSPage = () => {
 
                     <div className="bg-[#111] border border-white/5 p-8 mt-8 text-center">
                         <p className="text-white/30 text-sm font-bold uppercase tracking-widest mb-3">{t('sss_question_missing')}</p>
-                        <Link to="/iletisim" className="inline-flex items-center gap-2 bg-[#ccff00] text-black px-6 py-3 font-black uppercase text-sm hover:brightness-110 transition-all">
+                        <a href="mailto:migron@mtive.tech" className="inline-flex items-center gap-2 bg-[#ccff00] text-black px-6 py-3 font-black uppercase text-sm hover:brightness-110 transition-all">
                             {t('sss_contact_us')}
-                        </Link>
+                        </a>
                     </div>
 
                     <YouTubeBox />

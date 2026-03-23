@@ -220,9 +220,7 @@ const ProgramModal = ({ program, onClose, t }) => {
 
                 <div className="mt-8 pt-6 border-t border-white/10">
                     <a
-                        href="https://ye-ro.com/iletisim"
-                        target="_blank"
-                        rel="noopener noreferrer"
+                        href="mailto:migron@mtive.tech"
                         onClick={onClose}
                         className="inline-flex items-center gap-2 bg-[#ccff00] text-black px-5 py-2.5 font-black uppercase text-sm hover:brightness-110 transition-all"
                     >
@@ -355,9 +353,7 @@ const ProgramTurleriPage = () => {
                             <p className="text-white/40 text-sm mt-1">{t('program_cta_desc')}</p>
                         </div>
                         <a
-                            href="https://ye-ro.com/iletisim"
-                            target="_blank"
-                            rel="noopener noreferrer"
+                            href="mailto:migron@mtive.tech"
                             className="inline-flex items-center gap-2 bg-[#ccff00] text-black px-6 py-3 font-black uppercase text-sm hover:brightness-110 transition-all shrink-0"
                         >
                             {t('program_cta_btn')} <ArrowUpRight size={16} />

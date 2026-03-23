@@ -152,8 +152,8 @@ const translations = {
         program_details_label: "Detaylı Bilgi",
         program_requirements_label: "Temel Gereksinimler",
         program_cta_title: "Hangi program size uygun?",
-        program_cta_desc: "Uluslararası destek ortağımız Yero ile iletişime geçin.",
-        program_cta_btn: "Yero ile İletişime Geç",
+        program_cta_desc: "Sorularınız için doğrudan bizimle iletişime geçin.",
+        program_cta_btn: "İletişime Geç",
         program_view_details: "Detayları Gör",
 
         // Points Calculator Page
@@ -333,8 +333,8 @@ const translations = {
         program_details_label: "Detailed Information",
         program_requirements_label: "Key Requirements",
         program_cta_title: "Which program suits you?",
-        program_cta_desc: "Get in touch with our international support partner Yero.",
-        program_cta_btn: "Contact Yero",
+        program_cta_desc: "Get in touch with us directly for your questions.",
+        program_cta_btn: "Get in Touch",
         program_view_details: "View Details",
 
         // Points Calculator Page
