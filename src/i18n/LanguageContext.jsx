@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState } from 'react';
 
 const LanguageContext = createContext();
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useLanguage = () => useContext(LanguageContext);
 
 const LANG_KEY = 'migron_lang';
@@ -381,7 +382,7 @@ export const LanguageProvider = ({ children }) => {
     const toggleLanguage = () => {
         setLang(prev => {
             const next = prev === 'tr' ? 'en' : 'tr';
-            try { localStorage.setItem(LANG_KEY, next); } catch {}
+            try { localStorage.setItem(LANG_KEY, next); } catch { /* storage unavailable */ }
             return next;
         });
     };

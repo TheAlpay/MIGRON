@@ -7,9 +7,16 @@ const STATIC_URLS = [
     { loc: '/egitim',               priority: '0.8', changefreq: 'weekly' },
     { loc: '/sosyal',               priority: '0.8', changefreq: 'weekly' },
     { loc: '/sss',                  priority: '0.8', changefreq: 'weekly' },
-    { loc: '/program-turleri',      priority: '0.8', changefreq: 'weekly' },
+    { loc: '/program-turleri',      priority: '0.9', changefreq: 'monthly' },
+    { loc: '/pr-yol-haritasi',      priority: '0.9', changefreq: 'monthly' },
     { loc: '/puan-hesapla',         priority: '0.9', changefreq: 'monthly' },
     { loc: '/vize-kontrol-listesi', priority: '0.9', changefreq: 'monthly' },
+    { loc: '/belge-sablonlari',     priority: '0.8', changefreq: 'monthly' },
+    { loc: '/ilk-48-saat',          priority: '0.8', changefreq: 'monthly' },
+    { loc: '/sertifikalar',         priority: '0.8', changefreq: 'monthly' },
+    { loc: '/vergi-ve-super',       priority: '0.8', changefreq: 'monthly' },
+    { loc: '/centrelink',           priority: '0.7', changefreq: 'monthly' },
+    { loc: '/maas-rehberi',         priority: '0.8', changefreq: 'monthly' },
     { loc: '/iletisim',             priority: '0.6', changefreq: 'monthly' },
 ];
 

@@ -74,7 +74,7 @@ const SECTION_KEYS = [
 ];
 
 const PointsCalculatorPage = () => {
-    const { t, lang } = useLanguage();
+    const { t } = useLanguage();
     const [selected, setSelected] = useState({
         age: 0, english: 0, ausExp: 0, osExp: 0, education: 0,
         partner: 0, nomination: 0, ausStudy: 0, naati: 0, profYear: 0,

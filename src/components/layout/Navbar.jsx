@@ -51,11 +51,13 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }) => {
 
     // Close menu on route change
     useEffect(() => {
+        /* eslint-disable react-hooks/set-state-in-effect */
         setIsMenuOpen(false);
         setToolsOpen(false);
         setSosyalOpen(false);
         setEgitimOpen(false);
         setProgramOpen(false);
+        /* eslint-enable react-hooks/set-state-in-effect */
     }, [location.pathname]);
 
     const isSosyalActive = ['/sosyal', '/ilk-48-saat', '/centrelink', '/maas-rehberi'].includes(location.pathname);

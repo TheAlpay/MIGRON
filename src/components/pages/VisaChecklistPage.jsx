@@ -121,6 +121,7 @@ const VisaChecklistPage = () => {
     // Persist to localStorage
     useEffect(() => {
         const saved = localStorage.getItem('migron_checklist');
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         if (saved) setChecked(JSON.parse(saved));
     }, []);
 

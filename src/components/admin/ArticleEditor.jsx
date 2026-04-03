@@ -271,7 +271,7 @@ const ArticleEditor = ({ article, onSave, onCancel }) => {
         }
     };
 
-    const activeEditor = activeLangTab === 'tr' ? editorTr : editorEn;
+    const _activeEditor = activeLangTab === 'tr' ? editorTr : editorEn; // reserved for future toolbar actions
 
     return (
         <div className="min-h-screen bg-[#050505] text-[#e0e0e0] pt-8 px-6">

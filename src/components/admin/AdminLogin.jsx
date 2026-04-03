@@ -17,7 +17,7 @@ const AdminLogin = ({ onLogin }) => {
         try {
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
             onLogin(userCredential.user);
-        } catch (err) {
+        } catch {
             setError('Geçersiz email veya şifre.');
         } finally {
             setLoading(false);

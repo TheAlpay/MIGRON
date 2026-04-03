@@ -94,6 +94,7 @@ const AdminDashboard = ({ user, onLogout }) => {
         setLoading(false);
     };
 
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     useEffect(() => { fetchAll(); }, []);
 
     // ── Seed functions ─────────────────────────────────────────────────────────

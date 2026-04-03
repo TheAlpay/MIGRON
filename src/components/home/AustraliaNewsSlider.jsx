@@ -139,7 +139,7 @@ const AustraliaNewsSlider = () => {
                     ? 'Şu anda haber bulunamadı.'
                     : 'No articles available right now.');
             }
-        } catch (err) {
+        } catch {
             setError(langRef.current === 'tr' ? 'Haberler yüklenemedi.' : 'Could not load news.');
         } finally {
             setLoading(false);
@@ -153,16 +153,6 @@ const AustraliaNewsSlider = () => {
         const hourly = setInterval(() => fetchNews(), REFRESH_INTERVAL);
         return () => clearInterval(hourly);
     }, [fetchNews]);
-
-    // Auto-advance slide
-    const goTo = useCallback((idx) => {
-        setArticles(prev => {
-            const next = ((idx % prev.length) + prev.length) % prev.length;
-            setActiveIndex(next);
-            setProgressKey(k => k + 1);
-            return prev;
-        });
-    }, []);
 
     useEffect(() => {
         if (articles.length < 2) return;

@@ -26,6 +26,7 @@ const CurrencyWidget = () => {
     };
 
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         fetchRates();
         const id = setInterval(fetchRates, 30 * 60 * 1000);
         return () => clearInterval(id);

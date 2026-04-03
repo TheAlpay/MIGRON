@@ -40,11 +40,11 @@ const PATHWAYS = [
     {
         id: 'tss',
         color: '#ff9500',
-        startLabel: { tr: '482 — TSS', en: '482 — TSS' },
+        startLabel: { tr: '482 — Skills in Demand (SID)', en: '482 — Skills in Demand (SID)' },
         steps: [
-            { visa: '482 Kısa', label: { tr: 'Short-term', en: 'Short-term' }, desc: { tr: '2 yıl — MLTSSL listesi', en: '2 years — MLTSSL list' } },
-            { visa: '482 Orta', label: { tr: 'Medium-term', en: 'Medium-term' }, desc: { tr: '4 yıl — STSOL listesi', en: '4 years — STSOL list' } },
-            { visa: '186', label: { tr: 'PR', en: 'PR' }, desc: { tr: '2–3 yıl sonra kalıcı oturum', en: 'Permanent after 2–3 years' }, pr: true },
+            { visa: 'Core Skills', label: { tr: 'Core Skills', en: 'Core Skills' }, desc: { tr: '4 yıl — CSOL listesi, min. $73,150', en: '4 years — CSOL list, min. $73,150' } },
+            { visa: 'Specialist', label: { tr: 'Specialist', en: 'Specialist' }, desc: { tr: '4 yıl — liste yok, min. $141,210', en: '4 years — no list, min. $141,210' } },
+            { visa: '186', label: { tr: 'PR', en: 'PR' }, desc: { tr: '2 yıl sonra kalıcı oturum', en: 'Permanent after 2 years' }, pr: true },
         ],
     },
     {

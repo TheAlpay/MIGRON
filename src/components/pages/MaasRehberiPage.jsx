@@ -13,86 +13,86 @@ const DEFAULT_SECTORS = [
         id: 'yiyecek', icon: '🍽️',
         name: { tr: 'Yiyecek & İçecek', en: 'Food & Beverage' },
         positions: [
-            { tr: 'Kafe Görevlisi / Barista', en: 'Cafe Worker / Barista', hourly: '$24–28', weekly: '$800–1,000' },
-            { tr: 'Restoran Garson', en: 'Restaurant Waiter', hourly: '$24–30', weekly: '$850–1,100' },
-            { tr: 'Aşçı Yardımcısı', en: 'Kitchen Hand', hourly: '$25–30', weekly: '$900–1,100' },
-            { tr: 'Sous Chef', en: 'Sous Chef', hourly: '$30–38', weekly: '$1,100–1,400' },
-            { tr: 'Head Chef', en: 'Head Chef', hourly: '$38–50', weekly: '$1,400–1,900' },
+            { tr: 'Kafe Görevlisi / Barista', en: 'Cafe Worker / Barista', hourly: '$25–31', weekly: '$950–1,150' },
+            { tr: 'Restoran Garson', en: 'Restaurant Waiter', hourly: '$25–32', weekly: '$950–1,200' },
+            { tr: 'Aşçı Yardımcısı', en: 'Kitchen Hand', hourly: '$26–32', weekly: '$980–1,200' },
+            { tr: 'Sous Chef', en: 'Sous Chef', hourly: '$32–40', weekly: '$1,200–1,500' },
+            { tr: 'Head Chef', en: 'Head Chef', hourly: '$40–55', weekly: '$1,500–2,100' },
         ],
     },
     {
         id: 'insaat', icon: '🏗️',
         name: { tr: 'İnşaat & Saha', en: 'Construction & Site' },
         positions: [
-            { tr: 'Genel İşçi', en: 'General Labourer', hourly: '$28–35', weekly: '$1,050–1,300' },
-            { tr: 'Forklift Operatörü', en: 'Forklift Operator', hourly: '$30–38', weekly: '$1,100–1,400' },
-            { tr: 'Traffic Controller', en: 'Traffic Controller', hourly: '$35–45', weekly: '$1,300–1,700' },
-            { tr: 'Elektrikçi', en: 'Electrician', hourly: '$45–65', weekly: '$1,700–2,400', note: { tr: 'En çok aranan meslek', en: 'Most in-demand trade' } },
-            { tr: 'İnşaat Mühendisi', en: 'Civil Engineer', hourly: '$50–75', weekly: '$1,900–2,800' },
+            { tr: 'Genel İşçi', en: 'General Labourer', hourly: '$30–38', weekly: '$1,100–1,450' },
+            { tr: 'Forklift Operatörü', en: 'Forklift Operator', hourly: '$32–42', weekly: '$1,200–1,600' },
+            { tr: 'Traffic Controller', en: 'Traffic Controller', hourly: '$38–50', weekly: '$1,450–1,900' },
+            { tr: 'Elektrikçi', en: 'Electrician', hourly: '$48–70', weekly: '$1,800–2,650', note: { tr: 'En çok aranan meslek', en: 'Most in-demand trade' } },
+            { tr: 'İnşaat Mühendisi', en: 'Civil Engineer', hourly: '$55–80', weekly: '$2,100–3,050' },
         ],
     },
     {
         id: 'guvenlik', icon: '🛡️',
         name: { tr: 'Güvenlik', en: 'Security' },
         positions: [
-            { tr: 'Güvenlik Görevlisi', en: 'Security Guard', hourly: '$28–35', weekly: '$1,000–1,300' },
-            { tr: 'Gece Kulübü Güvenliği', en: 'Crowd Controller', hourly: '$35–45', weekly: '$1,200–1,600' },
-            { tr: 'Güvenlik Süpervizörü', en: 'Security Supervisor', hourly: '$38–50', weekly: '$1,400–1,900' },
+            { tr: 'Güvenlik Görevlisi', en: 'Security Guard', hourly: '$30–38', weekly: '$1,100–1,450' },
+            { tr: 'Gece Kulübü Güvenliği', en: 'Crowd Controller', hourly: '$38–50', weekly: '$1,450–1,900' },
+            { tr: 'Güvenlik Süpervizörü', en: 'Security Supervisor', hourly: '$42–55', weekly: '$1,600–2,100' },
         ],
     },
     {
         id: 'it', icon: '💻',
         name: { tr: 'IT & Teknoloji', en: 'IT & Technology' },
         positions: [
-            { tr: 'IT Destek', en: 'IT Support', hourly: '$35–45', weekly: '$1,300–1,700' },
-            { tr: 'Yazılım Geliştirici (Junior)', en: 'Software Developer (Junior)', hourly: '$45–60', weekly: '$1,700–2,200' },
-            { tr: 'Yazılım Geliştirici (Mid)', en: 'Software Developer (Mid)', hourly: '$60–80', weekly: '$2,200–3,000' },
-            { tr: 'Veri Analisti', en: 'Data Analyst', hourly: '$50–70', weekly: '$1,900–2,600' },
-            { tr: 'Siber Güvenlik Uzmanı', en: 'Cybersecurity Specialist', hourly: '$65–90', weekly: '$2,400–3,400' },
+            { tr: 'IT Destek', en: 'IT Support', hourly: '$38–50', weekly: '$1,450–1,900' },
+            { tr: 'Yazılım Geliştirici (Junior)', en: 'Software Developer (Junior)', hourly: '$48–65', weekly: '$1,800–2,500' },
+            { tr: 'Yazılım Geliştirici (Mid)', en: 'Software Developer (Mid)', hourly: '$65–90', weekly: '$2,500–3,400' },
+            { tr: 'Veri Analisti', en: 'Data Analyst', hourly: '$55–78', weekly: '$2,100–3,000' },
+            { tr: 'Siber Güvenlik Uzmanı', en: 'Cybersecurity Specialist', hourly: '$70–100', weekly: '$2,650–3,800' },
         ],
     },
     {
         id: 'saglik', icon: '🏥',
         name: { tr: 'Sağlık & Bakım', en: 'Health & Care' },
         positions: [
-            { tr: 'Yaşlı Bakım Görevlisi', en: 'Aged Care Worker', hourly: '$28–35', weekly: '$1,000–1,300' },
-            { tr: 'NDIS Destek Görevlisi', en: 'NDIS Support Worker', hourly: '$30–40', weekly: '$1,100–1,500' },
-            { tr: 'Hemşire (RN)', en: 'Registered Nurse', hourly: '$40–60', weekly: '$1,500–2,200' },
+            { tr: 'Yaşlı Bakım Görevlisi', en: 'Aged Care Worker', hourly: '$30–40', weekly: '$1,100–1,500' },
+            { tr: 'NDIS Destek Görevlisi', en: 'NDIS Support Worker', hourly: '$32–45', weekly: '$1,200–1,700' },
+            { tr: 'Hemşire (RN)', en: 'Registered Nurse', hourly: '$43–65', weekly: '$1,650–2,500' },
         ],
     },
     {
         id: 'nakliye', icon: '🚛',
         name: { tr: 'Nakliye & Lojistik', en: 'Transport & Logistics' },
         positions: [
-            { tr: 'Depo Görevlisi', en: 'Warehouse Worker', hourly: '$28–35', weekly: '$1,000–1,300' },
-            { tr: 'Kamyon Sürücüsü (HR)', en: 'Truck Driver (HR)', hourly: '$35–50', weekly: '$1,300–1,900' },
-            { tr: 'Uzun Yol Sürücüsü', en: 'Long-Haul Driver', hourly: '$40–55', weekly: '$1,500–2,000' },
+            { tr: 'Depo Görevlisi', en: 'Warehouse Worker', hourly: '$30–38', weekly: '$1,100–1,450' },
+            { tr: 'Kamyon Sürücüsü (HR)', en: 'Truck Driver (HR)', hourly: '$38–55', weekly: '$1,450–2,100' },
+            { tr: 'Uzun Yol Sürücüsü', en: 'Long-Haul Driver', hourly: '$42–60', weekly: '$1,600–2,300' },
         ],
     },
     {
         id: 'temizlik', icon: '🧹',
         name: { tr: 'Temizlik', en: 'Cleaning' },
         positions: [
-            { tr: 'Temizlik Görevlisi', en: 'Cleaner', hourly: '$28–35', weekly: '$900–1,200' },
-            { tr: 'Endüstriyel Temizlik', en: 'Industrial Cleaner', hourly: '$35–45', weekly: '$1,200–1,600' },
+            { tr: 'Temizlik Görevlisi', en: 'Cleaner', hourly: '$30–36', weekly: '$1,000–1,350' },
+            { tr: 'Endüstriyel Temizlik', en: 'Industrial Cleaner', hourly: '$36–48', weekly: '$1,350–1,800' },
         ],
     },
     {
         id: 'cocuk', icon: '👶',
         name: { tr: 'Çocuk & Eğitim', en: 'Childcare & Education' },
         positions: [
-            { tr: 'Çocuk Bakıcısı', en: 'Nanny / Babysitter', hourly: '$25–35', weekly: '$900–1,300' },
-            { tr: 'Kreş Görevlisi', en: 'Childcare Worker', hourly: '$28–38', weekly: '$1,000–1,400' },
-            { tr: 'İlkokul Öğretmeni', en: 'Primary School Teacher', hourly: '$40–55', weekly: '$1,500–2,000' },
+            { tr: 'Çocuk Bakıcısı', en: 'Nanny / Babysitter', hourly: '$26–38', weekly: '$980–1,450' },
+            { tr: 'Kreş Görevlisi', en: 'Childcare Worker', hourly: '$30–42', weekly: '$1,100–1,600' },
+            { tr: 'İlkokul Öğretmeni', en: 'Primary School Teacher', hourly: '$42–60', weekly: '$1,600–2,280' },
         ],
     },
 ];
 
 const DEFAULT_FAIR_WORK = {
-    hourly: '$24.10',
-    weekly: '$915.90',
-    effectiveDate: '1 Temmuz 2024',
-    effectiveDateEn: '1 July 2024',
+    hourly: '$24.95',
+    weekly: '$948.10',
+    effectiveDate: '1 Temmuz 2025',
+    effectiveDateEn: '1 July 2025',
 };
 
 const MaasRehberiPage = () => {
@@ -138,10 +138,10 @@ const MaasRehberiPage = () => {
     return (
         <>
             <SEOHead
-                title={lang === 'en' ? 'Australia Salary Guide 2025–2026' : 'Avustralya Maaş Rehberi 2025–2026'}
+                title={lang === 'en' ? 'Australia Salary Guide 2026' : 'Avustralya Maaş Rehberi 2026'}
                 description={lang === 'en'
-                    ? 'Sector-by-sector average wages in Australia. Hourly and weekly rates for 2025–2026.'
-                    : 'Avustralya\'da sektör bazlı ortalama ücretler. 2025–2026 saatlik ve haftalık maaş rehberi.'}
+                    ? 'Sector-by-sector average wages in Australia. Hourly and weekly rates for 2026.'
+                    : 'Avustralya\'da sektör bazlı ortalama ücretler. 2026 saatlik ve haftalık maaş rehberi.'}
                 path="/maas-rehberi"
             />
             <div className="min-h-screen bg-[#050505] text-[#e0e0e0] pt-20">
@@ -169,8 +169,8 @@ const MaasRehberiPage = () => {
                         </div>
                         <p className="text-sm md:text-base text-white/50 leading-relaxed font-medium">
                             {lang === 'en'
-                                ? 'Sector-by-sector average wages in Australia. Hourly and weekly rates for 2025–2026. All figures are estimates — casual workers receive an additional 25% loading.'
-                                : 'Avustralya\'da sektör bazlı ortalama ücretler — 2025–2026. Tüm rakamlar tahmindir. Casual çalışanlar %25 loading alır. Fazla mesai dahil değildir.'}
+                                ? 'Sector-by-sector average wages in Australia. Hourly and weekly rates for 2026. All figures are estimates — casual workers receive an additional 25% loading.'
+                                : 'Avustralya\'da sektör bazlı ortalama ücretler — 2026. Tüm rakamlar tahmindir. Casual çalışanlar %25 loading alır. Fazla mesai dahil değildir.'}
                         </p>
                         {lastUpdated && (
                             <p className="text-[10px] text-white/25 mt-2 flex items-center gap-1.5">
@@ -300,12 +300,12 @@ const MaasRehberiPage = () => {
                         </p>
                         <ul className="space-y-1.5">
                             {(lang === 'en' ? [
-                                'All figures are 2025–2026 estimates sourced from Fair Work, ABS, and Seek.com.au.',
+                                'All figures are 2026 estimates sourced from Fair Work, ABS, and Seek.com.au.',
                                 'Casual workers receive an additional 25% casual loading on top of the base rate.',
                                 'Overtime rates are not included.',
                                 'Rates may vary by state, enterprise agreement, or individual contract.',
                             ] : [
-                                'Tüm rakamlar Fair Work, ABS ve Seek.com.au kaynaklı 2025–2026 tahminleridir.',
+                                'Tüm rakamlar Fair Work, ABS ve Seek.com.au kaynaklı 2026 tahminleridir.',
                                 'Casual çalışanlar temel ücrete ek olarak %25 casual loading alır.',
                                 'Fazla mesai ücretleri dahil değildir.',
                                 'Ücretler eyalete, kurumsal anlaşmaya veya bireysel sözleşmeye göre farklılık gösterebilir.',

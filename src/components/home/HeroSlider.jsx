@@ -87,7 +87,7 @@ const HeroSlider = () => {
                         {/* Sadece kısa bir özet varsa veya description varsa 2 satırda (markdown temizlenerek) kesilir */}
                         {(slide.excerpt || slide.description) && (
                             <p className="text-lg md:text-xl text-white/70 font-medium mb-8 max-w-2xl line-clamp-2">
-                                {slide.excerpt || (slide.description ? slide.description.replace(/[#*_\[\]>`]/g, '').replace(/(\r\n|\n|\r)/gm, " ") : '')}
+                                {slide.excerpt || (slide.description ? slide.description.replace(/[#*_[\]>`]/g, '').replace(/(\r\n|\n|\r)/gm, " ") : '')}
                             </p>
                         )}
                         <div className="flex gap-4">

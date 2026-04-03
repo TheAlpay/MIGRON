@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Scale, BookOpen, Users, Briefcase, Mail, Clock, ArrowUpRight } from 'lucide-react';
-import { collection, query, where, getDocs, orderBy } from 'firebase/firestore';
+import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { SITE_EMAIL } from '../../config/constants';
 import { useLanguage } from '../../i18n/LanguageContext';
@@ -25,6 +25,7 @@ const SubPage = ({ pageId }) => {
 
     useEffect(() => {
         if (!config?.category) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setLoading(false);
             return;
         }

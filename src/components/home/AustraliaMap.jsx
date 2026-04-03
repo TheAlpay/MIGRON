@@ -179,9 +179,10 @@ const AustraliaMap = () => {
             const cached = sessionStorage.getItem(CACHE_KEY);
             if (cached) {
                 const { data, ts } = JSON.parse(cached);
+                // eslint-disable-next-line react-hooks/set-state-in-effect
                 if (Date.now() - ts < CACHE_TTL) { setCityOverrides(data); return; }
             }
-        } catch { }
+        } catch { /* cache parse error, refetch */ }
         const fetch = async () => {
             try {
                 const snap = await getDocs(collection(db, 'cities'));
@@ -189,7 +190,7 @@ const AustraliaMap = () => {
                 snap.forEach(d => { data[d.id] = d.data(); });
                 if (Object.keys(data).length > 0) {
                     setCityOverrides(data);
-                    try { sessionStorage.setItem(CACHE_KEY, JSON.stringify({ data, ts: Date.now() })); } catch { }
+                    try { sessionStorage.setItem(CACHE_KEY, JSON.stringify({ data, ts: Date.now() })); } catch { /* storage full */ }
                 }
             } catch { /* Firestore yoksa hardcoded veriler kullanılır */ }
         };
@@ -329,6 +330,7 @@ const AustraliaMap = () => {
                                         { icon: DollarSign, label: t('map_stat_salary'), value: ov.salary || selected.avgSalary },
                                         { icon: MapPin, label: t('map_stat_cost'), value: selected.costIndex[lang] || selected.costIndex.en },
                                     ];
+                                // eslint-disable-next-line no-unused-vars
                                 })().map(({ icon: Icon, label, value }) => (
                                     <div key={label} className="bg-black/30 p-3">
                                         <div className="flex items-center gap-1 mb-1">

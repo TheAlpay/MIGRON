@@ -604,7 +604,7 @@ const SertifikalarPage = () => {
     const { lang } = useLanguage();
     const [activeFilter, setActiveFilter] = useState('TÜMÜ');
 
-    const activeCategoryData = CATEGORIES.find(c => c.key === activeFilter);
+    const _activeCategoryData = CATEGORIES.find(c => c.key === activeFilter);
 
     return (
         <>

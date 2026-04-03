@@ -201,7 +201,7 @@ const VergiVeSuperPage = () => {
 
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
                             <div className="bg-[#111] border border-white/5 p-5 text-center">
-                                <p className="text-2xl font-black text-[#a78bfa] mb-1">%11</p>
+                                <p className="text-2xl font-black text-[#a78bfa] mb-1">%12</p>
                                 <p className="text-[10px] text-white/30 uppercase tracking-widest font-black">
                                     {lang === 'en' ? 'Employer contribution' : 'İşveren katkısı'}
                                 </p>
@@ -228,8 +228,8 @@ const VergiVeSuperPage = () => {
                                 <InfoRow
                                     label="Ne?" labelEn="What?"
                                     value={lang === 'en'
-                                        ? "Your employer is legally required to contribute 11% of your salary to your retirement fund."
-                                        : "İşverenin maaşının %11'ini senin emeklilik fonuna yatırması yasal zorunluluk."}
+                                        ? "Your employer is legally required to contribute 12% of your salary to your retirement fund (from 1 July 2025)."
+                                        : "İşverenin maaşının %12'sini senin emeklilik fonuna yatırması yasal zorunluluk (1 Temmuz 2025'ten itibaren)."}
                                     lang={lang}
                                 />
                                 <InfoRow

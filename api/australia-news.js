@@ -18,11 +18,8 @@ export default async function handler(req, res) {
         { url: 'https://www.sbs.com.au/news/topic/australia/feed',         source: 'SBS News'     },
     ];
 
-    const feedResults = [];
-
     const results = await Promise.allSettled(
         FEEDS.map(async ({ url, source }) => {
-            console.log(`[australia-news] Fetching ${source}: ${url}`);
             const r = await fetch(url, {
                 headers: {
                     'User-Agent': 'Mozilla/5.0 (compatible; Migron-News-Bot/1.0)',
@@ -33,13 +30,8 @@ export default async function handler(req, res) {
             if (!r.ok) {
                 throw new Error(`HTTP ${r.status} ${r.statusText} from ${source} (${url})`);
             }
-            const contentType = r.headers.get('content-type') || '';
             const text = await r.text();
-            console.log(`[australia-news] ${source}: ${r.status}, content-type=${contentType}, body-length=${text.length}`);
-
-            const items = parseRSS(text, source);
-            console.log(`[australia-news] ${source}: parsed ${items.length} items`);
-            return items;
+            return parseRSS(text, source);
         })
     );
 
@@ -50,7 +42,6 @@ export default async function handler(req, res) {
         if (result.status === 'fulfilled') {
             articles.push(...result.value);
         } else {
-            // FIX: log full error message including URL for easier debugging
             console.error(`[australia-news] FAILED ${label}:`, result.reason?.message);
         }
     }
@@ -61,8 +52,6 @@ export default async function handler(req, res) {
         const db = b.pubDate ? new Date(b.pubDate) : new Date(0);
         return db - da;
     });
-
-    console.log(`[australia-news] Total articles after merge+sort: ${articles.length}`);
 
     if (articles.length === 0) {
         return res.status(200).json({

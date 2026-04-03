@@ -155,7 +155,7 @@ const FairWorkSection = ({ toast }) => {
             try {
                 const snap = await getDoc(doc(db, 'fairwork', 'minimum_wage'));
                 if (snap.exists()) setData({ ...DEFAULT_FAIR_WORK, ...snap.data() });
-            } catch { }
+            } catch { /* fallback to defaults */ }
             setLoading(false);
         };
         load();
@@ -204,7 +204,7 @@ const PrTableSection = ({ toast }) => {
             try {
                 const snap = await getDoc(doc(db, 'pr_yollari', 'sureler'));
                 if (snap.exists() && snap.data().rows) setRows(snap.data().rows);
-            } catch { }
+            } catch { /* fallback to defaults */ }
             setLoading(false);
         };
         load();

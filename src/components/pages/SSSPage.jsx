@@ -235,7 +235,6 @@ const FAQItem = ({ question, answer, accent }) => {
 
 const SSSPage = () => {
     const { t, lang } = useLanguage();
-    const [faqData, setFaqData] = useState(null);
     const [loading, setLoading] = useState(true);
 
     // In English mode always use English defaults (Firestore data is Turkish-only)

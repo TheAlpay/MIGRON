@@ -140,7 +140,7 @@ const Ilk48SaatPage = () => {
     const toggle = (id) => {
         setChecked(prev => {
             const next = { ...prev, [id]: !prev[id] };
-            try { localStorage.setItem(CHECKLIST_KEY, JSON.stringify(next)); } catch {}
+            try { localStorage.setItem(CHECKLIST_KEY, JSON.stringify(next)); } catch { /* storage full */ }
             return next;
         });
     };
@@ -151,7 +151,7 @@ const Ilk48SaatPage = () => {
 
     const resetAll = () => {
         setChecked({});
-        try { localStorage.removeItem(CHECKLIST_KEY); } catch {}
+        try { localStorage.removeItem(CHECKLIST_KEY); } catch { /* storage unavailable */ }
     };
 
     return (

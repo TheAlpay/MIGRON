@@ -28,12 +28,12 @@ const defaultProgramsTr = [
     },
     {
         id: 'default-3', color: "#ff6b6b", tag: "EMPLOYER",
-        title: "Temporary Skill Shortage (482)",
-        subtitle: "İşveren Sponsorlu Geçici Vize",
-        desc: "Avustralyalı işverenler tarafından sponsor olunan çalışanlar için geçici çalışma vizesi. Belirli koşullar sağlandığında PR'a geçiş mümkündür.",
-        requirements: ["Sponsor işveren", "Nominasyon onayı", "2 yıl deneyim", "English yeterliliği"],
-        processingTime: "1-6 ay", prDirect: false,
-        details: "482 vizesi (TSS), short-term stream (2 yıl) ve medium-term stream (4 yıl) olmak üzere iki akıştan oluşur. Medium-term stream sahipleri, belirli koşullar sağlandığında 186 ya da 191 vizesiyle PR başvurusunda bulunabilir. İşveren değişikliği için yeni bir nominasyon gereklidir."
+        title: "Skills in Demand / SID (482)",
+        subtitle: "İşveren Sponsorlu Beceri Vizesi",
+        desc: "7 Aralık 2024'ten itibaren 482 TSS vizesinin yerini alan SID vizesi; Core Skills, Specialist Skills ve Labour Agreement olmak üzere 3 akıştan oluşur. Tüm akışlar 4 yıl geçerlidir ve 186 ENS ile PR'a kapı açar.",
+        requirements: ["Sponsor işveren", "Nominasyon onayı", "1 yıl deneyim (son 5 yıl içinde)", "IELTS 5.0+ (Core Skills) veya gelir eşiği (Specialist)"],
+        processingTime: "1-4 ay", prDirect: false,
+        details: "Skills in Demand (SID) vizesi 3 akıştan oluşur: Core Skills (CSOL listesindeki meslekler, min. $73,150 yıllık maaş), Specialist Skills (meslek listesi yok, min. $141,210 — 7 günde işlem), Labour Agreement (sektörel anlaşmalar). Tüm akışlar 4 yıl geçerlidir. 2 yıl çalışma sonrası 186 ENS vizesiyle kalıcı oturuma geçiş mümkündür. İşveren değişikliğinde yeni nominasyon gereklidir; iş kaybında 180 gün süre tanınır."
     },
     {
         id: 'default-4', color: "#a78bfa", tag: "EMPLOYER",
@@ -57,10 +57,10 @@ const defaultProgramsTr = [
         id: 'default-6', color: "#10b981", tag: "STUDENT",
         title: "Student Visa (500)",
         subtitle: "Öğrenci Vizesi",
-        desc: "Avustralya'da CRICOS kayıtlı bir kurumda tam zamanlı öğrenim için vize. Çalışma izni ile birlikte gelir (haftada 48 saat).",
+        desc: "Avustralya'da CRICOS kayıtlı bir kurumda tam zamanlı öğrenim için vize. Çalışma izni ile birlikte gelir (iki haftada 48 saat).",
         requirements: ["CRICOS kayıtlı kurum kabulü", "GTE (Genuine Temporary Entrant)", "English yeterliliği", "Mali yeterlilik"],
         processingTime: "1-4 ay", prDirect: false,
-        details: "500 vizesi, Avustralya'daki eğitim sonrası 485 (Graduate Visa) vizesi için kapı açan önemli bir adımdır. GTE (Genuine Temporary Entrant) koşulunu karşılamak kritiktir. 2024 itibarıyla haftada 48 saate çıkan çalışma hakkı, öğrencilere önemli gelir imkânı sunmaktadır."
+        details: "500 vizesi, Avustralya'daki eğitim sonrası 485 (Graduate Visa) vizesi için kapı açan önemli bir adımdır. GTE (Genuine Temporary Entrant) koşulunu karşılamak kritiktir. Öğrenim döneminde iki haftada (fortnight) 48 saatlik çalışma hakkı, öğrencilere önemli gelir imkânı sunmaktadır."
     },
     {
         id: 'default-7', color: "#ec4899", tag: "PARTNER",
@@ -103,12 +103,12 @@ const defaultProgramsEn = [
     },
     {
         id: 'default-3', color: "#ff6b6b", tag: "EMPLOYER",
-        title: "Temporary Skill Shortage (482)",
-        subtitle: "Employer-Sponsored Temporary Visa",
-        desc: "A temporary work visa for employees sponsored by an Australian employer. Transition to PR is possible under certain conditions.",
-        requirements: ["Sponsoring employer", "Nomination approval", "2 years' experience", "English proficiency"],
-        processingTime: "1–6 months", prDirect: false,
-        details: "The 482 visa (TSS) has two streams: short-term (2 years) and medium-term (4 years). Medium-term stream holders may apply for PR via a 186 or 191 visa once certain conditions are met. A new nomination is required when changing employers."
+        title: "Skills in Demand / SID (482)",
+        subtitle: "Employer-Sponsored Skills Visa",
+        desc: "Since 7 December 2024, the SID visa replaces the 482 TSS visa with three streams: Core Skills, Specialist Skills and Labour Agreement — all valid for 4 years with a direct PR pathway via ENS 186.",
+        requirements: ["Sponsoring employer", "Nomination approval", "1 year's experience (within last 5 years)", "IELTS 5.0+ (Core Skills) or income threshold (Specialist)"],
+        processingTime: "1–4 months", prDirect: false,
+        details: "The Skills in Demand (SID) visa has 3 streams: Core Skills (occupations on the CSOL list, min. $73,150 annual salary), Specialist Skills (no occupation list required, min. $141,210 — processed in 7 days), and Labour Agreement (sector-specific agreements). All streams are valid for 4 years. PR via the ENS 186 visa is possible after 2 years. A new nomination is required when changing employers; 180 days are granted if you lose your job."
     },
     {
         id: 'default-4', color: "#a78bfa", tag: "EMPLOYER",
@@ -132,7 +132,7 @@ const defaultProgramsEn = [
         id: 'default-6', color: "#10b981", tag: "STUDENT",
         title: "Student Visa (500)",
         subtitle: "Student Visa",
-        desc: "A visa for full-time study at a CRICOS-registered institution in Australia. Includes work rights (48 hours per fortnight).",
+        desc: "A visa for full-time study at a CRICOS-registered institution in Australia. Includes work rights (48 hours per fortnight during study periods).",
         requirements: ["Acceptance from a CRICOS-registered institution", "GTE (Genuine Temporary Entrant)", "English proficiency", "Financial capacity"],
         processingTime: "1–4 months", prDirect: false,
         details: "The 500 visa is an important stepping stone towards the 485 (Graduate Visa) after studying in Australia. Meeting the GTE (Genuine Temporary Entrant) requirement is critical. As of 2024, the 48-hour per fortnight work allowance provides students with significant income opportunities."

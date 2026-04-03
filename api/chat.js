@@ -1,3 +1,4 @@
+/* global process */
 // Simple in-memory rate limiter: max 10 requests per IP per minute
 const rateLimitMap = new Map();
 const RATE_LIMIT = 10;

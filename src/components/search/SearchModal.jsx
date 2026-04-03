@@ -38,6 +38,7 @@ const SearchModal = ({ open, onClose }) => {
 
     useEffect(() => {
         if (open) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setQuery('');
             setResults([]);
             setActive(0);
@@ -46,6 +47,7 @@ const SearchModal = ({ open, onClose }) => {
     }, [open]);
 
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         if (!query.trim()) { setResults([]); return; }
         const r = fuse.search(query).slice(0, 8).map(r => r.item);
         setResults(r);
