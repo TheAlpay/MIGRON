@@ -15,7 +15,7 @@ const CurrencyWidget = () => {
 
     const fetchRates = async () => {
         try {
-            const res = await fetch('https://api.frankfurter.app/latest?from=AUD&to=TRY,USD,EUR');
+            const res = await fetch('https://api.frankfurter.dev/v1/latest?from=AUD&to=TRY,USD,EUR');
             if (!res.ok) return;
             const data = await res.json();
             setPrev(rates);
