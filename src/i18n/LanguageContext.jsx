@@ -374,10 +374,10 @@ const translations = {
 
 export const LanguageProvider = ({ children }) => {
     const [lang, setLang] = useState(() => {
-        try { return localStorage.getItem(LANG_KEY) || 'tr'; } catch { return 'tr'; }
+        try { return localStorage.getItem(LANG_KEY) || 'en'; } catch { return 'en'; }
     });
 
-    const t = (key) => translations[lang]?.[key] || translations['tr']?.[key] || key;
+    const t = (key) => translations[lang]?.[key] || translations['en']?.[key] || key;
 
     const toggleLanguage = () => {
         setLang(prev => {

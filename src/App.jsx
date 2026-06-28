@@ -19,6 +19,9 @@ import SSSPage from './components/pages/SSSPage';
 import ProgramTurleriPage from './components/pages/ProgramTurleriPage';
 import PointsCalculatorPage from './components/pages/PointsCalculatorPage';
 import VisaChecklistPage from './components/pages/VisaChecklistPage';
+import OccupationCheckerPage from './components/pages/OccupationCheckerPage';
+import SalaryCalculatorPage from './components/pages/SalaryCalculatorPage';
+import VisaGuidePage from './components/pages/VisaGuidePage';
 import Ilk48SaatPage from './components/pages/Ilk48SaatPage';
 import SertifikalarPage from './components/pages/SertifikalarPage';
 import VergiVeSuperPage from './components/pages/VergiVeSuperPage';
@@ -33,8 +36,8 @@ import SEOHead from './components/seo/SEOHead';
 const HomePage = () => (
   <>
     <SEOHead
-      title="Anasayfa"
-      description="MIGRON — Avustralya göçmenlik hukuku ve danışmanlık platformu. Güncel analizler, canlı kur ve hukuki rehberlik."
+      title="Australian Immigration Platform — Visa Tools, Occupation Checker & Settlement Guide"
+      description="MIGRON — The ultimate Australian immigration platform. Visa guides, occupation checker, salary calculator, points test and settlement resources for skilled migrants."
     />
     <main id="main-content" className="pt-20">
       <HeroSlider />
@@ -61,7 +64,7 @@ const AdminPage = () => {
   if (checking) {
     return (
       <div className="min-h-screen bg-[#050505] flex items-center justify-center">
-        <div className="text-[#ccff00] animate-pulse font-bold tracking-widest">YÜKLENİYOR...</div>
+        <div className="text-[#ccff00] animate-pulse font-bold tracking-widest">LOADING...</div>
       </div>
     );
   }
@@ -81,7 +84,7 @@ const App = () => {
           href="#main-content"
           className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:bg-[#ccff00] focus:text-black focus:px-4 focus:py-2 focus:font-black focus:uppercase"
         >
-          İçeriğe Atla
+          Skip to Content
         </a>
         <Routes>
           <Route path="/admin" element={<AdminPage />} />
@@ -97,7 +100,13 @@ const App = () => {
                 <Route path="/sss" element={<SSSPage />} />
                 <Route path="/program-turleri" element={<ProgramTurleriPage />} />
                 <Route path="/puan-hesapla" element={<PointsCalculatorPage />} />
+                <Route path="/points-calculator" element={<PointsCalculatorPage />} />
                 <Route path="/vize-kontrol-listesi" element={<VisaChecklistPage />} />
+                <Route path="/visa-checklist" element={<VisaChecklistPage />} />
+                <Route path="/occupation" element={<OccupationCheckerPage />} />
+                <Route path="/salary-calculator" element={<SalaryCalculatorPage />} />
+                <Route path="/visa" element={<VisaGuidePage />} />
+                <Route path="/visa/:code" element={<VisaGuidePage />} />
                 <Route path="/iletisim" element={<SubPage pageId="iletisim" />} />
                 <Route path="/ilk-48-saat" element={<Ilk48SaatPage />} />
                 <Route path="/sertifikalar" element={<SertifikalarPage />} />
