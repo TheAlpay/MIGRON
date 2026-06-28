@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import ErrorBoundary from './components/ErrorBoundary';
 import { onAuthStateChanged } from 'firebase/auth';
@@ -10,7 +10,6 @@ import HeroSlider from './components/home/HeroSlider';
 import BentoGrid from './components/home/BentoGrid';
 import LiveTicker from './components/home/LiveTicker';
 import AustraliaMap from './components/home/AustraliaMap';
-import AustraliaMapGoogle from './components/home/AustraliaMapGoogle';
 import AustraliaNewsSlider from './components/home/AustraliaNewsSlider';
 import CurrencyWidget from './components/home/CurrencyWidget';
 import AiTerminal from './components/chat/AiTerminal';
@@ -30,10 +29,12 @@ import BelgeSablonlariPage from './components/pages/BelgeSablonlariPage';
 import CentrelinkPage from './components/pages/CentrelinkPage';
 import MaasRehberiPage from './components/pages/MaasRehberiPage';
 import PrYolHaritasiPage from './components/pages/PrYolHaritasiPage';
-import TrafficPage from './components/pages/TrafficPage';
 import AdminLogin from './components/admin/AdminLogin';
 import AdminDashboard from './components/admin/AdminDashboard';
 import SEOHead from './components/seo/SEOHead';
+
+const AustraliaMapGoogle = lazy(() => import('./components/home/AustraliaMapGoogle'));
+const TrafficPage = lazy(() => import('./components/pages/TrafficPage'));
 
 const HomePage = () => (
   <>
@@ -46,7 +47,16 @@ const HomePage = () => (
       <LiveTicker />
       <AustraliaNewsSlider />
       <BentoGrid />
-      {import.meta.env.VITE_GOOGLE_MAPS_API_KEY ? <AustraliaMapGoogle /> : <AustraliaMap />}
+      {import.meta.env.VITE_GOOGLE_MAPS_API_KEY
+        ? (
+          <ErrorBoundary>
+            <Suspense fallback={<AustraliaMap />}>
+              <AustraliaMapGoogle />
+            </Suspense>
+          </ErrorBoundary>
+        )
+        : <AustraliaMap />
+      }
     </main>
   </>
 );
@@ -117,7 +127,13 @@ const App = () => {
                 <Route path="/centrelink" element={<CentrelinkPage />} />
                 <Route path="/maas-rehberi" element={<MaasRehberiPage />} />
                 <Route path="/pr-yol-haritasi" element={<PrYolHaritasiPage />} />
-                <Route path="/traffic" element={<TrafficPage />} />
+                <Route path="/traffic" element={
+                  <ErrorBoundary>
+                    <Suspense fallback={<div className="min-h-screen bg-[#050505]" />}>
+                      <TrafficPage />
+                    </Suspense>
+                  </ErrorBoundary>
+                } />
                 <Route path="/makale/:slug" element={<ArticlePage />} />
               </Routes>
               <AiTerminal />
