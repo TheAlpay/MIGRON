@@ -21,6 +21,7 @@
     "@tiptap/extension-text-align": "^3.20.4",
     "@tiptap/react": "^3.20.4",
     "@tiptap/starter-kit": "^3.20.4",
+    "@vis.gl/react-google-maps": "^1.8.3",
     "dompurify": "^3.3.3",
     "firebase": "^12.9.0",
     "fuse.js": "^7.1.0",

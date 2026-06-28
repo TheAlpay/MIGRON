@@ -62,7 +62,7 @@ const HeroSlider = () => {
             className="relative h-[80vh] min-h-[600px] bg-black overflow-hidden border-b border-white/10"
             role="region"
             aria-roledescription="carousel"
-            aria-label="Öne Çıkan Haberler"
+            aria-label="Featured Stories"
         >
             {slides.map((slide, index) => (
                 <div
@@ -95,7 +95,7 @@ const HeroSlider = () => {
                                 <Link
                                     to={`/makale/${slide.articleSlug}`}
                                     className="bg-white text-black px-10 py-4 font-black uppercase text-sm hover:bg-[#ccff00] transition-colors flex items-center gap-2 group"
-                                    aria-label={`${slide.title} detaylarını gör`}
+                                    aria-label={`View details: ${slide.title}`}
                                 >
                                     {t('btn_open_file')} <ArrowUpRight className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
                                 </Link>
@@ -109,14 +109,14 @@ const HeroSlider = () => {
                 <button
                     onClick={() => setActiveSlide((activeSlide - 1 + slides.length) % slides.length)}
                     className="w-14 h-14 border border-white/20 flex items-center justify-center hover:bg-white hover:text-black transition-all"
-                    aria-label="Önceki slide"
+                    aria-label="Previous slide"
                 >
                     <ChevronLeft size={32} />
                 </button>
                 <button
                     onClick={() => setActiveSlide((activeSlide + 1) % slides.length)}
                     className="w-14 h-14 border border-white/20 flex items-center justify-center hover:bg-white hover:text-black transition-all"
-                    aria-label="Sonraki slide"
+                    aria-label="Next slide"
                 >
                     <ChevronRight size={32} />
                 </button>

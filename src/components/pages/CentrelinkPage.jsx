@@ -166,7 +166,7 @@ const CentrelinkPage = () => {
                                 <a href="mailto:migron@mtive.tech" className="text-[#ccff00] underline hover:brightness-125 transition-all">
                                     migron@mtive.tech
                                 </a>
-                                {lang === 'en' ? " adresine iletebilirsin." : " adresine iletebilirsin."}
+                                {lang === 'en' ? '.' : ' adresine iletebilirsin.'}
                             </p>
                         </div>
                     </div>

@@ -66,7 +66,7 @@ const AiTerminal = () => {
                 <button
                     onClick={() => setChatOpen(true)}
                     className="fixed bottom-8 right-8 w-14 h-14 bg-[#ccff00] text-black rounded-none shadow-[6px_6px_0px_0px_rgba(255,255,255,0.1)] hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all z-40 flex items-center justify-center group"
-                    aria-label="AI Terminal'i aç"
+                    aria-label="Open AI Terminal"
                 >
                     <MessageSquare size={20} className="group-hover:scale-110 transition-transform" />
                 </button>
@@ -76,7 +76,7 @@ const AiTerminal = () => {
                 <div className="fixed bottom-8 right-8 w-[360px] h-[520px] bg-black border-2 border-[#ccff00] z-50 flex flex-col shadow-[12px_12px_0px_0px_rgba(204,255,0,0.1)]">
                     <div className="p-3 bg-[#ccff00] text-black flex justify-between items-center font-black italic uppercase tracking-tighter text-sm">
                         <span>{t('chat_title')}</span>
-                        <button onClick={() => setChatOpen(false)} aria-label="Kapat"><X size={18} strokeWidth={3} /></button>
+                        <button onClick={() => setChatOpen(false)} aria-label="Close"><X size={18} strokeWidth={3} /></button>
                     </div>
 
                     <div className="flex-1 overflow-y-auto p-4 space-y-4 text-[12px] font-mono leading-relaxed">
@@ -109,7 +109,7 @@ const AiTerminal = () => {
                             onClick={handleSendMessage}
                             disabled={isTyping || !chatInput.trim()}
                             className="p-2 text-[#ccff00] hover:scale-110 transition-transform disabled:opacity-30 disabled:cursor-not-allowed"
-                            aria-label="Gönder"
+                            aria-label="Send"
                         >
                             <Send size={20} />
                         </button>

@@ -10,7 +10,7 @@ const AGE_POINTS = [
     { label: '25–32', points: 30 },
     { label: '33–39', points: 25 },
     { label: '40–44', points: 15 },
-    { label: '45+', points: 0, note: 'Skilled vize için uygun değil' },
+    { label: '45+', points: 0, note: 'Not eligible for skilled visas' },
 ];
 const ENGLISH_POINTS = [
     { label: 'Competent (IELTS 6.0)', points: 0 },
@@ -18,46 +18,46 @@ const ENGLISH_POINTS = [
     { label: 'Superior (IELTS 8.0)', points: 20 },
 ];
 const AUS_EXP_POINTS = [
-    { label: 'Yok', points: 0 },
-    { label: '1–2 yıl', points: 5 },
-    { label: '3–4 yıl', points: 10 },
-    { label: '5–7 yıl', points: 15 },
-    { label: '8+ yıl', points: 20 },
+    { label: 'None', points: 0 },
+    { label: '1–2 years', points: 5 },
+    { label: '3–4 years', points: 10 },
+    { label: '5–7 years', points: 15 },
+    { label: '8+ years', points: 20 },
 ];
 const OS_EXP_POINTS = [
-    { label: 'Yok', points: 0 },
-    { label: '3–4 yıl', points: 5 },
-    { label: '5–7 yıl', points: 10 },
-    { label: '8+ yıl', points: 15 },
+    { label: 'None', points: 0 },
+    { label: '3–4 years', points: 5 },
+    { label: '5–7 years', points: 10 },
+    { label: '8+ years', points: 15 },
 ];
 const EDUCATION_POINTS = [
-    { label: 'Yok / Lise', points: 0 },
-    { label: 'Diploma / Ön Lisans', points: 10 },
-    { label: 'Lisans veya Yüksek Lisans', points: 15 },
-    { label: 'Doktora', points: 20 },
+    { label: 'None / High School', points: 0 },
+    { label: 'Diploma / Associate Degree', points: 10 },
+    { label: 'Bachelor or Master\'s Degree', points: 15 },
+    { label: 'Doctorate (PhD)', points: 20 },
 ];
 const PARTNER_POINTS = [
-    { label: 'Yok / Bekâr', points: 0 },
-    { label: "Partner var, skilled değil", points: 0 },
-    { label: "Partner var, skilled + competent English", points: 5 },
-    { label: 'Partner yok (single applicant)', points: 10 },
+    { label: 'No partner / Single', points: 0 },
+    { label: 'Partner — not skilled', points: 0 },
+    { label: 'Partner — skilled + Competent English', points: 5 },
+    { label: 'No partner (single applicant)', points: 10 },
 ];
 const NOMINATION = [
-    { label: 'Nominasyon yok', points: 0 },
-    { label: 'Eyalet nominasyonu (190)', points: 5 },
-    { label: 'Bölgesel nominasyon (491)', points: 15 },
+    { label: 'No nomination', points: 0 },
+    { label: 'State nomination (190)', points: 5 },
+    { label: 'Regional nomination (491)', points: 15 },
 ];
 const AUS_STUDY = [
-    { label: 'Yok', points: 0 },
-    { label: "Avustralya'da 2 yıl üniversite okudum", points: 5 },
+    { label: 'None', points: 0 },
+    { label: '2 years of university study in Australia', points: 5 },
 ];
 const NAATI = [
-    { label: 'Yok', points: 0 },
-    { label: 'NAATI topluluk dili sertifikası', points: 5 },
+    { label: 'None', points: 0 },
+    { label: 'NAATI community language certificate', points: 5 },
 ];
 const PROF_YEAR = [
-    { label: 'Yok', points: 0 },
-    { label: 'Professional Year tamamlandı', points: 5 },
+    { label: 'None', points: 0 },
+    { label: 'Professional Year completed', points: 5 },
 ];
 
 const SECTION_KEYS = [
@@ -102,9 +102,9 @@ const PointsCalculatorPage = () => {
     return (
         <>
             <SEOHead
-                title="Puan Hesaplama Aracı"
-                description="Avustralya Skilled Migration puan testini hesaplayın. Yaş, İngilizce, deneyim ve eğitime göre puanınızı öğrenin."
-                path="/puan-hesapla"
+                title="Australian Points Calculator — Skilled Migration Points Test 2026"
+                description="Calculate your Australian skilled migration points score. Age, English, work experience, education and more — based on the official Department of Home Affairs points table."
+                path="/points-calculator"
             />
             <div className="min-h-screen bg-[#050505] text-[#e0e0e0] pt-20">
                 <section className="pt-8 pb-6 px-6 border-b border-white/10">
@@ -165,14 +165,14 @@ const PointsCalculatorPage = () => {
                             <div className="flex items-start gap-4">
                                 {total >= 65 ? <CheckCircle size={24} style={{ color: result.color }} className="shrink-0" /> : <AlertCircle size={24} style={{ color: result.color }} className="shrink-0" />}
                                 <div>
-                                    <p className="font-black text-xl uppercase" style={{ color: result.color }}>{result.label} · {total} Puan</p>
+                                    <p className="font-black text-xl uppercase" style={{ color: result.color }}>{result.label} · {total} Points</p>
                                     <p className="text-sm text-white/60 mt-2 leading-relaxed">{result.desc}</p>
                                     {total >= 65 && (
                                         <div className="mt-4 flex gap-3">
                                             <Link to="/program-turleri" className="text-xs font-black uppercase text-black px-4 py-2 hover:brightness-110" style={{ backgroundColor: result.color }}>
                                                 {t('points_see_visa_types')}
                                             </Link>
-                                            <Link to="/vize-kontrol-listesi" className="text-xs font-black uppercase border px-4 py-2 hover:bg-white/5 transition-colors" style={{ borderColor: result.color, color: result.color }}>
+                                            <Link to="/visa-checklist" className="text-xs font-black uppercase border px-4 py-2 hover:bg-white/5 transition-colors" style={{ borderColor: result.color, color: result.color }}>
                                                 {t('points_checklist')}
                                             </Link>
                                         </div>

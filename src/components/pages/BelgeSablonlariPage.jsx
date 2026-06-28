@@ -209,7 +209,7 @@ const templates = [
     },
 ];
 
-const CopyButton = ({ text }) => {
+const CopyButton = ({ text, lang }) => {
     const [copied, setCopied] = useState(false);
     const handleCopy = () => {
         navigator.clipboard.writeText(text).then(() => {
@@ -225,7 +225,7 @@ const CopyButton = ({ text }) => {
                 : 'border-white/10 text-white/30 hover:border-white/30 hover:text-white/60'}`}
         >
             {copied ? <Check size={11} /> : <Copy size={11} />}
-            {copied ? 'Kopyalandı' : 'Kopyala'}
+            {copied ? (lang === 'en' ? 'Copied' : 'Kopyalandı') : (lang === 'en' ? 'Copy' : 'Kopyala')}
         </button>
     );
 };
@@ -294,7 +294,7 @@ const TemplateCard = ({ tmpl, lang }) => {
                                     <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40">
                                         {lang === 'en' ? (s.headingEn || s.heading) : s.heading}
                                     </span>
-                                    <CopyButton text={lang === 'en' ? (s.contentEn || s.content) : s.content} />
+                                    <CopyButton text={lang === 'en' ? (s.contentEn || s.content) : s.content} lang={lang} />
                                 </div>
                                 <pre className="p-4 text-xs text-white/60 leading-relaxed whitespace-pre-wrap font-sans">
                                     {lang === 'en' ? (s.contentEn || s.content) : s.content}

@@ -101,7 +101,7 @@ const SearchModal = ({ open, onClose }) => {
                         onKeyDown={handleKey}
                         placeholder={lang === 'en' ? 'Search visa, certificate, guide...' : 'Vize, sertifika, rehber ara...'}
                         className="flex-1 bg-transparent text-white text-sm placeholder-white/25 focus:outline-none"
-                        aria-label="Arama"
+                        aria-label="Search"
                     />
                     <button onClick={onClose} className="text-white/30 hover:text-white transition-colors p-1">
                         <X size={14} />

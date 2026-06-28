@@ -24,7 +24,7 @@ const Footer = () => {
             <div className="max-w-[1600px] mx-auto">
                 <div className="grid grid-cols-1 md:grid-cols-12 gap-16">
                     <div className="md:col-span-5">
-                        <Link to="/" className="flex items-center mb-8 hover:opacity-80 transition-opacity" aria-label={`${SITE_NAME} Anasayfa`}>
+                        <Link to="/" className="flex items-center mb-8 hover:opacity-80 transition-opacity" aria-label={`${SITE_NAME} Homepage`}>
                             <img src={Logo} alt={SITE_NAME} className="h-16 w-auto object-contain" />
                         </Link>
                         <p className="text-lg text-white/40 uppercase font-black tracking-tight leading-tight">
@@ -36,7 +36,7 @@ const Footer = () => {
                         {/* Navigation */}
                         <div>
                             <h5 className="text-[10px] font-black text-[#ccff00] uppercase tracking-[0.3em] mb-6">{t('footer_nav')}</h5>
-                            <nav aria-label="Footer Navigasyon">
+                            <nav aria-label="Footer Navigation">
                                 <ul className="space-y-4 text-xs font-bold text-white/60">
                                     {navLinks.map(item => (
                                         <li key={item.label}>
@@ -71,7 +71,7 @@ const Footer = () => {
                             <a
                                 href={`mailto:${SITE_EMAIL}`}
                                 className="text-xs font-black italic tracking-widest underline decoration-[#ccff00] hover:text-[#ccff00] transition-colors"
-                                aria-label={`E-posta gönder: ${SITE_EMAIL}`}
+                                aria-label={`Send email: ${SITE_EMAIL}`}
                             >
                                 {SITE_EMAIL}
                             </a>

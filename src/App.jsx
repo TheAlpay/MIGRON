@@ -10,6 +10,7 @@ import HeroSlider from './components/home/HeroSlider';
 import BentoGrid from './components/home/BentoGrid';
 import LiveTicker from './components/home/LiveTicker';
 import AustraliaMap from './components/home/AustraliaMap';
+import AustraliaMapGoogle from './components/home/AustraliaMapGoogle';
 import AustraliaNewsSlider from './components/home/AustraliaNewsSlider';
 import CurrencyWidget from './components/home/CurrencyWidget';
 import AiTerminal from './components/chat/AiTerminal';
@@ -29,6 +30,7 @@ import BelgeSablonlariPage from './components/pages/BelgeSablonlariPage';
 import CentrelinkPage from './components/pages/CentrelinkPage';
 import MaasRehberiPage from './components/pages/MaasRehberiPage';
 import PrYolHaritasiPage from './components/pages/PrYolHaritasiPage';
+import TrafficPage from './components/pages/TrafficPage';
 import AdminLogin from './components/admin/AdminLogin';
 import AdminDashboard from './components/admin/AdminDashboard';
 import SEOHead from './components/seo/SEOHead';
@@ -44,7 +46,7 @@ const HomePage = () => (
       <LiveTicker />
       <AustraliaNewsSlider />
       <BentoGrid />
-      <AustraliaMap />
+      {import.meta.env.VITE_GOOGLE_MAPS_API_KEY ? <AustraliaMapGoogle /> : <AustraliaMap />}
     </main>
   </>
 );
@@ -115,6 +117,7 @@ const App = () => {
                 <Route path="/centrelink" element={<CentrelinkPage />} />
                 <Route path="/maas-rehberi" element={<MaasRehberiPage />} />
                 <Route path="/pr-yol-haritasi" element={<PrYolHaritasiPage />} />
+                <Route path="/traffic" element={<TrafficPage />} />
                 <Route path="/makale/:slug" element={<ArticlePage />} />
               </Routes>
               <AiTerminal />

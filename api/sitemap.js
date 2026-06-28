@@ -34,6 +34,7 @@ const STATIC_URLS = [
     { loc: '/vergi-ve-super',       priority: '0.8', changefreq: 'monthly', lastmod: TODAY },
     { loc: '/centrelink',           priority: '0.7', changefreq: 'monthly', lastmod: TODAY },
     { loc: '/maas-rehberi',         priority: '0.8', changefreq: 'monthly', lastmod: TODAY },
+    { loc: '/traffic',              priority: '0.8', changefreq: 'daily',   lastmod: TODAY },
     { loc: '/iletisim',             priority: '0.6', changefreq: 'monthly', lastmod: TODAY },
 ];
 

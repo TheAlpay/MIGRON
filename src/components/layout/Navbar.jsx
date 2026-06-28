@@ -67,7 +67,7 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }) => {
 
     const isToolsActive   = ['/occupation', '/salary-calculator', '/points-calculator', '/puan-hesapla', '/visa-checklist', '/vize-kontrol-listesi', '/belge-sablonlari'].includes(location.pathname);
     const isVisaActive    = ['/visa', '/program-turleri', '/pr-yol-haritasi'].some(p => location.pathname.startsWith(p));
-    const isSettleActive  = ['/sosyal', '/ilk-48-saat', '/centrelink', '/maas-rehberi'].includes(location.pathname);
+    const isSettleActive  = ['/sosyal', '/ilk-48-saat', '/centrelink', '/maas-rehberi', '/traffic'].includes(location.pathname);
     const isResourceActive= ['/hukuk', '/egitim', '/sertifikalar', '/vergi-ve-super'].includes(location.pathname);
 
     const DropItem = ({ to, icon, label, onClick }) => (
@@ -138,6 +138,7 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }) => {
                                     <DropItem to="/ilk-48-saat"              label="First 48 Hours"     onClick={() => setSettleOpen(false)} />
                                     <DropItem to="/maas-rehberi"             label="Salary Guide"       onClick={() => setSettleOpen(false)} />
                                     <DropItem to="/centrelink"               label="Centrelink"         onClick={() => setSettleOpen(false)} />
+                                    <DropItem to="/traffic"                  label="Live Traffic (NSW)" onClick={() => setSettleOpen(false)} />
                                 </div>
                             )}
                         </div>
