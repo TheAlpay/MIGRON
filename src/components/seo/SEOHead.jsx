@@ -1,7 +1,8 @@
 import { useEffect } from 'react';
 import Logo from '../../assets/migron.webp';
+import { env } from '../../lib/env.ts';
 
-const SITE_URL = 'https://migron.mtive.tech';
+const SITE_URL = env.VITE_SITE_URL;
 
 /**
  * SEOHead — Sets document title and meta tags dynamically per page.

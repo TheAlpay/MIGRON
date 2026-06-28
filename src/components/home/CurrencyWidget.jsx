@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { TrendingUp, TrendingDown, RefreshCw } from 'lucide-react';
+import { FRANKFURTER_BASE } from '../../config/api.ts';
 
 const PAIRS = [
     { key: 'TRY', label: 'TRY', flag: '🇹🇷', color: '#ccff00' },
@@ -15,7 +16,7 @@ const CurrencyWidget = () => {
 
     const fetchRates = async () => {
         try {
-            const res = await fetch('https://api.frankfurter.dev/v1/latest?from=AUD&to=TRY,USD,EUR');
+            const res = await fetch(`${FRANKFURTER_BASE}/latest?from=AUD&to=TRY,USD,EUR`);
             if (!res.ok) return;
             const data = await res.json();
             setPrev(rates);

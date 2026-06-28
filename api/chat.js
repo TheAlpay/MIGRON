@@ -27,7 +27,9 @@ export default async function handler(req, res) {
     const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.socket?.remoteAddress || 'unknown';
     if (isRateLimited(ip)) return res.status(429).json({ error: 'Too many requests. Please wait a moment.' });
 
-    const apiKey = process.env.GROQ_API_KEY;
+    const apiKey  = process.env.GROQ_API_KEY;
+    const model   = process.env.GROQ_MODEL   || 'llama-3.3-70b-versatile';
+    const baseUrl = process.env.GROQ_API_URL || 'https://api.groq.com/openai/v1';
     if (!apiKey) return res.status(500).json({ error: 'API key not configured on server' });
 
     try {
@@ -37,14 +39,14 @@ export default async function handler(req, res) {
         if (message.length > 500)
             return res.status(400).json({ error: 'Message too long (max 500 characters)' });
 
-        const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        const response = await fetch(`${baseUrl}/chat/completions`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${apiKey}`
             },
             body: JSON.stringify({
-                model: 'llama-3.3-70b-versatile',
+                model,
                 messages: [
                     {
                         role: 'system',

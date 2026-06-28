@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { TrendingUp, TrendingDown } from 'lucide-react';
 import { useLanguage } from '../../i18n/LanguageContext';
+import { FRANKFURTER_BASE, COINGECKO_BASE, GOLD_API_BASE } from '../../config/api.ts';
 
 // ── Bilingual cost of living data (ABS + Numbeo sourced) ─────────────────
 const COST_ITEMS = {
@@ -43,10 +44,10 @@ const COST_ITEMS = {
 const fetchRates = async () => {
     try {
         const [fxRes, cryptoRes, goldRes, silverRes] = await Promise.all([
-            fetch('https://api.frankfurter.dev/v1/latest?from=AUD&to=TRY,USD,EUR'),
-            fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana&vs_currencies=usd'),
-            fetch('https://api.gold-api.com/price/XAU'),
-            fetch('https://api.gold-api.com/price/XAG')
+            fetch(`${FRANKFURTER_BASE}/latest?from=AUD&to=TRY,USD,EUR`),
+            fetch(`${COINGECKO_BASE}/simple/price?ids=bitcoin,ethereum,solana&vs_currencies=usd`),
+            fetch(`${GOLD_API_BASE}/XAU`),
+            fetch(`${GOLD_API_BASE}/XAG`),
         ]);
 
         const [fxData, cryptoData, goldData, silverData] = await Promise.all([

@@ -1,5 +1,6 @@
-const PROJECT_ID = 'migron-32348';
-const SITE_URL = 'https://migron.mtive.tech';
+/* global process */
+const PROJECT_ID = process.env.VITE_FIREBASE_PROJECT_ID;
+const SITE_URL   = process.env.VITE_SITE_URL;
 
 const TODAY = new Date().toISOString().split('T')[0];
 

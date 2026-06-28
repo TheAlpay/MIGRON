@@ -8,6 +8,7 @@ import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import DOMPurify from 'dompurify';
 import SEOHead from '../seo/SEOHead';
+import { env } from '../../lib/env.ts';
 
 // Custom markdown renderers — no @tailwindcss/typography needed
 const MD_COMPONENTS = {
@@ -114,16 +115,16 @@ const ArticlePage = () => {
             '@type': 'BlogPosting',
             headline: article.title,
             description: article.excerpt || article.title,
-            image: article.coverImage || 'https://migron.mtive.tech/migron.webp',
+            image: article.coverImage || `${env.VITE_SITE_URL}/migron.webp`,
             datePublished,
             dateModified,
-            author: { '@type': 'Organization', name: 'MIGRON', url: 'https://migron.mtive.tech' },
+            author: { '@type': 'Organization', name: 'MIGRON', url: env.VITE_SITE_URL },
             publisher: {
                 '@type': 'Organization',
                 name: 'MIGRON',
-                logo: { '@type': 'ImageObject', url: 'https://migron.mtive.tech/migron.webp' },
+                logo: { '@type': 'ImageObject', url: `${env.VITE_SITE_URL}/migron.webp` },
             },
-            mainEntityOfPage: { '@type': 'WebPage', '@id': `https://migron.mtive.tech/makale/${slug}` },
+            mainEntityOfPage: { '@type': 'WebPage', '@id': `${env.VITE_SITE_URL}/makale/${slug}` },
             inLanguage: 'tr',
         });
         document.getElementById('article-jsonld')?.remove();
