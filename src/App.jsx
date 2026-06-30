@@ -1,5 +1,5 @@
 import React, { useState, useEffect, lazy, Suspense } from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import ErrorBoundary from './components/ErrorBoundary';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from './config/firebase';
@@ -21,8 +21,9 @@ import PointsCalculatorPage from './components/pages/PointsCalculatorPage';
 import VisaChecklistPage from './components/pages/VisaChecklistPage';
 import OccupationCheckerPage from './components/pages/OccupationCheckerPage';
 import SalaryCalculatorPage from './components/pages/SalaryCalculatorPage';
+import TaxCalculatorPage from './components/pages/TaxCalculatorPage';
+import SuperCalculatorPage from './components/pages/SuperCalculatorPage';
 import VisaGuidePage from './components/pages/VisaGuidePage';
-import Ilk48SaatPage from './components/pages/Ilk48SaatPage';
 import SertifikalarPage from './components/pages/SertifikalarPage';
 import VergiVeSuperPage from './components/pages/VergiVeSuperPage';
 import BelgeSablonlariPage from './components/pages/BelgeSablonlariPage';
@@ -33,8 +34,10 @@ import AdminLogin from './components/admin/AdminLogin';
 import AdminDashboard from './components/admin/AdminDashboard';
 import SEOHead from './components/seo/SEOHead';
 
-const AustraliaMapGoogle = lazy(() => import('./components/home/AustraliaMapGoogle'));
-const TrafficPage = lazy(() => import('./components/pages/TrafficPage'));
+const AustraliaMapGoogle    = lazy(() => import('./components/home/AustraliaMapGoogle'));
+const TrafficPage           = lazy(() => import('./components/pages/TrafficPage'));
+const SuburbExplorerPage    = lazy(() => import('./components/pages/SuburbExplorerPage'));
+const ProcessingTimesPage   = lazy(() => import('./components/pages/ProcessingTimesPage'));
 
 const HomePage = () => (
   <>
@@ -49,7 +52,7 @@ const HomePage = () => (
       <BentoGrid />
       {import.meta.env.VITE_GOOGLE_MAPS_API_KEY
         ? (
-          <ErrorBoundary>
+          <ErrorBoundary fallback={<AustraliaMap />}>
             <Suspense fallback={<AustraliaMap />}>
               <AustraliaMapGoogle />
             </Suspense>
@@ -111,16 +114,19 @@ const App = () => {
                 <Route path="/sosyal" element={<SubPage pageId="sosyal" />} />
                 <Route path="/sss" element={<SSSPage />} />
                 <Route path="/program-turleri" element={<ProgramTurleriPage />} />
-                <Route path="/puan-hesapla" element={<PointsCalculatorPage />} />
+                <Route path="/puan-hesapla" element={<Navigate to="/points-calculator" replace />} />
                 <Route path="/points-calculator" element={<PointsCalculatorPage />} />
-                <Route path="/vize-kontrol-listesi" element={<VisaChecklistPage />} />
+                <Route path="/vize-kontrol-listesi" element={<Navigate to="/visa-checklist" replace />} />
                 <Route path="/visa-checklist" element={<VisaChecklistPage />} />
                 <Route path="/occupation" element={<OccupationCheckerPage />} />
                 <Route path="/salary-calculator" element={<SalaryCalculatorPage />} />
+                <Route path="/tax-calculator" element={<TaxCalculatorPage />} />
+                <Route path="/super-calculator" element={<SuperCalculatorPage />} />
                 <Route path="/visa" element={<VisaGuidePage />} />
                 <Route path="/visa/:code" element={<VisaGuidePage />} />
                 <Route path="/iletisim" element={<SubPage pageId="iletisim" />} />
-                <Route path="/ilk-48-saat" element={<Ilk48SaatPage />} />
+                <Route path="/ilk-48-saat" element={<Navigate to="/" replace />} />
+                <Route path="/article/:slug" element={<ArticlePage />} />
                 <Route path="/sertifikalar" element={<SertifikalarPage />} />
                 <Route path="/vergi-ve-super" element={<VergiVeSuperPage />} />
                 <Route path="/belge-sablonlari" element={<BelgeSablonlariPage />} />
@@ -131,6 +137,20 @@ const App = () => {
                   <ErrorBoundary>
                     <Suspense fallback={<div className="min-h-screen bg-[#050505]" />}>
                       <TrafficPage />
+                    </Suspense>
+                  </ErrorBoundary>
+                } />
+                <Route path="/suburb" element={
+                  <ErrorBoundary>
+                    <Suspense fallback={<div className="min-h-screen bg-[#050505]" />}>
+                      <SuburbExplorerPage />
+                    </Suspense>
+                  </ErrorBoundary>
+                } />
+                <Route path="/processing-times" element={
+                  <ErrorBoundary>
+                    <Suspense fallback={<div className="min-h-screen bg-[#050505]" />}>
+                      <ProcessingTimesPage />
                     </Suspense>
                   </ErrorBoundary>
                 } />

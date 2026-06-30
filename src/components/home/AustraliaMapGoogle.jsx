@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
-  APIProvider, Map, AdvancedMarker, Pin, InfoWindow,
+  APIProvider, Map, AdvancedMarker,
 } from '@vis.gl/react-google-maps';
-import { Cloud, Thermometer, Wind, Droplets, Briefcase, Home, DollarSign, X, MapPin } from 'lucide-react';
+import { Cloud, Thermometer, Wind, Droplets, Briefcase, Home, DollarSign, X, MapPin, Leaf } from 'lucide-react';
 import { env } from '../../lib/env.ts';
 
 const GOOGLE_MAPS_API_KEY = env.VITE_GOOGLE_MAPS_API_KEY || '';
@@ -123,6 +123,38 @@ const CITIES = [
   },
 ];
 
+// ── AQI helpers ───────────────────────────────────────────────────────────────
+function aqiMeta(aqi) {
+  if (aqi === null || aqi === undefined) return null;
+  if (aqi <= 50)  return { label: 'Good',        color: '#22c55e', bg: 'rgba(34,197,94,0.12)' };
+  if (aqi <= 100) return { label: 'Moderate',     color: '#eab308', bg: 'rgba(234,179,8,0.12)' };
+  if (aqi <= 150) return { label: 'Unhealthy*',   color: '#f97316', bg: 'rgba(249,115,22,0.12)' };
+  if (aqi <= 200) return { label: 'Unhealthy',    color: '#ef4444', bg: 'rgba(239,68,68,0.12)' };
+  if (aqi <= 300) return { label: 'Very Unhealthy', color: '#a855f7', bg: 'rgba(168,85,247,0.12)' };
+  return           { label: 'Hazardous',          color: '#7f1d1d', bg: 'rgba(127,29,29,0.12)' };
+}
+
+// ── AQI hook ──────────────────────────────────────────────────────────────────
+const useAirQuality = (lat, lng) => {
+  const [aqi, setAqi] = useState(null);
+  const token = env.VITE_WAQI_TOKEN || env.VITE_WAQI_API_KEY;
+
+  useEffect(() => {
+    if (!lat || !lng || !token) return;
+    setAqi(null);
+    fetch(`https://api.waqi.info/feed/geo:${lat};${lng}/?token=${token}`)
+      .then(r => r.json())
+      .then(d => {
+        if (d.status === 'ok' && d.data?.aqi !== undefined) {
+          setAqi({ value: d.data.aqi, pol: d.data.dominentpol || '' });
+        }
+      })
+      .catch(() => {});
+  }, [lat, lng, token]);
+
+  return aqi;
+};
+
 // ── Weather hook ──────────────────────────────────────────────────────────────
 const useWeather = (cityId) => {
   const [weather, setWeather] = useState(null);
@@ -168,6 +200,8 @@ const useWeather = (cityId) => {
 // ── City info panel ───────────────────────────────────────────────────────────
 const CityPanel = ({ city, onClose }) => {
   const weather = useWeather(city?.id);
+  const aqi     = useAirQuality(city?.lat, city?.lng);
+  const aqiInfo = aqi ? aqiMeta(aqi.value) : null;
 
   if (!city) return null;
 
@@ -217,6 +251,21 @@ const CityPanel = ({ city, onClose }) => {
         </div>
       )}
 
+      {/* Air Quality */}
+      {aqiInfo && (
+        <div className="px-4 py-2.5 border-b border-white/5 flex items-center justify-between" style={{ background: aqiInfo.bg }}>
+          <div className="flex items-center gap-2">
+            <Leaf size={12} style={{ color: aqiInfo.color }} />
+            <span className="text-[9px] font-black uppercase tracking-widest text-white/40">Air Quality Index</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-black" style={{ color: aqiInfo.color }}>{aqi.value}</span>
+            <span className="text-[9px] font-black px-1.5 py-0.5 rounded" style={{ backgroundColor: aqiInfo.color, color: '#000' }}>{aqiInfo.label}</span>
+            {aqi.pol && <span className="text-[9px] text-white/30 uppercase">{aqi.pol}</span>}
+          </div>
+        </div>
+      )}
+
       {/* Stats */}
       <div className="grid grid-cols-3 divide-x divide-white/5 border-b border-white/5">
         {[
@@ -255,15 +304,37 @@ const CityPanel = ({ city, onClose }) => {
   );
 };
 
+// ── Map ID from env (optional — if missing, map loads without dark vector theme) ──
+const GOOGLE_MAPS_MAP_ID = env.VITE_GOOGLE_MAPS_MAP_ID || undefined;
+
 // ── Main map component ────────────────────────────────────────────────────────
 const AustraliaMapGoogle = () => {
   const [selectedCity, setSelectedCity] = useState(null);
+  const [mapError, setMapError] = useState(false);
+
+  useEffect(() => {
+    const onAuthFailure = () => setMapError(true);
+    window.addEventListener('gm-authfailure', onAuthFailure);
+    return () => window.removeEventListener('gm-authfailure', onAuthFailure);
+  }, []);
 
   const handleMarkerClick = useCallback((city) => {
     setSelectedCity(prev => prev?.id === city.id ? null : city);
   }, []);
 
-  if (!GOOGLE_MAPS_API_KEY) return null;
+  if (!GOOGLE_MAPS_API_KEY || mapError) {
+    throw new Error('Google Maps unavailable');
+  }
+
+  const mapProps = {
+    defaultCenter: { lat: -27, lng: 134 },
+    defaultZoom: 4,
+    disableDefaultUI: false,
+    gestureHandling: 'cooperative',
+    style: { width: '100%', height: '100%' },
+    mapTypeId: 'roadmap',
+    ...(GOOGLE_MAPS_MAP_ID ? { mapId: GOOGLE_MAPS_MAP_ID, colorScheme: 'DARK' } : {}),
+  };
 
   return (
     <section className="py-16 px-4 bg-[#050505]">
@@ -285,16 +356,7 @@ const AustraliaMapGoogle = () => {
         {/* Map */}
         <div className="relative w-full rounded-none overflow-hidden border border-white/10" style={{ height: '520px' }}>
           <APIProvider apiKey={GOOGLE_MAPS_API_KEY}>
-            <Map
-              defaultCenter={{ lat: -27, lng: 134 }}
-              defaultZoom={4}
-              mapId="migron-australia-map"
-              disableDefaultUI={false}
-              gestureHandling="cooperative"
-              colorScheme="DARK"
-              style={{ width: '100%', height: '100%' }}
-              mapTypeId="roadmap"
-            >
+            <Map {...mapProps}>
               {CITIES.map(city => (
                 <AdvancedMarker
                   key={city.id}

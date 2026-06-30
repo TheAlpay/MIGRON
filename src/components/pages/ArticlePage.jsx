@@ -110,11 +110,14 @@ const ArticlePage = () => {
         const dateModified = article.updatedAt
             ? (article.updatedAt.toDate ? article.updatedAt.toDate() : new Date(article.updatedAt)).toISOString()
             : datePublished;
+        const descText = displayExcerpt && displayExcerpt.length >= 50
+            ? displayExcerpt
+            : `Complete guide to ${displayTitle}. Read the full article on MIGRON, Australia's immigration platform.`;
         script.textContent = JSON.stringify({
             '@context': 'https://schema.org',
             '@type': 'BlogPosting',
-            headline: article.title,
-            description: article.excerpt || article.title,
+            headline: displayTitle,
+            description: descText,
             image: article.coverImage || `${env.VITE_SITE_URL}/migron.webp`,
             datePublished,
             dateModified,
@@ -124,13 +127,13 @@ const ArticlePage = () => {
                 name: 'MIGRON',
                 logo: { '@type': 'ImageObject', url: `${env.VITE_SITE_URL}/migron.webp` },
             },
-            mainEntityOfPage: { '@type': 'WebPage', '@id': `${env.VITE_SITE_URL}/makale/${slug}` },
-            inLanguage: 'tr',
+            mainEntityOfPage: { '@type': 'WebPage', '@id': `${env.VITE_SITE_URL}/article/${slug}` },
+            inLanguage: lang === 'tr' ? 'tr' : 'en',
         });
         document.getElementById('article-jsonld')?.remove();
         document.head.appendChild(script);
         return () => document.getElementById('article-jsonld')?.remove();
-    }, [article, slug]);
+    }, [article, slug, lang]);
 
     useEffect(() => {
         const normalizeSlug = (s) =>

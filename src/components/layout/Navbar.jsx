@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import {
   Menu, X, Globe, ChevronDown,
   Calculator, ClipboardList, FileText, Search,
-  Briefcase, DollarSign, MapPin,
+  Briefcase, DollarSign, MapPin, Clock, TrendingUp, PiggyBank,
 } from 'lucide-react';
 import { SITE_NAME } from '../../config/constants';
 import { useLanguage } from '../../i18n/LanguageContext';
@@ -65,9 +65,9 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }) => {
         setResourceOpen(false);
     };
 
-    const isToolsActive   = ['/occupation', '/salary-calculator', '/points-calculator', '/puan-hesapla', '/visa-checklist', '/vize-kontrol-listesi', '/belge-sablonlari'].includes(location.pathname);
+    const isToolsActive   = ['/occupation', '/salary-calculator', '/points-calculator', '/puan-hesapla', '/visa-checklist', '/vize-kontrol-listesi', '/belge-sablonlari', '/tax-calculator', '/super-calculator'].includes(location.pathname);
     const isVisaActive    = ['/visa', '/program-turleri', '/pr-yol-haritasi'].some(p => location.pathname.startsWith(p));
-    const isSettleActive  = ['/sosyal', '/ilk-48-saat', '/centrelink', '/maas-rehberi', '/traffic'].includes(location.pathname);
+    const isSettleActive  = ['/sosyal', '/centrelink', '/traffic'].includes(location.pathname);
     const isResourceActive= ['/hukuk', '/egitim', '/sertifikalar', '/vergi-ve-super'].includes(location.pathname);
 
     const DropItem = ({ to, icon, label, onClick }) => (
@@ -100,8 +100,11 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }) => {
                                 <div className="absolute top-full left-0 bg-[#0a0a0a] border border-white/10 min-w-[260px] shadow-2xl z-[100]">
                                     <DropItem to="/occupation"        icon={<Briefcase/>}     label="Occupation Checker"   onClick={() => setToolsOpen(false)} />
                                     <DropItem to="/salary-calculator" icon={<DollarSign/>}    label="Salary Calculator"    onClick={() => setToolsOpen(false)} />
+                                    <DropItem to="/tax-calculator"    icon={<TrendingUp/>}    label="Tax Calculator"       onClick={() => setToolsOpen(false)} />
+                                    <DropItem to="/super-calculator"  icon={<PiggyBank/>}     label="Super Calculator"     onClick={() => setToolsOpen(false)} />
                                     <DropItem to="/points-calculator" icon={<Calculator/>}    label="Points Calculator"    onClick={() => setToolsOpen(false)} />
                                     <DropItem to="/visa-checklist"    icon={<ClipboardList/>} label="Visa Checklist"       onClick={() => setToolsOpen(false)} />
+                                    <DropItem to="/suburb"            icon={<MapPin/>}        label="Suburb Explorer"      onClick={() => setToolsOpen(false)} />
                                     <DropItem to="/belge-sablonlari"  icon={<FileText/>}      label="Document Templates"   onClick={() => setToolsOpen(false)} />
                                 </div>
                             )}
@@ -120,8 +123,9 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }) => {
                                     <DropItem to="/visa/190"       label="Subclass 190 — Skilled Nominated"   onClick={() => setVisaOpen(false)} />
                                     <DropItem to="/visa/491"       label="Subclass 491 — Regional"            onClick={() => setVisaOpen(false)} />
                                     <DropItem to="/visa/482"       label="Subclass 482 — TSS"                 onClick={() => setVisaOpen(false)} />
-                                    <DropItem to="/program-turleri" label="Program Overview"   onClick={() => setVisaOpen(false)} />
-                                    <DropItem to="/pr-yol-haritasi" label="PR Roadmap"         onClick={() => setVisaOpen(false)} />
+                                    <DropItem to="/program-turleri"  label="Program Overview"   onClick={() => setVisaOpen(false)} />
+                                    <DropItem to="/pr-yol-haritasi"  label="PR Roadmap"         onClick={() => setVisaOpen(false)} />
+                                    <DropItem to="/processing-times" label="Processing Times"   icon={<Clock/>} onClick={() => setVisaOpen(false)} />
                                 </div>
                             )}
                         </div>
@@ -134,11 +138,10 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }) => {
                             </button>
                             {settleOpen && (
                                 <div className="absolute top-full left-0 bg-[#0a0a0a] border border-white/10 min-w-[220px] shadow-2xl z-[100]">
-                                    <DropItem to="/sosyal"      icon={<MapPin/>} label="Settlement Guide"  onClick={() => setSettleOpen(false)} />
-                                    <DropItem to="/ilk-48-saat"              label="First 48 Hours"     onClick={() => setSettleOpen(false)} />
-                                    <DropItem to="/maas-rehberi"             label="Salary Guide"       onClick={() => setSettleOpen(false)} />
-                                    <DropItem to="/centrelink"               label="Centrelink"         onClick={() => setSettleOpen(false)} />
-                                    <DropItem to="/traffic"                  label="Live Traffic (NSW)" onClick={() => setSettleOpen(false)} />
+                                    <DropItem to="/sosyal"    icon={<MapPin/>} label="Settlement Guide"  onClick={() => setSettleOpen(false)} />
+                                    <DropItem to="/centrelink"               label="Centrelink Guide"   onClick={() => setSettleOpen(false)} />
+                                    <DropItem to="/vergi-ve-super"           label="Tax & Super"        onClick={() => setSettleOpen(false)} />
+                                    <DropItem to="/traffic"                  label="Live Traffic"       onClick={() => setSettleOpen(false)} />
                                 </div>
                             )}
                         </div>
@@ -230,8 +233,11 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }) => {
                                 {[
                                     { label: 'Occupation Checker',  path: '/occupation'        },
                                     { label: 'Salary Calculator',   path: '/salary-calculator' },
+                                    { label: 'Tax Calculator',      path: '/tax-calculator'    },
+                                    { label: 'Super Calculator',    path: '/super-calculator'  },
                                     { label: 'Points Calculator',   path: '/points-calculator' },
                                     { label: 'Visa Checklist',      path: '/visa-checklist'    },
+                                    { label: 'Suburb Explorer',     path: '/suburb'            },
                                     { label: 'Document Templates',  path: '/belge-sablonlari'  },
                                 ].map(({ label, path }) => (
                                     <Link key={path} to={path} onClick={() => setIsMenuOpen(false)}
@@ -268,10 +274,10 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }) => {
                             <p className="text-[9px] font-black text-[#ccff00]/50 uppercase tracking-[0.3em] mb-3">Settlement</p>
                             <div className="flex flex-col gap-1 pl-2">
                                 {[
-                                    { label: 'Settlement Guide', path: '/sosyal'      },
-                                    { label: 'First 48 Hours',   path: '/ilk-48-saat' },
-                                    { label: 'Salary Guide',     path: '/maas-rehberi'},
-                                    { label: 'Centrelink',       path: '/centrelink'  },
+                                    { label: 'Settlement Guide', path: '/sosyal'        },
+                                    { label: 'Centrelink Guide', path: '/centrelink'    },
+                                    { label: 'Tax & Super',      path: '/vergi-ve-super'},
+                                    { label: 'Live Traffic',     path: '/traffic'       },
                                 ].map(({ label, path }) => (
                                     <Link key={path} to={path} onClick={() => setIsMenuOpen(false)}
                                         className="text-lg font-black uppercase text-white/70 hover:text-[#ccff00] py-2 transition-colors">

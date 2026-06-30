@@ -122,7 +122,7 @@ const BentoGrid = () => {
                             to={`/makale/${article.slug}`}
                             key={article.id}
                             className="bg-[#111] p-8 border border-white/5 hover:border-white/20 transition-all cursor-pointer flex flex-col justify-between group"
-                            aria-label={`${article.title} — ${t('article_read')}`}
+                            aria-label={`${(lang === 'en' ? article.title_en || article.title : article.title_tr || article.title)} — ${t('article_read')}`}
                         >
                             <div className="flex justify-between text-[10px] font-bold text-white/40 mb-8 uppercase tracking-widest">
                                 <span style={{ color: categoryColors[article.category] || '#ccff00' }}>
@@ -134,7 +134,7 @@ const BentoGrid = () => {
                                 </span>
                             </div>
                             <h4 className="text-xl font-black uppercase leading-none group-hover:text-[#ccff00] transition-colors">
-                                {article.title}
+                                {lang === 'en' ? (article.title_en || article.title) : (article.title_tr || article.title)}
                             </h4>
                         </Link>
                     ))

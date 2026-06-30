@@ -157,9 +157,9 @@ const Ilk48SaatPage = () => {
     return (
         <>
             <SEOHead
-                title={lang === 'en' ? "First 48 Hours in Australia — Arrival Guide" : "Avustralya'ya İndim, Şimdi Ne Yapacağım?"}
+                title={lang === 'en' ? "First 48 Hours in Australia — New Arrival Checklist" : "Avustralya'ya İndim, Şimdi Ne Yapacağım?"}
                 description={lang === 'en'
-                    ? "Step-by-step checklist for your first 48 hours in Australia. Follow along on your phone."
+                    ? "Everything you need to do in your first 48 hours in Australia. Tax file number, bank account, SIM card, Medicare — step-by-step guide for new arrivals."
                     : "Avustralya'ya yeni gelen birinin ilk 48 saatte adım adım yapması gerekenler. Telefona bakarak takip et."}
                 path="/ilk-48-saat"
             />

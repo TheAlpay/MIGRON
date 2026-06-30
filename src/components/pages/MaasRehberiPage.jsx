@@ -3,87 +3,85 @@ import { Link } from 'react-router-dom';
 import { ArrowLeft, DollarSign, RefreshCw, ExternalLink } from 'lucide-react';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../../config/firebase';
-import { useLanguage } from '../../i18n/LanguageContext';
 import SEOHead from '../seo/SEOHead';
-import YouTubeBox from '../shared/YouTubeBox';
 
-// ── Varsayılan Sektör Verileri (Firestore fallback) ──────────────────────────
+// ── Default Sector Data (Firestore fallback) ──────────────────────────────────
 const DEFAULT_SECTORS = [
     {
-        id: 'yiyecek', icon: '🍽️',
-        name: { tr: 'Yiyecek & İçecek', en: 'Food & Beverage' },
+        id: 'food', icon: '🍽️',
+        name: 'Food & Beverage',
         positions: [
-            { tr: 'Kafe Görevlisi / Barista', en: 'Cafe Worker / Barista', hourly: '$25–31', weekly: '$950–1,150' },
-            { tr: 'Restoran Garson', en: 'Restaurant Waiter', hourly: '$25–32', weekly: '$950–1,200' },
-            { tr: 'Aşçı Yardımcısı', en: 'Kitchen Hand', hourly: '$26–32', weekly: '$980–1,200' },
-            { tr: 'Sous Chef', en: 'Sous Chef', hourly: '$32–40', weekly: '$1,200–1,500' },
-            { tr: 'Head Chef', en: 'Head Chef', hourly: '$40–55', weekly: '$1,500–2,100' },
+            { label: 'Cafe Worker / Barista', hourly: '$25–31', weekly: '$950–1,150' },
+            { label: 'Restaurant Waiter', hourly: '$25–32', weekly: '$950–1,200' },
+            { label: 'Kitchen Hand', hourly: '$26–32', weekly: '$980–1,200' },
+            { label: 'Sous Chef', hourly: '$32–40', weekly: '$1,200–1,500' },
+            { label: 'Head Chef', hourly: '$40–55', weekly: '$1,500–2,100' },
         ],
     },
     {
-        id: 'insaat', icon: '🏗️',
-        name: { tr: 'İnşaat & Saha', en: 'Construction & Site' },
+        id: 'construction', icon: '🏗️',
+        name: 'Construction & Site',
         positions: [
-            { tr: 'Genel İşçi', en: 'General Labourer', hourly: '$30–38', weekly: '$1,100–1,450' },
-            { tr: 'Forklift Operatörü', en: 'Forklift Operator', hourly: '$32–42', weekly: '$1,200–1,600' },
-            { tr: 'Traffic Controller', en: 'Traffic Controller', hourly: '$38–50', weekly: '$1,450–1,900' },
-            { tr: 'Elektrikçi', en: 'Electrician', hourly: '$48–70', weekly: '$1,800–2,650', note: { tr: 'En çok aranan meslek', en: 'Most in-demand trade' } },
-            { tr: 'İnşaat Mühendisi', en: 'Civil Engineer', hourly: '$55–80', weekly: '$2,100–3,050' },
+            { label: 'General Labourer', hourly: '$30–38', weekly: '$1,100–1,450' },
+            { label: 'Forklift Operator', hourly: '$32–42', weekly: '$1,200–1,600' },
+            { label: 'Traffic Controller', hourly: '$38–50', weekly: '$1,450–1,900' },
+            { label: 'Electrician', hourly: '$48–70', weekly: '$1,800–2,650', note: 'Most in-demand trade' },
+            { label: 'Civil Engineer', hourly: '$55–80', weekly: '$2,100–3,050' },
         ],
     },
     {
-        id: 'guvenlik', icon: '🛡️',
-        name: { tr: 'Güvenlik', en: 'Security' },
+        id: 'security', icon: '🛡️',
+        name: 'Security',
         positions: [
-            { tr: 'Güvenlik Görevlisi', en: 'Security Guard', hourly: '$30–38', weekly: '$1,100–1,450' },
-            { tr: 'Gece Kulübü Güvenliği', en: 'Crowd Controller', hourly: '$38–50', weekly: '$1,450–1,900' },
-            { tr: 'Güvenlik Süpervizörü', en: 'Security Supervisor', hourly: '$42–55', weekly: '$1,600–2,100' },
+            { label: 'Security Guard', hourly: '$30–38', weekly: '$1,100–1,450' },
+            { label: 'Crowd Controller', hourly: '$38–50', weekly: '$1,450–1,900' },
+            { label: 'Security Supervisor', hourly: '$42–55', weekly: '$1,600–2,100' },
         ],
     },
     {
         id: 'it', icon: '💻',
-        name: { tr: 'IT & Teknoloji', en: 'IT & Technology' },
+        name: 'IT & Technology',
         positions: [
-            { tr: 'IT Destek', en: 'IT Support', hourly: '$38–50', weekly: '$1,450–1,900' },
-            { tr: 'Yazılım Geliştirici (Junior)', en: 'Software Developer (Junior)', hourly: '$48–65', weekly: '$1,800–2,500' },
-            { tr: 'Yazılım Geliştirici (Mid)', en: 'Software Developer (Mid)', hourly: '$65–90', weekly: '$2,500–3,400' },
-            { tr: 'Veri Analisti', en: 'Data Analyst', hourly: '$55–78', weekly: '$2,100–3,000' },
-            { tr: 'Siber Güvenlik Uzmanı', en: 'Cybersecurity Specialist', hourly: '$70–100', weekly: '$2,650–3,800' },
+            { label: 'IT Support', hourly: '$38–50', weekly: '$1,450–1,900' },
+            { label: 'Software Developer (Junior)', hourly: '$48–65', weekly: '$1,800–2,500' },
+            { label: 'Software Developer (Mid)', hourly: '$65–90', weekly: '$2,500–3,400' },
+            { label: 'Data Analyst', hourly: '$55–78', weekly: '$2,100–3,000' },
+            { label: 'Cybersecurity Specialist', hourly: '$70–100', weekly: '$2,650–3,800' },
         ],
     },
     {
-        id: 'saglik', icon: '🏥',
-        name: { tr: 'Sağlık & Bakım', en: 'Health & Care' },
+        id: 'health', icon: '🏥',
+        name: 'Health & Care',
         positions: [
-            { tr: 'Yaşlı Bakım Görevlisi', en: 'Aged Care Worker', hourly: '$30–40', weekly: '$1,100–1,500' },
-            { tr: 'NDIS Destek Görevlisi', en: 'NDIS Support Worker', hourly: '$32–45', weekly: '$1,200–1,700' },
-            { tr: 'Hemşire (RN)', en: 'Registered Nurse', hourly: '$43–65', weekly: '$1,650–2,500' },
+            { label: 'Aged Care Worker', hourly: '$30–40', weekly: '$1,100–1,500' },
+            { label: 'NDIS Support Worker', hourly: '$32–45', weekly: '$1,200–1,700' },
+            { label: 'Registered Nurse (RN)', hourly: '$43–65', weekly: '$1,650–2,500' },
         ],
     },
     {
-        id: 'nakliye', icon: '🚛',
-        name: { tr: 'Nakliye & Lojistik', en: 'Transport & Logistics' },
+        id: 'transport', icon: '🚛',
+        name: 'Transport & Logistics',
         positions: [
-            { tr: 'Depo Görevlisi', en: 'Warehouse Worker', hourly: '$30–38', weekly: '$1,100–1,450' },
-            { tr: 'Kamyon Sürücüsü (HR)', en: 'Truck Driver (HR)', hourly: '$38–55', weekly: '$1,450–2,100' },
-            { tr: 'Uzun Yol Sürücüsü', en: 'Long-Haul Driver', hourly: '$42–60', weekly: '$1,600–2,300' },
+            { label: 'Warehouse Worker', hourly: '$30–38', weekly: '$1,100–1,450' },
+            { label: 'Truck Driver (HR)', hourly: '$38–55', weekly: '$1,450–2,100' },
+            { label: 'Long-Haul Driver', hourly: '$42–60', weekly: '$1,600–2,300' },
         ],
     },
     {
-        id: 'temizlik', icon: '🧹',
-        name: { tr: 'Temizlik', en: 'Cleaning' },
+        id: 'cleaning', icon: '🧹',
+        name: 'Cleaning',
         positions: [
-            { tr: 'Temizlik Görevlisi', en: 'Cleaner', hourly: '$30–36', weekly: '$1,000–1,350' },
-            { tr: 'Endüstriyel Temizlik', en: 'Industrial Cleaner', hourly: '$36–48', weekly: '$1,350–1,800' },
+            { label: 'Cleaner', hourly: '$30–36', weekly: '$1,000–1,350' },
+            { label: 'Industrial Cleaner', hourly: '$36–48', weekly: '$1,350–1,800' },
         ],
     },
     {
-        id: 'cocuk', icon: '👶',
-        name: { tr: 'Çocuk & Eğitim', en: 'Childcare & Education' },
+        id: 'childcare', icon: '👶',
+        name: 'Childcare & Education',
         positions: [
-            { tr: 'Çocuk Bakıcısı', en: 'Nanny / Babysitter', hourly: '$26–38', weekly: '$980–1,450' },
-            { tr: 'Kreş Görevlisi', en: 'Childcare Worker', hourly: '$30–42', weekly: '$1,100–1,600' },
-            { tr: 'İlkokul Öğretmeni', en: 'Primary School Teacher', hourly: '$42–60', weekly: '$1,600–2,280' },
+            { label: 'Nanny / Babysitter', hourly: '$26–38', weekly: '$980–1,450' },
+            { label: 'Childcare Worker', hourly: '$30–42', weekly: '$1,100–1,600' },
+            { label: 'Primary School Teacher', hourly: '$42–60', weekly: '$1,600–2,280' },
         ],
     },
 ];
@@ -91,12 +89,10 @@ const DEFAULT_SECTORS = [
 const DEFAULT_FAIR_WORK = {
     hourly: '$24.95',
     weekly: '$948.10',
-    effectiveDate: '1 Temmuz 2025',
-    effectiveDateEn: '1 July 2025',
+    effectiveDate: '1 July 2025',
 };
 
 const MaasRehberiPage = () => {
-    const { lang } = useLanguage();
     const [activeFilter, setActiveFilter] = useState('all');
     const [fairWork, setFairWork] = useState(DEFAULT_FAIR_WORK);
     const [lastUpdated, setLastUpdated] = useState(null);
@@ -111,8 +107,7 @@ const MaasRehberiPage = () => {
                     setFairWork({
                         hourly: d.hourly || DEFAULT_FAIR_WORK.hourly,
                         weekly: d.weekly || DEFAULT_FAIR_WORK.weekly,
-                        effectiveDate: d.effective_date || DEFAULT_FAIR_WORK.effectiveDate,
-                        effectiveDateEn: d.effective_date_en || DEFAULT_FAIR_WORK.effectiveDateEn,
+                        effectiveDate: d.effective_date_en || d.effective_date || DEFAULT_FAIR_WORK.effectiveDate,
                     });
                 }
                 const rehberSnap = await getDoc(doc(db, 'maas_rehberi', 'meta'));
@@ -127,7 +122,7 @@ const MaasRehberiPage = () => {
     }, []);
 
     const filters = [
-        { id: 'all', label: { tr: 'Tümü', en: 'All' } },
+        { id: 'all', label: 'All' },
         ...DEFAULT_SECTORS.map(s => ({ id: s.id, label: s.name })),
     ];
 
@@ -138,10 +133,8 @@ const MaasRehberiPage = () => {
     return (
         <>
             <SEOHead
-                title={lang === 'en' ? 'Australia Salary Guide 2026' : 'Avustralya Maaş Rehberi 2026'}
-                description={lang === 'en'
-                    ? 'Sector-by-sector average wages in Australia. Hourly and weekly rates for 2026.'
-                    : 'Avustralya\'da sektör bazlı ortalama ücretler. 2026 saatlik ve haftalık maaş rehberi.'}
+                title="Australian Salary Guide — Industry Pay Rates & Award Wages 2026 | MIGRON"
+                description="Comprehensive Australian salary guide by industry and occupation. Fair Work minimum wages, award rates, median salaries and salary negotiation tips for migrants."
                 path="/maas-rehberi"
             />
             <div className="min-h-screen bg-[#050505] text-[#e0e0e0] pt-20">
@@ -152,10 +145,10 @@ const MaasRehberiPage = () => {
                         <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
                             <Link to="/" className="inline-flex items-center gap-2 text-white/40 hover:text-[#ccff00] transition-colors text-[10px] font-black uppercase tracking-[0.2em]">
                                 <ArrowLeft size={14} />
-                                {lang === 'en' ? 'Back to Home' : 'Anasayfaya Dön'}
+                                Back to Home
                             </Link>
                             <p className="text-[10px] text-white/40 uppercase font-black tracking-[0.2em]">
-                                {lang === 'en' ? 'SALARY GUIDE' : 'MAAŞ REHBERİ'}
+                                SALARY GUIDE
                             </p>
                         </div>
 
@@ -164,18 +157,16 @@ const MaasRehberiPage = () => {
                                 <DollarSign className="text-black" size={28} strokeWidth={3} />
                             </div>
                             <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tighter italic text-[#ccff00]">
-                                {lang === 'en' ? 'SALARY GUIDE' : 'MAAŞ REHBERİ'}
+                                SALARY GUIDE
                             </h1>
                         </div>
                         <p className="text-sm md:text-base text-white/50 leading-relaxed font-medium">
-                            {lang === 'en'
-                                ? 'Sector-by-sector average wages in Australia. Hourly and weekly rates for 2026. All figures are estimates — casual workers receive an additional 25% loading.'
-                                : 'Avustralya\'da sektör bazlı ortalama ücretler — 2026. Tüm rakamlar tahmindir. Casual çalışanlar %25 loading alır. Fazla mesai dahil değildir.'}
+                            Sector-by-sector average wages in Australia. Hourly and weekly rates for 2026. All figures are estimates — casual workers receive an additional 25% loading. Overtime not included.
                         </p>
                         {lastUpdated && (
                             <p className="text-[10px] text-white/25 mt-2 flex items-center gap-1.5">
                                 <RefreshCw size={9} />
-                                {lang === 'en' ? 'Last updated:' : 'Son güncelleme:'} {lastUpdated.toLocaleDateString(lang === 'en' ? 'en-AU' : 'tr-TR', { day: 'numeric', month: 'long', year: 'numeric' })}
+                                Last updated: {lastUpdated.toLocaleDateString('en-AU', { day: 'numeric', month: 'long', year: 'numeric' })}
                             </p>
                         )}
                     </div>
@@ -188,18 +179,18 @@ const MaasRehberiPage = () => {
                         <div className="flex flex-wrap items-start justify-between gap-4">
                             <div>
                                 <p className="text-[10px] font-black tracking-[0.3em] uppercase text-[#ccff00] mb-2">
-                                    {lang === 'en' ? '⚖️ FAIR WORK MINIMUM WAGES' : '⚖️ FAIR WORK MİNİMUM ÜCRET'}
+                                    ⚖️ FAIR WORK MINIMUM WAGES
                                 </p>
                                 <div className="flex flex-wrap gap-6">
                                     <div>
                                         <p className="text-[9px] text-white/30 uppercase tracking-wider font-bold mb-0.5">
-                                            {lang === 'en' ? 'Hourly' : 'Saatlik'}
+                                            Hourly
                                         </p>
                                         <p className="text-2xl font-black text-white">{loading ? '...' : fairWork.hourly}</p>
                                     </div>
                                     <div>
                                         <p className="text-[9px] text-white/30 uppercase tracking-wider font-bold mb-0.5">
-                                            {lang === 'en' ? 'Weekly' : 'Haftalık'}
+                                            Weekly
                                         </p>
                                         <p className="text-2xl font-black text-white">{loading ? '...' : fairWork.weekly}</p>
                                     </div>
@@ -207,10 +198,10 @@ const MaasRehberiPage = () => {
                             </div>
                             <div className="text-right">
                                 <p className="text-[9px] text-white/30 uppercase tracking-wider font-bold mb-1">
-                                    {lang === 'en' ? 'Effective from' : 'Geçerlilik tarihi'}
+                                    Effective from
                                 </p>
                                 <p className="text-sm font-black text-white/70">
-                                    {loading ? '...' : (lang === 'en' ? fairWork.effectiveDateEn : fairWork.effectiveDate)}
+                                    {loading ? '...' : fairWork.effectiveDate}
                                 </p>
                                 <a
                                     href="https://www.fairwork.gov.au/pay-and-wages/minimum-wages"
@@ -235,7 +226,7 @@ const MaasRehberiPage = () => {
                                     : 'border-white/10 text-white/50 hover:border-white/30 hover:text-white/80'
                                     }`}
                             >
-                                {typeof f.label === 'string' ? f.label : (lang === 'en' ? f.label.en : f.label.tr)}
+                                {f.label}
                             </button>
                         ))}
                     </div>
@@ -247,7 +238,7 @@ const MaasRehberiPage = () => {
                                 <div className="px-5 py-3 border-b border-white/5 flex items-center gap-3">
                                     <span className="text-xl">{sector.icon}</span>
                                     <h2 className="text-sm font-black uppercase tracking-wider text-white">
-                                        {lang === 'en' ? sector.name.en : sector.name.tr}
+                                        {sector.name}
                                     </h2>
                                 </div>
                                 <div className="overflow-x-auto">
@@ -255,13 +246,13 @@ const MaasRehberiPage = () => {
                                         <thead>
                                             <tr className="border-b border-white/5">
                                                 <th className="text-left px-5 py-2.5 text-[9px] font-black uppercase tracking-[0.2em] text-white/25">
-                                                    {lang === 'en' ? 'Position' : 'Pozisyon'}
+                                                    Position
                                                 </th>
                                                 <th className="text-right px-4 py-2.5 text-[9px] font-black uppercase tracking-[0.2em] text-white/25 whitespace-nowrap">
-                                                    {lang === 'en' ? 'Hourly' : 'Saatlik'}
+                                                    Hourly
                                                 </th>
                                                 <th className="text-right px-5 py-2.5 text-[9px] font-black uppercase tracking-[0.2em] text-white/25 whitespace-nowrap">
-                                                    {lang === 'en' ? 'Weekly' : 'Haftalık'}
+                                                    Weekly
                                                 </th>
                                             </tr>
                                         </thead>
@@ -270,11 +261,11 @@ const MaasRehberiPage = () => {
                                                 <tr key={i} className="border-b border-white/5 last:border-0 hover:bg-white/2 transition-colors">
                                                     <td className="px-5 py-3">
                                                         <span className="text-sm text-white/70 font-medium">
-                                                            {lang === 'en' ? pos.en : pos.tr}
+                                                            {pos.label}
                                                         </span>
                                                         {pos.note && (
                                                             <span className="ml-2 text-[9px] font-black uppercase tracking-wider text-[#ccff00]/70 border border-[#ccff00]/30 px-1.5 py-0.5">
-                                                                {lang === 'en' ? pos.note.en : pos.note.tr}
+                                                                {pos.note}
                                                             </span>
                                                         )}
                                                     </td>
@@ -296,20 +287,15 @@ const MaasRehberiPage = () => {
                     {/* Info box */}
                     <div className="border border-white/5 bg-[#111] p-5 mt-8">
                         <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30 mb-3">
-                            {lang === 'en' ? 'ℹ️ NOTES' : 'ℹ️ NOTLAR'}
+                            ℹ️ NOTES
                         </p>
                         <ul className="space-y-1.5">
-                            {(lang === 'en' ? [
+                            {[
                                 'All figures are 2026 estimates sourced from Fair Work, ABS, and Seek.com.au.',
                                 'Casual workers receive an additional 25% casual loading on top of the base rate.',
                                 'Overtime rates are not included.',
                                 'Rates may vary by state, enterprise agreement, or individual contract.',
-                            ] : [
-                                'Tüm rakamlar Fair Work, ABS ve Seek.com.au kaynaklı 2026 tahminleridir.',
-                                'Casual çalışanlar temel ücrete ek olarak %25 casual loading alır.',
-                                'Fazla mesai ücretleri dahil değildir.',
-                                'Ücretler eyalete, kurumsal anlaşmaya veya bireysel sözleşmeye göre farklılık gösterebilir.',
-                            ]).map((note, i) => (
+                            ].map((note, i) => (
                                 <li key={i} className="text-xs text-white/40 leading-relaxed flex items-start gap-2">
                                     <span className="text-[#ccff00]/40 mt-0.5">—</span>
                                     {note}
@@ -321,25 +307,23 @@ const MaasRehberiPage = () => {
                     {/* Related links */}
                     <div className="bg-[#111] border border-white/5 p-6 mt-6">
                         <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30 mb-4">
-                            {lang === 'en' ? "WHAT'S NEXT?" : 'SIRA NE?'}
+                            WHAT'S NEXT?
                         </p>
                         <div className="flex flex-col sm:flex-row gap-3">
                             <Link
                                 to="/pr-yol-haritasi"
                                 className="flex-1 px-4 py-3 border border-[#ccff00]/30 text-[#ccff00] text-xs font-black uppercase tracking-wider hover:bg-[#ccff00]/10 transition-all text-center"
                             >
-                                {lang === 'en' ? 'PR Roadmap →' : 'PR Yol Haritası →'}
+                                PR Roadmap →
                             </Link>
                             <Link
                                 to="/sertifikalar"
                                 className="flex-1 px-4 py-3 border border-white/10 text-white/50 text-xs font-black uppercase tracking-wider hover:border-white/30 hover:text-white/70 transition-all text-center"
                             >
-                                {lang === 'en' ? 'Certificates Guide →' : 'Sertifikalar Rehberi →'}
+                                Certificates Guide →
                             </Link>
                         </div>
                     </div>
-
-                    <YouTubeBox />
                 </div>
             </div>
         </>

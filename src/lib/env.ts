@@ -23,9 +23,11 @@ const clientEnvSchema = z.object({
   // ── Optional / future integrations ───────────────────────────────────────
   VITE_OPENWEATHER_API_KEY:    z.string().optional(),
   VITE_WAQI_API_KEY:           z.string().optional(),
+  VITE_WAQI_TOKEN:             z.string().optional(),
   VITE_WINDY_WEBCAMS_KEY:      z.string().optional(),
   VITE_NSW_TRANSPORT_API_KEY:  z.string().optional(),
   VITE_GOOGLE_MAPS_API_KEY:    z.string().optional(),
+  VITE_GOOGLE_MAPS_MAP_ID:     z.string().optional(),
   VITE_CF_TURNSTILE_SITE_KEY:  z.string().optional(),
 });
 

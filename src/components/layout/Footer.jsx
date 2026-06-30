@@ -15,8 +15,8 @@ const Footer = () => {
     ];
 
     const toolLinks = [
-        { label: t('nav_points_calc'), path: '/puan-hesapla' },
-        { label: t('nav_visa_checklist'), path: '/vize-kontrol-listesi' },
+        { label: t('nav_points_calc'), path: '/points-calculator' },
+        { label: t('nav_visa_checklist'), path: '/visa-checklist' },
     ];
 
     return (

@@ -3,86 +3,10 @@ import { Link } from 'react-router-dom';
 import { ArrowLeft, Layers, ArrowUpRight, X, ChevronRight } from 'lucide-react';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../../config/firebase';
-import { useLanguage } from '../../i18n/LanguageContext';
 import SEOHead from '../seo/SEOHead';
 
-// ── Varsayılan Veriler (Firebase boşsa bunlar gösterilir) ────────────────────
-const defaultProgramsTr = [
-    {
-        id: 'default-1', color: "#ccff00", tag: "SKILLED",
-        title: "Skilled Independent (189)",
-        subtitle: "Bağımsız Yetenekli Göçmen Vizesi",
-        desc: "Herhangi bir eyalet veya bölgesel sponsor gerektirmeyen, puan testi tabanlı bağımsız göçmenlik vizesi. Avustralya'nın herhangi bir yerinde yaşayabilir ve çalışabilirsiniz.",
-        requirements: ["Min. 65 EOI puanı", "Geçerli meslek değerlendirmesi", "Competent English (IELTS 6.0)", "Sağlık muayenesi"],
-        processingTime: "12-36 ay", prDirect: true,
-        details: "189 vizesi, herhangi bir Avustralyalı işveren veya eyalet tarafından sponsor olmaksızın başvurulabilen bir skilled göçmenlik vizesidir. SkillSelect sistemi üzerinden EOI (Expression of Interest) verilmesi ve ardından davet beklenmesi gerekir. Davet puanları genellikle 65'in çok üzerinde seyretmektedir; bu nedenle ek puan toplamak kritik önem taşır."
-    },
-    {
-        id: 'default-2', color: "#00d4ff", tag: "SKILLED",
-        title: "Skilled Nominated (190)",
-        subtitle: "Eyalet Nominasyonlu Vize",
-        desc: "Bir eyalet veya bölge tarafından nomine edilmenizi gerektiren, 5 ekstra puan kazandıran skilled göçmenlik vizesi.",
-        requirements: ["Min. 65 puan (+ 5 nominasyon bonusu)", "Eyalet nominasyonu", "Meslek değerlendirmesi", "Competent English"],
-        processingTime: "6-24 ay", prDirect: true,
-        details: "190 vizesi, state/territory nominasyonu ile 5 ek puan kazandıran ve bu nedenle daha ulaşılabilir bir skilled vize seçeneğidir. Her eyaletin kendi nominasyon kriterleri ve quota'ları vardır. Eyalet nominasyonu aldıktan sonra ise ilgili eyalette 2 yıl yaşama ve çalışma yükümlülüğü bulunmaktadır."
-    },
-    {
-        id: 'default-3', color: "#ff6b6b", tag: "EMPLOYER",
-        title: "Skills in Demand / SID (482)",
-        subtitle: "İşveren Sponsorlu Beceri Vizesi",
-        desc: "7 Aralık 2024'ten itibaren 482 TSS vizesinin yerini alan SID vizesi; Core Skills, Specialist Skills ve Labour Agreement olmak üzere 3 akıştan oluşur. Tüm akışlar 4 yıl geçerlidir ve 186 ENS ile PR'a kapı açar.",
-        requirements: ["Sponsor işveren", "Nominasyon onayı", "1 yıl deneyim (son 5 yıl içinde)", "IELTS 5.0+ (Core Skills) veya gelir eşiği (Specialist)"],
-        processingTime: "1-4 ay", prDirect: false,
-        details: "Skills in Demand (SID) vizesi 3 akıştan oluşur: Core Skills (CSOL listesindeki meslekler, min. $73,150 yıllık maaş), Specialist Skills (meslek listesi yok, min. $141,210 — 7 günde işlem), Labour Agreement (sektörel anlaşmalar). Tüm akışlar 4 yıl geçerlidir. 2 yıl çalışma sonrası 186 ENS vizesiyle kalıcı oturuma geçiş mümkündür. İşveren değişikliğinde yeni nominasyon gereklidir; iş kaybında 180 gün süre tanınır."
-    },
-    {
-        id: 'default-4', color: "#a78bfa", tag: "EMPLOYER",
-        title: "Employer Nomination Scheme (186)",
-        subtitle: "İşveren Nominasyonu Kalıcı Vize",
-        desc: "İşveren tarafından belirli bir pozisyona nomine edilen göçmenler için doğrudan PR imkânı sunan vize.",
-        requirements: ["İşveren nominasyonu", "3 yıl deneyim", "Competent English", "Meslek değerlendirmesi"],
-        processingTime: "6-24 ay", prDirect: true,
-        details: "186 vizesi, direct entry stream ve transition stream olmak üzere iki akışa sahiptir. Transition stream, en az 2 yıl 457 ya da 482 vizesiyle aynı işverende çalışmış kişiler içindir. Direct entry stream ise doğrudan işveren nominasyonuyla başvuru imkânı sunar."
-    },
-    {
-        id: 'default-5', color: "#f59e0b", tag: "REGIONAL",
-        title: "Skilled Work Regional (491)",
-        subtitle: "Bölgesel Çalışma Geçici Vizesi",
-        desc: "Bölgesel alanlarda çalışmayı ve yaşamayı gerektiren, 15 bonus puan kazandıran geçici vize. 3 yılın sonunda 191 vizesiyle PR'a geçiş mümkündür.",
-        requirements: ["Eyalet/bölge nominasyonu", "Bölgesel Avustralya'da ikamet", "Meslek değerlendirmesi", "Competent English"],
-        processingTime: "4-24 ay", prDirect: false,
-        details: "491 vizesi, regional Avustralya'da yaşamak ve çalışmak isteyenler için 15 ek puan sunar. 3 yıl bölgede çalıştıktan ve bölgesel gelir eşiğini karşıladıktan sonra 191 (Permanent Residence via Regional) vizesiyle kalıcı oturuma geçiş mümkündür."
-    },
-    {
-        id: 'default-6', color: "#10b981", tag: "STUDENT",
-        title: "Student Visa (500)",
-        subtitle: "Öğrenci Vizesi",
-        desc: "Avustralya'da CRICOS kayıtlı bir kurumda tam zamanlı öğrenim için vize. Çalışma izni ile birlikte gelir (iki haftada 48 saat).",
-        requirements: ["CRICOS kayıtlı kurum kabulü", "GTE (Genuine Temporary Entrant)", "English yeterliliği", "Mali yeterlilik"],
-        processingTime: "1-4 ay", prDirect: false,
-        details: "500 vizesi, Avustralya'daki eğitim sonrası 485 (Graduate Visa) vizesi için kapı açan önemli bir adımdır. GTE (Genuine Temporary Entrant) koşulunu karşılamak kritiktir. Öğrenim döneminde iki haftada (fortnight) 48 saatlik çalışma hakkı, öğrencilere önemli gelir imkânı sunmaktadır."
-    },
-    {
-        id: 'default-7', color: "#ec4899", tag: "PARTNER",
-        title: "Partner Visa (820/801)",
-        subtitle: "Eş/Partner Vizesi",
-        desc: "Avustralya vatandaşı veya PR sahibi biriyle ilişkisi olan kişiler için 2 aşamalı vize. İlk aşamada geçici, ikinci aşamada kalıcı oturum.",
-        requirements: ["Avustralyalı sponsor", "İlişkinin kanıtlanması", "Sağlık muayenesi", "Karakter gereksinimi"],
-        processingTime: "12-30 ay", prDirect: false,
-        details: "820 (onshore) ya da 309 (offshore) geçici partner vizesi ile başlayan süreç, 2 yıl sonra 801/100 kalıcı partner vizesiyle tamamlanır. İlişkinin gerçekliği; ortak banka hesabı, kira sözleşmesi, aile-arkadaş referansları ve fotoğraflar gibi belgelerle kanıtlanır."
-    },
-    {
-        id: 'default-8', color: "#6366f1", tag: "BUSINESS",
-        title: "Business Innovation & Investment (888)",
-        subtitle: "İş İnovasyonu ve Yatırım Vizesi",
-        desc: "Avustralya'da iş kurma veya yönetme ya da belirli yatırım faaliyetleri yürütme amacıyla verilen kalıcı oturum vizesi.",
-        requirements: ["Başarılı iş geçmişi", "Minimum net değer", "Eyalet nominasyonu", "İngilizce gereksinimi yok (bazı akışlar)"],
-        processingTime: "12-48 ay", prDirect: true,
-        details: "888 vizesi, genellikle 188 geçici iş vizesini tamamlayanlar için kalıcı oturum yoludur. Business Innovation stream (ciro ve işletme koşulları), Investor stream (yatırım miktarı koşulları) ve Significant Investor stream (5M AUD+) gibi farklı akışları mevcuttur."
-    },
-];
-
-const defaultProgramsEn = [
+// ── Default Program Data ──────────────────────────────────────────────────────
+const defaultPrograms = [
     {
         id: 'default-1', color: "#ccff00", tag: "SKILLED",
         title: "Skilled Independent (189)",
@@ -135,7 +59,7 @@ const defaultProgramsEn = [
         desc: "A visa for full-time study at a CRICOS-registered institution in Australia. Includes work rights (48 hours per fortnight during study periods).",
         requirements: ["Acceptance from a CRICOS-registered institution", "GTE (Genuine Temporary Entrant)", "English proficiency", "Financial capacity"],
         processingTime: "1–4 months", prDirect: false,
-        details: "The 500 visa is an important stepping stone towards the 485 (Graduate Visa) after studying in Australia. Meeting the GTE (Genuine Temporary Entrant) requirement is critical. As of 2024, the 48-hour per fortnight work allowance provides students with significant income opportunities."
+        details: "The 500 visa is an important stepping stone towards the 485 (Graduate Visa) after studying in Australia. Meeting the GTE (Genuine Temporary Entrant) requirement is critical. The 48-hour per fortnight work allowance provides students with significant income opportunities."
     },
     {
         id: 'default-7', color: "#ec4899", tag: "PARTNER",
@@ -157,8 +81,8 @@ const defaultProgramsEn = [
     },
 ];
 
-// Modal bileşeni
-const ProgramModal = ({ program, onClose, t }) => {
+// ── Modal Component ───────────────────────────────────────────────────────────
+const ProgramModal = ({ program, onClose }) => {
     if (!program) return null;
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={onClose}>
@@ -183,7 +107,7 @@ const ProgramModal = ({ program, onClose, t }) => {
                         {program.tag}
                     </span>
                     {program.prDirect && (
-                        <span className="px-2 py-1 text-[9px] font-black uppercase tracking-widest bg-white/5 text-white/40">{t('program_direct_pr')}</span>
+                        <span className="px-2 py-1 text-[9px] font-black uppercase tracking-widest bg-white/5 text-white/40">DIRECT PR</span>
                     )}
                     {program.processingTime && (
                         <span className="text-[10px] text-white/30 font-bold ml-auto">~{program.processingTime}</span>
@@ -199,14 +123,14 @@ const ProgramModal = ({ program, onClose, t }) => {
 
                 {program.details && (
                     <div className="bg-black/30 border border-white/5 p-5 mb-6">
-                        <p className="text-[10px] font-black text-white/30 uppercase tracking-widest mb-3">{t('program_details_label')}</p>
+                        <p className="text-[10px] font-black text-white/30 uppercase tracking-widest mb-3">DETAILED INFORMATION</p>
                         <p className="text-sm text-white/60 leading-relaxed">{program.details}</p>
                     </div>
                 )}
 
                 {program.requirements?.length > 0 && (
                     <div>
-                        <p className="text-[10px] text-white/30 uppercase tracking-widest font-black mb-3">{t('program_requirements_label')}</p>
+                        <p className="text-[10px] text-white/30 uppercase tracking-widest font-black mb-3">KEY REQUIREMENTS</p>
                         <ul className="space-y-2">
                             {program.requirements.map((req, j) => (
                                 <li key={j} className="flex items-center gap-3 text-sm text-white/60">
@@ -224,7 +148,7 @@ const ProgramModal = ({ program, onClose, t }) => {
                         onClick={onClose}
                         className="inline-flex items-center gap-2 bg-[#ccff00] text-black px-5 py-2.5 font-black uppercase text-sm hover:brightness-110 transition-all"
                     >
-                        {t('program_cta_btn')} <ArrowUpRight size={16} />
+                        Get in Touch <ArrowUpRight size={16} />
                     </a>
                 </div>
             </div>
@@ -233,24 +157,18 @@ const ProgramModal = ({ program, onClose, t }) => {
 };
 
 const ProgramTurleriPage = () => {
-    const { t, lang } = useLanguage();
-    const [firebasePrograms, setFirebasePrograms] = useState(null);
     const [loading, setLoading] = useState(true);
     const [selected, setSelected] = useState(null);
-
-    // In English mode always use English defaults (Firestore data is Turkish-only)
-    const programs = lang === 'en'
-        ? defaultProgramsEn
-        : (firebasePrograms || defaultProgramsTr);
+    // Always use English defaults — Firestore data is Turkish-only
+    const programs = defaultPrograms;
 
     useEffect(() => {
         const fetchPrograms = async () => {
             try {
                 const snapshot = await getDocs(collection(db, 'programs'));
+                // Firestore data is Turkish-only; ignore it and use English defaults
                 if (!snapshot.empty) {
-                    const items = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-                    items.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
-                    setFirebasePrograms(items);
+                    // No-op: we intentionally skip Turkish Firestore data
                 }
             } catch (err) {
                 console.error('Error fetching programs:', err);
@@ -263,8 +181,8 @@ const ProgramTurleriPage = () => {
     return (
         <>
             <SEOHead
-                title={t('program_title')}
-                description={t('nav_program') + ' — ' + t('program_page_desc')}
+                title="Australian Visa Programs — Complete Overview | MIGRON"
+                description="Overview of all Australian immigration pathways — skilled migration, employer-sponsored, regional, student, partner and family visa programs explained."
                 path="/program-turleri"
             />
             <div className="min-h-screen bg-[#050505] text-[#e0e0e0] pt-20">
@@ -272,9 +190,9 @@ const ProgramTurleriPage = () => {
                     <div className="max-w-[1200px] mx-auto">
                         <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
                             <Link to="/" className="inline-flex items-center gap-2 text-white/40 hover:text-[#ccff00] transition-colors text-[10px] font-black uppercase tracking-[0.2em]">
-                                <ArrowLeft size={14} /> {t('page_back_home')}
+                                <ArrowLeft size={14} /> Back to Home
                             </Link>
-                            <p className="text-[10px] text-white/40 uppercase font-black tracking-[0.2em]">{t('program_visa_categories')}</p>
+                            <p className="text-[10px] text-white/40 uppercase font-black tracking-[0.2em]">VISA CATEGORIES</p>
                         </div>
                         <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
                             <div className="flex items-center gap-4">
@@ -282,12 +200,12 @@ const ProgramTurleriPage = () => {
                                     <Layers className="text-black" size={28} strokeWidth={3} />
                                 </div>
                                 <h1 className="text-4xl md:text-6xl font-black uppercase tracking-tighter italic text-[#ccff00]">
-                                    {t('program_title')}
+                                    VISA PROGRAMS
                                 </h1>
                             </div>
                             <div className="max-w-xl">
                                 <p className="text-sm md:text-base text-white/50 leading-relaxed font-medium">
-                                    {t('program_page_desc')}
+                                    Explore all visa programs available for migrating to Australia. Click on a card for details.
                                 </p>
                             </div>
                         </div>
@@ -296,7 +214,7 @@ const ProgramTurleriPage = () => {
 
                 <section className="max-w-[1200px] mx-auto px-6 py-12">
                     {loading ? (
-                        <div className="text-center text-white/40 py-12 animate-pulse">{t('loading_text')}</div>
+                        <div className="text-center text-white/40 py-12 animate-pulse">LOADING...</div>
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             {programs.map((program) => (
@@ -314,7 +232,7 @@ const ProgramTurleriPage = () => {
                                                 {program.tag}
                                             </span>
                                             {program.prDirect && (
-                                                <span className="px-2 py-1 text-[9px] font-black uppercase tracking-widest bg-white/5 text-white/40">{t('program_direct_pr')}</span>
+                                                <span className="px-2 py-1 text-[9px] font-black uppercase tracking-widest bg-white/5 text-white/40">DIRECT PR</span>
                                             )}
                                         </div>
                                         <span className="text-[10px] text-white/30 font-bold uppercase tracking-wider">
@@ -340,7 +258,7 @@ const ProgramTurleriPage = () => {
                                     )}
 
                                     <div className="flex items-center gap-1 text-xs font-bold uppercase tracking-wider opacity-0 group-hover:opacity-100 transition-opacity mt-2" style={{ color: program.color || '#ccff00' }}>
-                                        {t('program_view_details')} <ChevronRight size={14} />
+                                        View Details <ChevronRight size={14} />
                                     </div>
                                 </button>
                             ))}
@@ -349,20 +267,20 @@ const ProgramTurleriPage = () => {
 
                     <div className="mt-8 bg-[#111] border border-white/5 p-8 flex flex-col md:flex-row items-center justify-between gap-6">
                         <div>
-                            <p className="font-black text-lg uppercase">{t('program_cta_title')}</p>
-                            <p className="text-white/40 text-sm mt-1">{t('program_cta_desc')}</p>
+                            <p className="font-black text-lg uppercase">Which program suits you?</p>
+                            <p className="text-white/40 text-sm mt-1">Get in touch with us directly for your questions.</p>
                         </div>
                         <a
                             href="mailto:migron@mtive.tech"
                             className="inline-flex items-center gap-2 bg-[#ccff00] text-black px-6 py-3 font-black uppercase text-sm hover:brightness-110 transition-all shrink-0"
                         >
-                            {t('program_cta_btn')} <ArrowUpRight size={16} />
+                            Get in Touch <ArrowUpRight size={16} />
                         </a>
                     </div>
                 </section>
             </div>
 
-            {selected && <ProgramModal program={selected} onClose={() => setSelected(null)} t={t} />}
+            {selected && <ProgramModal program={selected} onClose={() => setSelected(null)} />}
         </>
     );
 };

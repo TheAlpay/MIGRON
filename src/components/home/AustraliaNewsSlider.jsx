@@ -12,19 +12,13 @@ const SOURCE_COLORS = {
     'SBS News':     '#8b5cf6',
 };
 
-function timeAgo(dateStr, lang) {
+function timeAgo(dateStr) {
     if (!dateStr) return '';
     try {
         const diff = Date.now() - new Date(dateStr).getTime();
         const m = Math.floor(diff / 60000);
         const h = Math.floor(diff / 3600000);
         const d = Math.floor(diff / 86400000);
-        if (lang === 'tr') {
-            if (m < 2)  return 'Az önce';
-            if (h < 1)  return `${m} dk önce`;
-            if (d < 1)  return `${h} saat önce`;
-            return `${d} gün önce`;
-        }
         if (m < 2)  return 'Just now';
         if (h < 1)  return `${m}m ago`;
         if (d < 1)  return `${h}h ago`;
@@ -75,7 +69,7 @@ const NewsCard = React.memo(({ article, isActive, onClick }) => {
                 {/* Time */}
                 {article.pubDate && (
                     <div className="absolute top-3 right-3 text-[9px] text-white/50 font-mono bg-black/60 px-1.5 py-0.5">
-                        {timeAgo(article.pubDate, lang)}
+                        {timeAgo(article.pubDate)}
                     </div>
                 )}
             </div>
@@ -96,7 +90,7 @@ const NewsCard = React.memo(({ article, isActive, onClick }) => {
                     </p>
                 )}
                 <span className="inline-flex items-center gap-1 mt-3 text-[10px] font-black uppercase tracking-widest text-white/30 group-hover:text-[#ccff00] transition-colors">
-                    {lang === 'tr' ? 'OKU' : 'READ'} <ExternalLink size={9} />
+                    READ <ExternalLink size={9} />
                 </span>
             </div>
         </article>
@@ -205,7 +199,7 @@ const AustraliaNewsSlider = () => {
                     <div className="flex items-center gap-3 mb-8">
                         <span className="w-2 h-2 rounded-full bg-[#ccff00] animate-pulse" />
                         <span className="text-[10px] font-black uppercase tracking-[0.3em] text-white/40">
-                            {lang === 'tr' ? 'Haberler yükleniyor…' : 'Loading news…'}
+                            Loading news…
                         </span>
                     </div>
                     <div className="hidden md:flex gap-4">
@@ -230,7 +224,7 @@ const AustraliaNewsSlider = () => {
                         onClick={() => fetchNews(true)}
                         className="text-[#ccff00] hover:underline text-sm font-bold ml-2"
                     >
-                        {lang === 'tr' ? 'Tekrar dene' : 'Retry'}
+                        Retry
                     </button>
                 </div>
             </section>
@@ -241,7 +235,7 @@ const AustraliaNewsSlider = () => {
     return (
         <section
             className="bg-[#050505] border-b border-white/5 py-10 overflow-hidden"
-            aria-label={lang === 'tr' ? 'Avustralya Haber Slaydı' : 'Australia News Slider'}
+            aria-label="Australia News Slider"
         >
             <div className="max-w-7xl mx-auto px-6 md:px-12">
 
@@ -251,40 +245,40 @@ const AustraliaNewsSlider = () => {
                         <div className="flex items-center gap-2">
                             <span className="w-2 h-2 rounded-full bg-[#ccff00] animate-pulse" />
                             <span className="text-[9px] font-black uppercase tracking-[0.3em] text-[#ccff00]">
-                                {lang === 'tr' ? '● CANLI HABERLER' : '● LIVE NEWS'}
+                                ● LIVE NEWS
                             </span>
                         </div>
                         <h2 className="text-xl md:text-2xl font-black uppercase tracking-tighter text-white italic">
-                            {lang === 'tr' ? 'AVUSTRALYA' : 'AUSTRALIA'}
+                            AUSTRALIA
                         </h2>
                     </div>
 
                     <div className="flex items-center gap-3">
                         {lastFetch && (
                             <span className="hidden md:block text-[9px] text-white/20 font-mono">
-                                {lang === 'tr' ? 'Son: ' : 'Updated: '}
-                                {lastFetch.toLocaleTimeString(lang === 'tr' ? 'tr-TR' : 'en-AU', { hour: '2-digit', minute: '2-digit' })}
+                                Updated: 
+                                {lastFetch.toLocaleTimeString('en-AU', { hour: '2-digit', minute: '2-digit' })}
                             </span>
                         )}
                         <button
                             onClick={() => { clearInterval(slideTimerRef.current); fetchNews(true); }}
                             disabled={refreshing}
                             className="p-2 border border-white/10 hover:border-[#ccff00]/50 hover:text-[#ccff00] transition-all text-white/40 disabled:opacity-30"
-                            aria-label={lang === 'tr' ? 'Yenile' : 'Refresh'}
+                            aria-label="Refresh"
                         >
                             <RefreshCw size={12} className={refreshing ? 'animate-spin' : ''} />
                         </button>
                         <button
                             onClick={prev}
                             className="w-9 h-9 border border-white/10 flex items-center justify-center hover:bg-white hover:text-black transition-all text-white/60"
-                            aria-label={lang === 'tr' ? 'Önceki' : 'Previous'}
+                            aria-label="Previous"
                         >
                             <ChevronLeft size={16} />
                         </button>
                         <button
                             onClick={next}
                             className="w-9 h-9 border border-white/10 flex items-center justify-center hover:bg-white hover:text-black transition-all text-white/60"
-                            aria-label={lang === 'tr' ? 'Sonraki' : 'Next'}
+                            aria-label="Next"
                         >
                             <ChevronRight size={16} />
                         </button>

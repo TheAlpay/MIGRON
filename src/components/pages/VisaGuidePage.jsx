@@ -70,6 +70,17 @@ const VisaHubPage = () => (
             ))}
           </div>
         </section>
+
+        {/* Closed / Replaced */}
+        <section className="mb-8">
+          <h2 className="text-xs font-black uppercase tracking-widest text-white/40 mb-4 pb-2 border-b border-white/10">Closed / No Longer Accepting Applications</h2>
+          <p className="text-white/30 text-xs mb-4">These visa subclasses are closed to new applications. Listed here for reference and for applicants with existing applications in the queue.</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {VISA_LIST.filter(v => v.tag === 'CLOSED').map(v => (
+              <VisaCard key={v.code} visa={v} />
+            ))}
+          </div>
+        </section>
       </div>
     </main>
   </>
@@ -82,7 +93,7 @@ const VisaCard = ({ visa }) => (
       <div className="flex items-center gap-2">
         <span className="text-2xl">{visa.icon}</span>
         <div>
-          <span className="text-xs font-black px-2 py-0.5 rounded" style={{ background: visa.tagColor, color: visa.tagColor === '#888' ? '#fff' : '#000' }}>
+          <span className="text-xs font-black px-2 py-0.5 rounded" style={{ background: visa.tagColor, color: ['#888', '#666'].includes(visa.tagColor) ? '#fff' : '#000' }}>
             {visa.tag}
           </span>
         </div>
@@ -155,7 +166,7 @@ const VisaDetailPage = ({ visa }) => {
           <div className="mb-8">
             <div className="flex items-center gap-3 mb-3">
               <span className="text-3xl">{visa.icon}</span>
-              <span className="text-xs font-black px-2 py-1 rounded" style={{ background: visa.tagColor, color: visa.tagColor === '#888' ? '#fff' : '#000' }}>
+              <span className="text-xs font-black px-2 py-1 rounded" style={{ background: visa.tagColor, color: ['#888', '#666'].includes(visa.tagColor) ? '#fff' : '#000' }}>
                 {visa.tag}
               </span>
               <span className="text-white/30 text-sm font-mono">Subclass {visa.code}</span>

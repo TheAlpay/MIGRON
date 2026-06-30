@@ -1,9 +1,7 @@
 import React from 'react';
-import { useLanguage } from '../../i18n/LanguageContext';
 
 const LiveExperimentBand = () => {
-    const { lang } = useLanguage();
-    const today = new Date().toLocaleDateString(lang === 'en' ? 'en-AU' : 'tr-TR', {
+    const today = new Date().toLocaleDateString('en-AU', {
         day: 'numeric', month: 'long', year: 'numeric'
     });
     return (
@@ -11,13 +9,11 @@ const LiveExperimentBand = () => {
             <div className="flex items-center gap-2 shrink-0">
                 <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
                 <span className="text-[10px] font-black tracking-[0.3em] uppercase text-red-400">
-                    {lang === 'en' ? 'LIVE EXPERIMENT' : 'CANLI DENEY'}
+                    LIVE EXPERIMENT
                 </span>
             </div>
             <p className="text-[11px] text-white/35 leading-relaxed">
-                {lang === 'en'
-                    ? `Some of this content is written by Alpay as he lives the Australian immigration process firsthand. — ${today}`
-                    : `Bu içeriklerin bir kısmı Alpay tarafından Avustralya'da bizzat yaşanarak yazılıyor. — ${today}`}
+                {`Some of this content is written by Alpay as he lives the Australian immigration process firsthand. — ${today}`}
             </p>
         </div>
     );

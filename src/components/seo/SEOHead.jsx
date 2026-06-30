@@ -1,24 +1,23 @@
 import { useEffect } from 'react';
-import Logo from '../../assets/migron.webp';
 import { env } from '../../lib/env.ts';
 
 const SITE_URL = env.VITE_SITE_URL;
+const DEFAULT_IMAGE = `${SITE_URL}/migron.webp`;
 
-/**
- * SEOHead — Sets document title and meta tags dynamically per page.
- * Lightweight alternative to react-helmet, uses direct DOM manipulation.
- */
-const SEOHead = ({ title, description, path = '/', ogImage = null, lang = 'tr' }) => {
-    const fullTitle = title ? `${title} | MIGRON` : 'MIGRON | Göç & Hukuk Platformu';
-    const fullUrl = `${SITE_URL}${path}`;
-    const desc = description || 'MIGRON — Avustralya göçmenlik hukuku, vize danışmanlığı ve diaspora teknoloji platformu.';
-    const image = ogImage || `${SITE_URL}/migron.webp`;
+const DEFAULT_TITLE = 'MIGRON — Australian Immigration Platform | Visa Tools, Occupation Checker & Settlement Guide';
+const DEFAULT_DESC  = 'Australia\'s most comprehensive immigration platform. Visa guides, occupation checker, points calculator, salary tools, suburb explorer and settlement resources for skilled migrants.';
+
+const SEOHead = ({ title, description, path = '/', ogImage = null, ogType = 'website', lang = 'en' }) => {
+    const fullTitle = title ? `${title} | MIGRON` : DEFAULT_TITLE;
+    const fullUrl   = `${SITE_URL}${path}`;
+    const desc      = description || DEFAULT_DESC;
+    const image     = ogImage || DEFAULT_IMAGE;
+    const locale    = lang === 'tr' ? 'tr_TR' : 'en_AU';
 
     useEffect(() => {
-        // Title
         document.title = fullTitle;
+        document.documentElement.lang = lang;
 
-        // Helper to set or create meta tags
         const setMeta = (attr, key, content) => {
             let el = document.querySelector(`meta[${attr}="${key}"]`);
             if (!el) {
@@ -29,55 +28,46 @@ const SEOHead = ({ title, description, path = '/', ogImage = null, lang = 'tr' }
             el.setAttribute('content', content);
         };
 
-        // Standard meta
+        const setLink = (rel, href, extra = {}) => {
+            const selector = Object.entries(extra).reduce(
+                (s, [k, v]) => `${s}[${k}="${v}"]`, `link[rel="${rel}"]`
+            );
+            let el = document.querySelector(selector);
+            if (!el) {
+                el = document.createElement('link');
+                el.setAttribute('rel', rel);
+                Object.entries(extra).forEach(([k, v]) => el.setAttribute(k, v));
+                document.head.appendChild(el);
+            }
+            el.setAttribute('href', href);
+        };
+
+        // Standard
         setMeta('name', 'description', desc);
 
         // Open Graph
-        setMeta('property', 'og:title', fullTitle);
-        setMeta('property', 'og:description', desc);
-        setMeta('property', 'og:url', fullUrl);
-        setMeta('property', 'og:image', image);
-        setMeta('property', 'og:type', 'website');
-        setMeta('property', 'og:site_name', 'MIGRON');
-        setMeta('property', 'og:locale', 'tr_TR');
+        setMeta('property', 'og:title',       fullTitle);
+        setMeta('property', 'og:description',  desc);
+        setMeta('property', 'og:url',          fullUrl);
+        setMeta('property', 'og:image',        image);
+        setMeta('property', 'og:image:width',  '1200');
+        setMeta('property', 'og:image:height', '630');
+        setMeta('property', 'og:type',         ogType);
+        setMeta('property', 'og:site_name',    'MIGRON');
+        setMeta('property', 'og:locale',       locale);
 
         // Twitter Card
-        setMeta('name', 'twitter:card', 'summary_large_image');
-        setMeta('name', 'twitter:title', fullTitle);
+        setMeta('name', 'twitter:card',        'summary_large_image');
+        setMeta('name', 'twitter:title',       fullTitle);
         setMeta('name', 'twitter:description', desc);
-        setMeta('name', 'twitter:image', image);
+        setMeta('name', 'twitter:image',       image);
 
-        // Canonical URL
-        let canonical = document.querySelector('link[rel="canonical"]');
-        if (!canonical) {
-            canonical = document.createElement('link');
-            canonical.setAttribute('rel', 'canonical');
-            document.head.appendChild(canonical);
-        }
-        canonical.setAttribute('href', fullUrl);
+        // Canonical
+        setLink('canonical', fullUrl);
 
-        // hreflang — TR and EN alternates
-        const setHreflang = (hLang, hUrl) => {
-            const sel = `link[rel="alternate"][hreflang="${hLang}"]`;
-            let el = document.querySelector(sel);
-            if (!el) {
-                el = document.createElement('link');
-                el.setAttribute('rel', 'alternate');
-                el.setAttribute('hreflang', hLang);
-                document.head.appendChild(el);
-            }
-            el.setAttribute('href', hUrl);
-        };
-        setHreflang('tr', fullUrl);
-        setHreflang('en', fullUrl);
-        setHreflang('x-default', fullUrl);
+    }, [fullTitle, desc, fullUrl, image, lang, locale, ogType]);
 
-        // og:locale based on current lang
-        setMeta('property', 'og:locale', lang === 'en' ? 'en_AU' : 'tr_TR');
-
-    }, [fullTitle, desc, fullUrl, image, lang]);
-
-    return null; // This component renders nothing
+    return null;
 };
 
 export default SEOHead;

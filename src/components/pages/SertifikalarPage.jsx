@@ -1,11 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Award, CheckCircle, AlertCircle, Clock, DollarSign, Monitor } from 'lucide-react';
-import { useLanguage } from '../../i18n/LanguageContext';
+import {
+    ArrowLeft, Award, CheckCircle, AlertCircle, Clock,
+    DollarSign, Monitor, Search, X, BookOpen, Shield,
+    Truck, Heart, Laptop, Wrench, Building2, TrendingUp, Home, GraduationCap,
+} from 'lucide-react';
 import SEOHead from '../seo/SEOHead';
 import YouTubeBox from '../shared/YouTubeBox';
 import LiveExperimentBand from '../shared/LiveExperimentBand';
 
+/* ─────────────────────────── VISA COLOUR CONFIG ──────────────────────── */
 const VISA_CONFIG = {
     '417': { color: '#ccff00', bg: '#ccff0020' },
     '462': { color: '#ccff00', bg: '#ccff0020' },
@@ -13,492 +17,782 @@ const VISA_CONFIG = {
     '482': { color: '#ff9500', bg: '#ff950020' },
     '189': { color: '#00ff88', bg: '#00ff8820' },
     '190': { color: '#00ff88', bg: '#00ff8820' },
+    '491': { color: '#b388ff', bg: '#b388ff20' },
 };
 
+/* ──────────────────────────── CATEGORIES ─────────────────────────────── */
 const CATEGORIES = [
-    { key: 'yiyecek', label: 'Yiyecek & İçecek', labelEn: 'Food & Beverage', icon: '🍽️' },
-    { key: 'insaat', label: 'İnşaat & Saha', labelEn: 'Construction & Site', icon: '🏗️' },
-    { key: 'guvenlik', label: 'Güvenlik', labelEn: 'Security', icon: '🛡️' },
-    { key: 'cocuk', label: 'Çocuk & Bakım', labelEn: 'Children & Care', icon: '👶' },
-    { key: 'it', label: 'IT & Teknoloji', labelEn: 'IT & Technology', icon: '💻' },
-    { key: 'saglik', label: 'Sağlık & Yaşlı Bakımı', labelEn: 'Health & Aged Care', icon: '🏥' },
-    { key: 'nakliye', label: 'Nakliye & Lojistik', labelEn: 'Transport & Logistics', icon: '🚛' },
+    { key: 'food',      label: 'Food & Beverage',        icon: '🍽️', IconComp: BookOpen },
+    { key: 'construction', label: 'Construction & Site', icon: '🏗️', IconComp: Building2 },
+    { key: 'security',  label: 'Security',               icon: '🛡️', IconComp: Shield },
+    { key: 'children',  label: 'Children & Care',        icon: '👶', IconComp: Heart },
+    { key: 'it',        label: 'IT & Technology',        icon: '💻', IconComp: Laptop },
+    { key: 'health',    label: 'Health & Aged Care',     icon: '🏥', IconComp: Heart },
+    { key: 'transport', label: 'Transport & Logistics',  icon: '🚛', IconComp: Truck },
+    { key: 'finance',   label: 'Finance & Business',     icon: '💼', IconComp: TrendingUp },
+    { key: 'realestate',label: 'Real Estate & Property', icon: '🏠', IconComp: Home },
+    { key: 'education', label: 'Education & Training',   icon: '🎓', IconComp: GraduationCap },
+    { key: 'trades',    label: 'Trades & Maintenance',   icon: '🔧', IconComp: Wrench },
 ];
 
-const certificates = [
-    // Yiyecek & İçecek
+/* ──────────────────────────── CERTIFICATES ──────────────────────────── */
+const CERTIFICATES = [
+
+    /* ═══════════════ FOOD & BEVERAGE ═══════════════ */
     {
         id: 'rsa',
-        category: 'yiyecek',
+        category: 'food',
         name: 'RSA — Responsible Service of Alcohol',
-        nameEn: 'RSA — Responsible Service of Alcohol',
         code: 'SITHFAB021',
-        sectors: ['Bar', 'Restoran', 'Kafe', 'Etkinlik'],
-        sectorsEn: ['Bar', 'Restaurant', 'Café', 'Events'],
-        sektorSarti: true,
         cost: '$50–80 AUD',
-        duration: '4–6 saat',
-        durationEn: '4–6 hours',
+        duration: '4–6 hours',
         how: 'Online',
-        howEn: 'Online',
         visas: ['417', '462', '500', '482', '189', '190'],
-        tafe: false,
-        note: "Alkol servisi yapılan tüm mekânlarda yasal zorunluluk. Avustralya'da en hızlı iş kapısı açan sertifika.",
-        noteEn: "A legal requirement at all venues serving alcohol. Australia's fastest door-opening certificate.",
-    },
-    {
-        id: 'foodsafety_supervisor',
-        category: 'yiyecek',
-        name: 'Food Safety Supervisor Certificate',
-        nameEn: 'Food Safety Supervisor Certificate',
-        code: 'SITXFSA005 + SITXFSA006',
-        sectors: ['Mutfak', 'Kafe', 'Fast Food', 'Catering', 'Hastane'],
-        sectorsEn: ['Kitchen', 'Café', 'Fast Food', 'Catering', 'Hospital'],
-        sektorSarti: true,
-        cost: '$80–150 AUD',
-        duration: '1 gün',
-        durationEn: '1 day',
-        how: 'Online veya yüz yüze',
-        howEn: 'Online or in-person',
-        visas: ['417', '462', '500', '482'],
-        tafe: false,
-        note: 'Gıda güvenliği denetimi yapacak kişiler için zorunlu. Food Handler\'dan bir üst seviye.',
-        noteEn: 'Required for those supervising food safety. One level above Food Handler.',
-    },
-    {
-        id: 'food_handler',
-        category: 'yiyecek',
-        name: 'Food Handler Certificate',
-        nameEn: 'Food Handler Certificate',
-        code: null,
-        sectors: ['Mutfak', 'Kafe', 'Fast Food', 'Catering'],
-        sectorsEn: ['Kitchen', 'Café', 'Fast Food', 'Catering'],
-        sektorSarti: false,
-        cost: '$20–50 AUD',
-        duration: '2–3 saat',
-        durationEn: '2–3 hours',
-        how: 'Online',
-        howEn: 'Online',
-        visas: ['417', '462', '500'],
-        tafe: false,
-        note: 'Temel gıda hijyeni sertifikası. Düşük maliyetiyle mutfak sektörüne giriş için ilk adım.',
-        noteEn: 'Basic food hygiene certificate. Low-cost first step into kitchen work.',
-    },
-    {
-        id: 'barista',
-        category: 'yiyecek',
-        name: 'Barista Sertifikası',
-        nameEn: 'Barista Certificate',
-        code: null,
-        sectors: ['Kafe', 'Restoran', 'Otel', 'Catering'],
-        sectorsEn: ['Café', 'Restaurant', 'Hotel', 'Catering'],
-        sektorSarti: false,
-        cost: '$150–200 AUD',
-        duration: '1 gün',
-        durationEn: '1 day',
-        how: 'Yüz yüze',
-        howEn: 'In-person',
-        visas: ['417', '462', '500', '482'],
-        tafe: false,
-        note: "Avustralya'da kahve kültürü son derece güçlü. Kafe iş görüşmelerinde pratik kahve bilgisi doğrudan sorgulanır.",
-        noteEn: 'Coffee culture is huge in Australia. Practical coffee skills are directly tested in café interviews.',
+        isTAFE: false,
+        isMandatory: true,
+        sectors: ['Bar', 'Restaurant', 'Café', 'Events', 'Bottle Shop'],
+        note: "A legal requirement at all venues serving alcohol in every Australian state. Australia's fastest door-opening certificate for new migrants — complete it online in a single day for under $80.",
     },
     {
         id: 'rsg',
-        category: 'yiyecek',
+        category: 'food',
         name: 'RSG — Responsible Service of Gambling',
-        nameEn: 'RSG — Responsible Service of Gambling',
         code: null,
-        sectors: ['Casino', 'TAB', 'Slot Makinesi Olan Mekanlar'],
-        sectorsEn: ['Casino', 'TAB', 'Venues with Gaming Machines'],
-        sektorSarti: true,
-        cost: '$30–50 AUD',
-        duration: '2–3 saat',
-        durationEn: '2–3 hours',
+        cost: '$50–80 AUD',
+        duration: '4–6 hours',
         how: 'Online',
-        howEn: 'Online',
         visas: ['417', '462', '500', '482'],
-        tafe: false,
-        note: 'RSA ile birlikte alındığında hospitality sektöründe tam paket oluşturur.',
-        noteEn: 'Combined with RSA, creates a full package for the hospitality sector.',
+        isTAFE: false,
+        isMandatory: true,
+        sectors: ['Casino', 'TAB', 'Venues with Gaming Machines', 'Pubs'],
+        note: 'Legally required in any venue that operates gaming machines (pokies). Combined with RSA, you become a full-package hospitality worker that employers actively seek out.',
+    },
+    {
+        id: 'food_safety_supervisor',
+        category: 'food',
+        name: 'Food Safety Supervisor Certificate',
+        code: 'SITXFSA005 + SITXFSA006',
+        cost: '$80–150 AUD',
+        duration: '1 day',
+        how: 'Online or in-person',
+        visas: ['417', '462', '500', '482', '189', '190'],
+        isTAFE: false,
+        isMandatory: true,
+        sectors: ['Kitchen', 'Café', 'Fast Food', 'Catering', 'Hospital Food Service'],
+        note: 'Every food business must have at least one certified Food Safety Supervisor on the premises. This is one level above the Food Handler certificate and makes you eligible for supervisory kitchen roles.',
+    },
+    {
+        id: 'food_handler',
+        category: 'food',
+        name: 'Food Handler Certificate',
+        code: null,
+        cost: '$20–50 AUD',
+        duration: '2–3 hours',
+        how: 'Online',
+        visas: ['417', '462', '500'],
+        isTAFE: false,
+        isMandatory: false,
+        sectors: ['Kitchen', 'Café', 'Fast Food', 'Catering', 'Supermarket'],
+        note: 'The most affordable entry point into Australia\'s food industry. Low cost, fast completion — do it the day before a job interview to demonstrate initiative.',
+    },
+    {
+        id: 'barista',
+        category: 'food',
+        name: 'Barista Certificate',
+        code: null,
+        cost: '$200–400 AUD',
+        duration: '1–2 days',
+        how: 'In-person',
+        visas: ['417', '462', '500', '482'],
+        isTAFE: false,
+        isMandatory: false,
+        sectors: ['Café', 'Restaurant', 'Hotel', 'Catering'],
+        note: "Coffee culture is extraordinary in Australia — barista skills are tested hands-on in virtually every café interview. A formal certificate signals seriousness and cuts through competition from casual applicants.",
     },
 
-    // İnşaat & Saha
+    /* ═══════════════ CONSTRUCTION & SITE ═══════════════ */
     {
         id: 'whitecard',
-        category: 'insaat',
+        category: 'construction',
         name: 'White Card — Construction Induction',
-        nameEn: 'White Card — Construction Induction',
-        code: null,
-        sectors: ['İnşaat', 'Peyzaj', 'Tadilat', 'Yol Çalışması'],
-        sectorsEn: ['Construction', 'Landscaping', 'Renovation', 'Roadworks'],
-        sektorSarti: true,
-        cost: '$60–100 AUD',
-        duration: 'Yarım gün',
-        durationEn: 'Half day',
-        how: 'Online veya yüz yüze',
-        howEn: 'Online or in-person',
-        visas: ['417', '462', '500', '482', '189', '190'],
-        tafe: false,
-        note: 'Herhangi bir inşaat sahasına girmek için yasal zorunluluk. Avustralya genelinde geçerli.',
-        noteEn: 'A legal requirement to enter any construction site. Valid across all of Australia.',
-    },
-    {
-        id: 'traffic',
-        category: 'insaat',
-        name: 'Traffic Controller — Boom Gate Operatörü',
-        nameEn: 'Traffic Controller — Boom Gate Operator',
-        code: null,
-        sectors: ['İnşaat', 'Yol Çalışması', 'Etkinlik'],
-        sectorsEn: ['Construction', 'Roadworks', 'Events'],
-        sektorSarti: false,
-        cost: '$200–350 AUD',
-        duration: '1–2 gün',
-        durationEn: '1–2 days',
-        how: 'Yüz yüze',
-        howEn: 'In-person',
-        visas: ['417', '462', '482'],
-        tafe: false,
-        note: 'White Card ile birlikte alındığında saha iş imkânlarını önemli ölçüde genişletir.',
-        noteEn: 'Combined with White Card, significantly expands opportunities in site work.',
+        code: 'CPCCWHS1001',
+        cost: '$80–150 AUD',
+        duration: '1 day',
+        how: 'Online or in-person',
+        visas: ['417', '462', '500', '482', '189', '190', '491'],
+        isTAFE: false,
+        isMandatory: true,
+        sectors: ['Construction', 'Landscaping', 'Renovation', 'Roadworks', 'Mining Infrastructure'],
+        note: 'Legally mandatory before setting foot on any construction site in Australia. Nationally recognised and never expires. Get this first — it unlocks the entire construction sector immediately.',
     },
     {
         id: 'forklift',
-        category: 'insaat',
-        name: 'Forklift Licence — LF',
-        nameEn: 'Forklift Licence — LF',
-        code: null,
-        sectors: ['Depo', 'Fabrika', 'Lojistik', 'İnşaat'],
-        sectorsEn: ['Warehouse', 'Factory', 'Logistics', 'Construction'],
-        sektorSarti: false,
+        category: 'construction',
+        name: 'Forklift Licence — LF Class',
+        code: 'LF (High Risk Work Licence)',
         cost: '$300–500 AUD',
-        duration: '1–2 gün',
-        durationEn: '1–2 days',
-        how: 'Yüz yüze',
-        howEn: 'In-person',
-        visas: ['417', '462', '482', '189'],
-        tafe: false,
-        note: 'Lojistik ve depo sektöründe geniş iş imkânı sunar.',
-        noteEn: 'Offers wide job opportunities in logistics and warehouse work.',
+        duration: '2–3 days',
+        how: 'In-person',
+        visas: ['417', '462', '482', '189', '190'],
+        isTAFE: false,
+        isMandatory: true,
+        sectors: ['Warehouse', 'Factory', 'Logistics', 'Construction', 'Retail Distribution'],
+        note: 'Issued by WorkCover/SafeWork — a High Risk Work Licence required by law to operate any forklift. Cross-listed across construction and transport/logistics due to universal applicability.',
+    },
+    {
+        id: 'working_at_heights',
+        category: 'construction',
+        name: 'Working at Heights',
+        code: null,
+        cost: '$200–400 AUD',
+        duration: '1 day',
+        how: 'In-person',
+        visas: ['417', '462', '482', '189', '190'],
+        isTAFE: false,
+        isMandatory: true,
+        sectors: ['Construction', 'Maintenance', 'Telecommunications', 'Roofing', 'Window Cleaning'],
+        note: 'Mandatory for any work performed above 2 metres. A non-negotiable requirement on commercial construction sites and a quick add-on after your White Card.',
     },
     {
         id: 'ewp',
-        category: 'insaat',
-        name: 'EWP Licence — Elevated Work Platform',
-        nameEn: 'EWP Licence — Elevated Work Platform',
-        code: null,
-        sectors: ['İnşaat', 'Bakım-Onarım', 'Telekomünikasyon'],
-        sectorsEn: ['Construction', 'Maintenance', 'Telecommunications'],
-        sektorSarti: false,
-        cost: '$200–400 AUD',
-        duration: '1 gün',
-        durationEn: '1 day',
-        how: 'Yüz yüze',
-        howEn: 'In-person',
-        visas: ['417', '462', '482'],
-        tafe: false,
-        note: 'Kiralık platform veya vinç sepeti kullanımı için gerekli. İnşaat sektöründe ek iş kapısı açar.',
-        noteEn: 'Required for operating elevated work platforms. Opens additional doors in construction.',
-    },
-    {
-        id: 'dogman',
-        category: 'insaat',
-        name: 'Dogman Licence',
-        nameEn: 'Dogman Licence',
-        code: null,
-        sectors: ['İnşaat', 'Vinç Operasyonu'],
-        sectorsEn: ['Construction', 'Crane Operations'],
-        sektorSarti: true,
-        cost: '$400–700 AUD',
-        duration: '2–3 gün',
-        durationEn: '2–3 days',
-        how: 'Yüz yüze',
-        howEn: 'In-person',
-        visas: ['417', '462', '482', '189'],
-        tafe: false,
-        note: 'Vinç yükleme ve boşaltma operasyonlarını yönetmek için zorunlu lisans. İnşaat sektöründe yüksek ücretli pozisyon.',
-        noteEn: 'Mandatory licence for managing crane loading operations. A high-paying position in construction.',
-    },
-
-    // Güvenlik
-    {
-        id: 'security',
-        category: 'guvenlik',
-        name: 'Security Licence — CPP20218',
-        nameEn: 'Security Licence — CPP20218',
-        code: 'Certificate II in Security Operations',
-        sectors: ['Güvenlik', 'Etkinlik', 'AVM', 'Gece Kulübü', 'Hastane'],
-        sectorsEn: ['Security', 'Events', 'Shopping Centre', 'Nightclub', 'Hospital'],
-        sektorSarti: true,
-        cost: '$500–800 AUD',
-        duration: '3–5 gün + background check',
-        durationEn: '3–5 days + background check',
-        how: 'Yüz yüze',
-        howEn: 'In-person',
+        category: 'construction',
+        name: 'Elevated Work Platform (EWP) Licence',
+        code: 'WP (High Risk Work Licence)',
+        cost: '$300–500 AUD',
+        duration: '2 days',
+        how: 'In-person',
         visas: ['417', '462', '482', '189', '190'],
-        tafe: true,
-        note: 'Güvenlik sektöründe çalışmak için zorunlu lisans. Hafta sonu ve gece vardiyalarında saatlik ücret ortalamanın üzerinde.',
-        noteEn: 'Mandatory licence to work in security. Hourly rates above average for weekend and night shifts.',
+        isTAFE: false,
+        isMandatory: true,
+        sectors: ['Construction', 'Maintenance', 'Telecommunications', 'Events'],
+        note: 'Required by law to operate boom lifts, scissor lifts, and cherry pickers. Significantly boosts hourly rates in civil construction and maintenance work.',
     },
     {
         id: 'firstaid',
-        category: 'guvenlik',
-        name: 'First Aid Certificate — HLTAID011',
-        nameEn: 'First Aid Certificate — HLTAID011',
-        code: null,
-        sectors: ['Güvenlik', 'Çocuk Bakımı', 'Spor Tesisleri', 'Hastane', 'Tüm Sektörler'],
-        sectorsEn: ['Security', 'Childcare', 'Sports Facilities', 'Hospital', 'All Sectors'],
-        sektorSarti: false,
+        category: 'construction',
+        name: 'First Aid Certificate',
+        code: 'HLTAID011',
         cost: '$100–150 AUD',
-        duration: '1 gün',
-        durationEn: '1 day',
-        how: 'Yüz yüze',
-        howEn: 'In-person',
-        visas: ['417', '462', '500', '482', '189', '190'],
-        tafe: false,
-        note: "Neredeyse her sektörde işveren tarafından tercih edilen ek nitelik. CV'de her zaman olumlu etki yaratır.",
-        noteEn: 'A preferred additional qualification in nearly every sector. Always makes a positive impression on your CV.',
+        duration: '1 day',
+        how: 'In-person',
+        visas: ['417', '462', '500', '482', '189', '190', '491'],
+        isTAFE: false,
+        isMandatory: false,
+        sectors: ['Construction', 'Security', 'Childcare', 'Sports Facilities', 'All Sectors'],
+        note: 'Valid for 3 years. Required for security work and childcare, and a preferred qualification in virtually every other sector. Add it to any job application for instant credibility.',
     },
     {
         id: 'cpr',
-        category: 'guvenlik',
-        name: 'CPR Sertifikası — HLTAID009',
-        nameEn: 'CPR Certificate — HLTAID009',
+        category: 'construction',
+        name: 'CPR Certificate',
+        code: 'HLTAID009',
+        cost: '$30–60 AUD',
+        duration: '3–4 hours',
+        how: 'In-person',
+        visas: ['417', '462', '500', '482', '189', '190'],
+        isTAFE: false,
+        isMandatory: false,
+        sectors: ['All Sectors'],
+        note: 'Requires annual renewal. A shorter and cheaper version of the full First Aid certificate — sufficient for workplaces that require basic life-support readiness without full first-aid coverage.',
+    },
+    {
+        id: 'asbestos',
+        category: 'construction',
+        name: 'Asbestos Awareness Training',
         code: null,
-        sectors: ['Tüm Sektörler'],
-        sectorsEn: ['All Sectors'],
-        sektorSarti: false,
-        cost: '$50–80 AUD',
-        duration: 'Yarım gün',
-        durationEn: 'Half day',
-        how: 'Yüz yüze',
-        howEn: 'In-person',
-        visas: ['417', '462', '500', '482'],
-        tafe: false,
-        note: 'First Aid sertifikasının daha kısa ve ucuz versiyonu. Temel yaşam desteği için yeterli.',
-        noteEn: 'A shorter, cheaper version of First Aid. Sufficient for basic life support.',
+        cost: '$50 AUD',
+        duration: '2–3 hours',
+        how: 'Online',
+        visas: ['417', '462', '482', '189', '190'],
+        isTAFE: false,
+        isMandatory: true,
+        sectors: ['Construction', 'Renovation', 'Demolition', 'Maintenance'],
+        note: 'Legally required for anyone working on or near structures built before 1990. Australia has one of the world\'s highest rates of asbestos-related disease — this training is taken seriously on every site.',
+    },
+    {
+        id: 'traffic_control',
+        category: 'construction',
+        name: 'Traffic Control — Stop/Slow Bat',
+        code: 'RIIWHS302E',
+        cost: '$300–500 AUD',
+        duration: '2–3 days',
+        how: 'In-person',
+        visas: ['417', '462', '482'],
+        isTAFE: false,
+        isMandatory: true,
+        sectors: ['Construction', 'Roadworks', 'Events', 'Utilities'],
+        note: 'Required by law to direct traffic at roadworks or events. Combined with a White Card this creates a strong entry-level construction profile — traffic control roles are abundant and pay well above minimum wage.',
     },
 
-    // Çocuk & Bakım
+    /* ═══════════════ SECURITY ═══════════════ */
+    {
+        id: 'security_licence',
+        category: 'security',
+        name: 'Security Licence — Certificate II in Security Operations',
+        code: 'CPP20218',
+        cost: '$400–800 AUD',
+        duration: '3–6 months (TAFE or RTO)',
+        how: 'In-person (TAFE or RTO)',
+        visas: ['417', '462', '482', '189', '190'],
+        isTAFE: true,
+        isMandatory: true,
+        sectors: ['Security', 'Events', 'Shopping Centre', 'Nightclub', 'Hospital', 'Retail'],
+        note: 'Mandatory to work legally as a security guard in any Australian state. Weekend and night shift rates are significantly above the national average — a reliable income pathway for newly arrived migrants.',
+    },
+    {
+        id: 'security_firstaid',
+        category: 'security',
+        name: 'First Aid — Required for Security Licence',
+        code: 'HLTAID011',
+        cost: '$100–150 AUD',
+        duration: '1 day',
+        how: 'In-person',
+        visas: ['417', '462', '482', '189', '190'],
+        isTAFE: false,
+        isMandatory: true,
+        sectors: ['Security'],
+        note: 'You cannot obtain or renew a Security Licence without a current First Aid certificate. Always complete this before starting the security course to avoid delays.',
+    },
+    {
+        id: 'security_cpr',
+        category: 'security',
+        name: 'CPR — Annual Renewal for Security Workers',
+        code: 'HLTAID009',
+        cost: '$30–60 AUD',
+        duration: '3–4 hours',
+        how: 'In-person',
+        visas: ['417', '462', '482', '189', '190'],
+        isTAFE: false,
+        isMandatory: true,
+        sectors: ['Security'],
+        note: 'Security industry regulations require CPR to be renewed every 12 months. Budget for this as an annual operating cost of maintaining your licence.',
+    },
+
+    /* ═══════════════ CHILDREN & CARE ═══════════════ */
     {
         id: 'wwc',
-        category: 'cocuk',
+        category: 'children',
         name: 'Working with Children Check — WWC',
-        nameEn: 'Working with Children Check — WWC',
         code: null,
-        sectors: ['Çocuk Bakımı', 'Eğitim', 'Spor Kulüpleri', 'Gönüllü Çalışma'],
-        sectorsEn: ['Childcare', 'Education', 'Sports Clubs', 'Volunteer Work'],
-        sektorSarti: true,
-        cost: 'Ücretsiz (gönüllüler) / $118 AUD (ücretli)',
-        costEn: 'Free (volunteers) / $118 AUD (paid workers)',
-        duration: 'Online başvuru, 1–4 hafta',
-        durationEn: 'Online application, 1–4 weeks',
-        how: 'Online',
-        howEn: 'Online',
-        visas: ['417', '462', '500', '482', '189', '190'],
-        tafe: false,
-        note: '18 yaş altı bireylerle çalışan herkes için zorunlu. Avustralya\'da çocukla temas eden her pozisyonda şart.',
-        noteEn: 'Mandatory for anyone working with people under 18. Required for every position involving contact with children in Australia.',
+        cost: '$80 AUD NSW / Free QLD & VIC',
+        duration: 'Online application — 1–4 weeks processing',
+        how: 'Online (state government portal)',
+        visas: ['417', '462', '500', '482', '189', '190', '491'],
+        isTAFE: false,
+        isMandatory: true,
+        sectors: ['Childcare', 'Education', 'Sports Clubs', 'Volunteer Work', 'Health'],
+        note: 'Mandatory for anyone working or volunteering with people under 18 in Australia. Each state issues its own check — apply in the state where you will be working. Cost and processing time vary by state.',
     },
     {
-        id: 'ece',
-        category: 'cocuk',
-        name: 'Certificate III in Early Childhood Education — CHC30121',
-        nameEn: 'Certificate III in Early Childhood Education — CHC30121',
-        code: null,
-        sectors: ['Kreş', 'Anaokulu', 'Aile Bakım Evi'],
-        sectorsEn: ['Childcare Centre', 'Kindergarten', 'Family Day Care'],
-        sektorSarti: true,
-        cost: "$1.500–3.000 AUD (TAFE'de indirimli)",
-        costEn: '$1,500–3,000 AUD (discounted at TAFE)',
-        duration: '6–12 ay',
-        durationEn: '6–12 months',
-        how: 'Yüz yüze veya karma',
-        howEn: 'In-person or blended',
+        id: 'childcare_firstaid',
+        category: 'children',
+        name: 'First Aid for Childcare — Paediatric',
+        code: 'HLTAID012',
+        cost: '$200–300 AUD',
+        duration: '1 day',
+        how: 'In-person',
         visas: ['500', '482', '189', '190'],
-        tafe: true,
-        note: "Avustralya'da erken çocukluk eğitimi sektörü ciddi personel açığı yaşıyor. PR yolculuğu için değerli meslek listesinde.",
-        noteEn: "Australia's early childhood sector faces a serious staffing shortage. Listed as a valued occupation for the PR pathway.",
+        isTAFE: false,
+        isMandatory: true,
+        sectors: ['Childcare Centre', 'Family Day Care', 'Kindergarten', 'OOSH'],
+        note: 'This paediatric-specific first aid unit is a regulatory requirement under the National Quality Framework for all early childhood services. It must be renewed every 3 years.',
+    },
+    {
+        id: 'ece_cert3',
+        category: 'children',
+        name: 'Certificate III in Early Childhood Education & Care',
+        code: 'CHC30121',
+        cost: '$2,000–8,000 AUD (or subsidised via government)',
+        duration: '6–12 months',
+        how: 'In-person or blended (TAFE)',
+        visas: ['500', '482', '189', '190'],
+        isTAFE: true,
+        isMandatory: true,
+        sectors: ['Childcare Centre', 'Kindergarten', 'Family Day Care', 'OOSH'],
+        note: "AQF Level 3 — the minimum qualification required by law to work in a regulated childcare service in Australia. The sector faces a critical national shortage; this qualification is on the priority migration occupation list.",
+    },
+    {
+        id: 'cert4_school_age',
+        category: 'children',
+        name: 'Certificate IV in School Age Education and Care',
+        code: 'CHC40121',
+        cost: '$2,000–6,000 AUD',
+        duration: '12 months',
+        how: 'Blended (TAFE)',
+        visas: ['500', '482', '189', '190'],
+        isTAFE: true,
+        isMandatory: false,
+        sectors: ['Out of School Hours Care (OOSH)', 'Vacation Care', 'Before & After School Programs'],
+        note: 'The advanced pathway after Cert III. Required for Coordinator-level roles in OOSH and vacation care programs. A strong qualification for the PR skills assessment pathway.',
     },
 
-    // IT & Teknoloji
+    /* ═══════════════ IT & TECHNOLOGY ═══════════════ */
     {
         id: 'comptia_a',
         category: 'it',
         name: 'CompTIA A+',
-        nameEn: 'CompTIA A+',
         code: null,
-        sectors: ['IT Destek', 'Teknik Servis'],
-        sectorsEn: ['IT Support', 'Tech Service'],
-        sektorSarti: false,
-        cost: '$230 USD (sınav ücreti)',
-        costEn: '$230 USD (exam fee)',
-        duration: 'Kendi hızında + online sınav',
-        durationEn: 'Self-paced + online exam',
-        how: 'Online sınav',
-        howEn: 'Online exam',
-        visas: ['500', '482', '189', '190'],
-        tafe: false,
-        note: "Uluslararası tanınan temel IT sertifikası. Yurt dışındaki IT deneyimini belgelemenin en yaygın yolu.",
-        noteEn: 'Internationally recognised foundational IT certificate. The most common way to document IT experience from abroad.',
+        cost: '$500–800 AUD (exam + prep)',
+        duration: 'Self-paced study + online exam',
+        how: 'Online (Pearson VUE exam centre)',
+        visas: ['500', '482', '189', '190', '491'],
+        isTAFE: false,
+        isMandatory: false,
+        sectors: ['IT Support', 'Help Desk', 'Technical Service'],
+        note: "Internationally recognised foundational IT certificate — the gold standard for proving IT competency to an Australian employer when your overseas qualifications aren't recognised locally.",
     },
     {
-        id: 'comptia_n',
-        category: 'it',
-        name: 'CompTIA Network+',
-        nameEn: 'CompTIA Network+',
-        code: null,
-        sectors: ['Ağ Yönetimi', 'IT Altyapısı'],
-        sectorsEn: ['Network Management', 'IT Infrastructure'],
-        sektorSarti: false,
-        cost: '$230 USD (sınav ücreti)',
-        costEn: '$230 USD (exam fee)',
-        duration: 'Kendi hızında + online sınav',
-        durationEn: 'Self-paced + online exam',
-        how: 'Online sınav',
-        howEn: 'Online exam',
-        visas: ['500', '482', '189', '190'],
-        tafe: false,
-        note: "A+'dan sonra mantıklı adım. Ağ altyapısı pozisyonlarına geçiş için.",
-        noteEn: 'A logical next step after A+. For transitioning into network infrastructure roles.',
-    },
-    {
-        id: 'comptia_s',
+        id: 'comptia_security',
         category: 'it',
         name: 'CompTIA Security+',
-        nameEn: 'CompTIA Security+',
         code: null,
-        sectors: ['Siber Güvenlik', 'IT Altyapısı'],
-        sectorsEn: ['Cybersecurity', 'IT Infrastructure'],
-        sektorSarti: false,
-        cost: '$370 USD (sınav ücreti)',
-        costEn: '$370 USD (exam fee)',
-        duration: 'Kendi hızında + online sınav',
-        durationEn: 'Self-paced + online exam',
-        how: 'Online sınav',
-        howEn: 'Online exam',
+        cost: '$400–700 AUD (exam + prep)',
+        duration: 'Self-paced study + online exam',
+        how: 'Online (Pearson VUE exam centre)',
         visas: ['482', '189', '190'],
-        tafe: false,
-        note: "Siber güvenlik alanında uluslararası standart sertifika. Avustralya'da IT sektöründe talep görüyor.",
-        noteEn: "International standard certificate in cybersecurity. In demand in Australia's IT sector.",
+        isTAFE: false,
+        isMandatory: false,
+        sectors: ['Cybersecurity', 'IT Infrastructure', 'Government & Defence'],
+        note: 'The baseline cybersecurity certification globally and increasingly the floor requirement for security-adjacent roles in Australian government and enterprise IT.',
     },
     {
         id: 'aws_cp',
         category: 'it',
         name: 'AWS Certified Cloud Practitioner',
-        nameEn: 'AWS Certified Cloud Practitioner',
         code: null,
-        sectors: ['Bulut Teknolojileri', 'IT'],
-        sectorsEn: ['Cloud Technologies', 'IT'],
-        sektorSarti: false,
-        cost: '$100 USD (sınav ücreti)',
-        costEn: '$100 USD (exam fee)',
-        duration: 'Kendi hızında + online sınav',
-        durationEn: 'Self-paced + online exam',
-        how: 'Online sınav',
-        howEn: 'Online exam',
+        cost: '$150 AUD (exam fee)',
+        duration: '2–3 months self-paced preparation',
+        how: 'Online exam',
+        visas: ['482', '189', '190', '500'],
+        isTAFE: false,
+        isMandatory: false,
+        sectors: ['Cloud Computing', 'IT Operations', 'DevOps'],
+        note: 'The entry point into the AWS certification pathway. Cloud roles are the fastest-growing IT segment in Australia — this cert validates foundational cloud literacy to any employer.',
+    },
+    {
+        id: 'azure_az900',
+        category: 'it',
+        name: 'Microsoft Azure Fundamentals — AZ-900',
+        code: 'AZ-900',
+        cost: '$200 AUD (exam fee)',
+        duration: '4–6 weeks self-paced preparation',
+        how: 'Online exam',
+        visas: ['482', '189', '190', '500'],
+        isTAFE: false,
+        isMandatory: false,
+        sectors: ['Cloud Computing', 'Enterprise IT', 'Microsoft Ecosystem'],
+        note: "Australia's enterprise sector runs heavily on the Microsoft stack. AZ-900 is the quickest credential to prove Azure familiarity and opens doors to Azure Administrator and Developer pathways.",
+    },
+    {
+        id: 'google_pca',
+        category: 'it',
+        name: 'Google Professional Cloud Architect',
+        code: null,
+        cost: '$300 AUD (exam fee)',
+        duration: '3–6 months preparation',
+        how: 'Online or remote proctored exam',
         visas: ['482', '189', '190'],
-        tafe: false,
-        note: "Bulut teknolojilerine giriş için en yaygın başlangıç sertifikası. IT sektöründe hızla artan talep.",
-        noteEn: "The most common entry-level certificate for cloud technologies. Rapidly growing demand in Australia's IT sector.",
+        isTAFE: false,
+        isMandatory: false,
+        sectors: ['Cloud Architecture', 'DevOps', 'Platform Engineering'],
+        note: "One of the most respected architect-level cloud certifications globally. Positions you for senior engineering and solutions architect roles — high-demand, high-salary tier in Australia's tech market.",
+    },
+    {
+        id: 'ccna',
+        category: 'it',
+        name: 'Cisco CCNA — Networking Associate',
+        code: null,
+        cost: '$400–600 AUD (exam + prep)',
+        duration: '3–6 months preparation',
+        how: 'Online or in-person exam',
+        visas: ['482', '189', '190', '500'],
+        isTAFE: false,
+        isMandatory: false,
+        sectors: ['Network Engineering', 'IT Infrastructure', 'Telco'],
+        note: "The industry standard for networking credentials. Particularly valuable in Australia's telecommunications sector and for ISP, enterprise networking, and managed services roles.",
     },
 
-    // Sağlık & Yaşlı Bakımı
+    /* ═══════════════ HEALTH & AGED CARE ═══════════════ */
     {
-        id: 'cert3_support',
-        category: 'saglik',
-        name: 'Certificate III in Individual Support — CHC33021',
-        nameEn: 'Certificate III in Individual Support — CHC33021',
-        code: null,
-        sectors: ['Yaşlı Bakımı', 'Engelli Bakımı', 'Toplum Hizmetleri'],
-        sectorsEn: ['Aged Care', 'Disability Care', 'Community Services'],
-        sektorSarti: true,
-        cost: "$800–2.000 AUD (TAFE'de indirimli)",
-        costEn: '$800–2,000 AUD (discounted at TAFE)',
-        duration: '6–12 ay',
-        durationEn: '6–12 months',
-        how: 'Karma (online + uygulamalı)',
-        howEn: 'Blended (online + practical)',
-        visas: ['500', '482', '189', '190'],
-        tafe: true,
-        note: "Avustralya'da yaşlı bakımı sektörü kritik personel açığı yaşıyor. PR yolculuğu için öncelikli meslek listesinde.",
-        noteEn: "Australia's aged care sector faces a critical staffing shortage. Listed as a priority occupation for the PR pathway.",
+        id: 'cert3_individual_support',
+        category: 'health',
+        name: 'Certificate III in Individual Support — Aged Care',
+        code: 'CHC33021',
+        cost: '$2,000–5,000 AUD (or free via government funding)',
+        duration: '6–12 months',
+        how: 'Blended — online + mandatory practical placement',
+        visas: ['500', '482', '189', '190', '491'],
+        isTAFE: true,
+        isMandatory: true,
+        sectors: ['Aged Care', 'Home Care', 'Residential Facilities', 'Community Services'],
+        note: "Mandatory minimum qualification for NDIS and aged care employment under the Aged Care Quality Standards. Australia is experiencing a critical workforce shortage in this sector — it appears on the Medium and Long-term Strategic Skills List (MLTSSL).",
     },
     {
-        id: 'ndis',
-        category: 'saglik',
-        name: 'NDIS Worker Screening Check',
-        nameEn: 'NDIS Worker Screening Check',
+        id: 'ndis_orientation',
+        category: 'health',
+        name: 'NDIS Worker Orientation Module',
         code: null,
-        sectors: ['Engelli Destek Hizmetleri', 'NDIS'],
-        sectorsEn: ['Disability Support Services', 'NDIS'],
-        sektorSarti: true,
-        cost: '$128 AUD',
-        duration: 'Online başvuru, 1–4 hafta',
-        durationEn: 'Online application, 1–4 weeks',
-        how: 'Online',
-        howEn: 'Online',
+        cost: 'Free',
+        duration: '1–2 hours',
+        how: 'Online (NDIS Commission website)',
+        visas: ['417', '462', '500', '482', '189', '190', '491'],
+        isTAFE: false,
+        isMandatory: true,
+        sectors: ['Disability Support Services', 'NDIS', 'Aged Care'],
+        note: 'Mandatory for all new workers entering the NDIS system. Completely free and completed online in under 2 hours — there is no reason not to complete this before your first support shift.',
+    },
+    {
+        id: 'manual_handling',
+        category: 'health',
+        name: 'Manual Handling & Safe Patient Handling',
+        code: null,
+        cost: '$50–100 AUD',
+        duration: 'Online or half-day in-person',
+        how: 'Online or in-person',
         visas: ['417', '462', '482', '189', '190'],
-        tafe: false,
-        note: 'NDIS (Ulusal Engellilik Sigorta Planı) kapsamındaki işlerde çalışmak için zorunlu tarama. Sektör hızla büyüyor.',
-        noteEn: 'Mandatory screening to work in NDIS (National Disability Insurance Scheme) roles. Sector is growing fast.',
+        isTAFE: false,
+        isMandatory: true,
+        sectors: ['Aged Care', 'Hospital', 'Disability Support', 'Warehousing'],
+        note: 'Required by workplace health and safety legislation in all care and physical work environments. Protects you from back injury and is often a Day 1 induction requirement before your first shift.',
+    },
+    {
+        id: 'medication_admin',
+        category: 'health',
+        name: 'Medication Administration Certificate',
+        code: null,
+        cost: '$200–400 AUD',
+        duration: '1 day',
+        how: 'In-person (RTO)',
+        visas: ['482', '189', '190'],
+        isTAFE: false,
+        isMandatory: false,
+        sectors: ['Aged Care', 'Disability Support', 'Home Care'],
+        note: 'Unlocks higher-paid support worker roles where medication assistance is part of the duty of care. Many employers sponsor this training once you are working — ask before self-funding.',
+    },
+    {
+        id: 'hoist_sling',
+        category: 'health',
+        name: 'Hoist & Sling Training',
+        code: null,
+        cost: '$150–300 AUD',
+        duration: 'Half day',
+        how: 'In-person',
+        visas: ['417', '462', '482', '189', '190'],
+        isTAFE: false,
+        isMandatory: true,
+        sectors: ['Aged Care', 'Disability Support', 'Hospital'],
+        note: 'Legally required before operating any patient lifting equipment. Residential aged care facilities cannot roster you for certain shifts without current hoist competency documentation.',
+    },
+    {
+        id: 'cert4_disability',
+        category: 'health',
+        name: 'Certificate IV in Disability Support',
+        code: 'CHC43121',
+        cost: '$3,000–6,000 AUD (government subsidies available)',
+        duration: '12 months',
+        how: 'Blended (TAFE or RTO)',
+        visas: ['500', '482', '189', '190'],
+        isTAFE: true,
+        isMandatory: false,
+        sectors: ['Disability Support', 'NDIS', 'Community Services'],
+        note: 'The advanced pathway after Cert III — opens Team Leader and Case Management roles. With NDIS funding growing year-on-year, Cert IV holders are in very strong demand.',
+    },
+    {
+        id: 'infection_control',
+        category: 'health',
+        name: 'Infection Control Training',
+        code: null,
+        cost: 'Free (government-funded)',
+        duration: '1–2 hours',
+        how: 'Online',
+        visas: ['417', '462', '500', '482', '189', '190', '491'],
+        isTAFE: false,
+        isMandatory: true,
+        sectors: ['Aged Care', 'Hospital', 'Childcare', 'Allied Health'],
+        note: 'Became a mandatory requirement for all aged care workers post-COVID. Free, fast, and completed online — do it immediately, as most aged care employers verify completion during hiring.',
     },
 
-    // Nakliye & Lojistik
+    /* ═══════════════ TRANSPORT & LOGISTICS ═══════════════ */
     {
         id: 'hr_licence',
-        category: 'nakliye',
-        name: 'Heavy Rigid (HR) Ehliyet',
-        nameEn: 'Heavy Rigid (HR) Licence',
+        category: 'transport',
+        name: 'Heavy Rigid (HR) Truck Licence',
         code: null,
-        sectors: ['Uzun Yol Nakliye', 'Şehir İçi Taşımacılık', 'İnşaat'],
-        sectorsEn: ['Long Haul Transport', 'Urban Transport', 'Construction'],
-        sektorSarti: true,
-        cost: '$300–600 AUD',
-        duration: '1–2 gün sınav + pratik',
-        durationEn: '1–2 days + practical',
-        how: 'Yüz yüze',
-        howEn: 'In-person',
-        visas: ['417', '462', '482', '189'],
-        tafe: false,
-        note: "Avustralya'da kamyon sürücüsüne talep yüksek. Şehirlerarası nakliyede uzun vadeli istihdam imkânı.",
-        noteEn: 'High demand for truck drivers in Australia. Long-term employment opportunity in interstate transport.',
+        cost: '$500–1,500 AUD',
+        duration: 'Varies by state — 1–3 days practical',
+        how: 'In-person (state road authority)',
+        visas: ['417', '462', '482', '189', '190', '491'],
+        isTAFE: false,
+        isMandatory: true,
+        sectors: ['Long Haul Transport', 'Urban Delivery', 'Construction', 'Mining'],
+        note: 'Australia has a severe truck driver shortage — HR licence holders can find full-time work within days of obtaining this licence in most states. Enables driving rigid trucks over 8 tonnes GVM.',
     },
     {
-        id: 'dg',
-        category: 'nakliye',
-        name: 'Dangerous Goods — DG Sertifikası',
-        nameEn: 'Dangerous Goods — DG Certificate',
+        id: 'mc_licence',
+        category: 'transport',
+        name: 'Multi-Combination (MC) Truck Licence',
         code: null,
-        sectors: ['Lojistik', 'Depo', 'Kimyasal Taşımacılık'],
-        sectorsEn: ['Logistics', 'Warehouse', 'Chemical Transport'],
-        sektorSarti: true,
-        cost: '$150–300 AUD',
-        duration: '1 gün',
-        durationEn: '1 day',
-        how: 'Yüz yüze',
-        howEn: 'In-person',
-        visas: ['417', '462', '482'],
-        tafe: false,
-        note: 'Tehlikeli madde taşıyan sektörlerde zorunlu. Lojistik sektöründe maaş üstü ek ödeme getirir.',
-        noteEn: 'Required in sectors handling hazardous materials. Comes with a pay premium in the logistics sector.',
+        cost: '$3,000–5,000 AUD',
+        duration: '3–5 days practical assessment',
+        how: 'In-person (state road authority)',
+        visas: ['482', '189', '190', '491'],
+        isTAFE: false,
+        isMandatory: true,
+        sectors: ['B-Double Transport', 'Road Train', 'Interstate Freight'],
+        note: 'The highest truck licence class — required for B-doubles and road trains. MC-licensed drivers command some of the highest wages in the transport sector, particularly on interstate runs.',
+    },
+    {
+        id: 'forklift_transport',
+        category: 'transport',
+        name: 'Forklift Licence — LF Class',
+        code: 'LF (High Risk Work Licence)',
+        cost: '$300–500 AUD',
+        duration: '2–3 days',
+        how: 'In-person',
+        visas: ['417', '462', '482', '189', '190'],
+        isTAFE: false,
+        isMandatory: true,
+        sectors: ['Warehouse', 'Freight Terminal', 'Retail Distribution', 'Manufacturing'],
+        note: 'The single most-requested qualification in warehouse and logistics job ads. Issued by WorkCover/SafeWork — a High Risk Work Licence required by law to operate any forklift in Australia.',
+    },
+    {
+        id: 'dangerous_goods',
+        category: 'transport',
+        name: 'Dangerous Goods Transport — ADG Certificate',
+        code: null,
+        cost: '$300–600 AUD',
+        duration: '1–2 days',
+        how: 'In-person',
+        visas: ['417', '462', '482', '189', '190'],
+        isTAFE: false,
+        isMandatory: true,
+        sectors: ['Chemical Transport', 'Fuel Delivery', 'Mining Logistics', 'Warehousing'],
+        note: 'Legally required under the Australian Dangerous Goods Code for anyone involved in transporting, handling or loading classified hazardous substances. Comes with a pay premium above standard freight roles.',
+    },
+    {
+        id: 'cor',
+        category: 'transport',
+        name: 'Chain of Responsibility (CoR) Training',
+        code: null,
+        cost: '$100–200 AUD',
+        duration: 'Online — 3–5 hours',
+        how: 'Online',
+        visas: ['417', '462', '482', '189', '190'],
+        isTAFE: false,
+        isMandatory: true,
+        sectors: ['Transport Management', 'Logistics Operations', 'Fleet Management'],
+        note: 'Required under the Heavy Vehicle National Law (HVNL). CoR means managers and business owners — not just drivers — are legally responsible for transport safety. Essential for anyone in a logistics management role.',
+    },
+
+    /* ═══════════════ FINANCE & BUSINESS ═══════════════ */
+    {
+        id: 'cert4_accounting',
+        category: 'finance',
+        name: 'Certificate IV in Accounting and Bookkeeping',
+        code: 'FNS40222',
+        cost: '$2,000–5,000 AUD (TAFE)',
+        duration: '12 months',
+        how: 'Online or in-person (TAFE)',
+        visas: ['500', '482', '189', '190'],
+        isTAFE: true,
+        isMandatory: false,
+        sectors: ['Bookkeeping', 'Accounts Payable/Receivable', 'Payroll', 'Small Business'],
+        note: 'The minimum qualification required to legally register as a BAS (Business Activity Statement) Agent with the Tax Practitioners Board. A clear pathway from overseas accounting experience into the Australian market.',
+    },
+    {
+        id: 'tax_agent',
+        category: 'finance',
+        name: 'Tax Agent Registration — Tax Practitioners Board',
+        code: 'TPB Registration',
+        cost: '$300–500 AUD (registration fee)',
+        duration: 'Qualification + 1,000 hours supervised experience',
+        how: 'Application via TPB (taxpractitioners.gov.au)',
+        visas: ['482', '189', '190'],
+        isTAFE: false,
+        isMandatory: true,
+        sectors: ['Accounting Firm', 'Tax Consulting', 'Financial Services'],
+        note: "Legally required to lodge tax returns for clients in Australia — it is a criminal offence to provide tax agent services without registration. The TPB assesses overseas qualifications — check eligibility before applying.",
+    },
+    {
+        id: 'afsl',
+        category: 'finance',
+        name: 'Australian Financial Services Licence — AFSL',
+        code: 'AFSL (ASIC regulated)',
+        cost: '$500–2,000 AUD (application fee — varies)',
+        duration: '3–6 months application process',
+        how: 'Application via ASIC (asic.gov.au)',
+        visas: ['482', '189', '190'],
+        isTAFE: false,
+        isMandatory: true,
+        sectors: ['Financial Planning', 'Investment Advice', 'Insurance Brokering', 'Fund Management'],
+        note: 'Regulated by ASIC — required by law to provide financial products or advice to clients in Australia. Individual advisers must also complete a relevant degree and the FASEA exam (now under ASIC).',
+    },
+
+    /* ═══════════════ REAL ESTATE & PROPERTY ═══════════════ */
+    {
+        id: 're_registration',
+        category: 'realestate',
+        name: 'Certificate of Registration — Real Estate',
+        code: 'CPP41419 (NSW) / State-specific',
+        cost: '$500–1,200 AUD',
+        duration: '3–6 months',
+        how: 'Online or in-person (RTO)',
+        visas: ['482', '189', '190', '500'],
+        isTAFE: false,
+        isMandatory: true,
+        sectors: ['Residential Sales', 'Property Management', 'Commercial Real Estate'],
+        note: 'State-specific — each state has different requirements and issuing authorities (e.g., NSW Fair Trading, Consumer Affairs VIC). The Certificate of Registration is the mandatory first step to work in real estate in Australia.',
+    },
+    {
+        id: 're_licence',
+        category: 'realestate',
+        name: 'Real Estate Agent Licence — Full Licence',
+        code: 'CPP51122 (NSW) / State-specific',
+        cost: '$1,500–4,000 AUD',
+        duration: '12–24 months (after 1–2 years of experience)',
+        how: 'Blended (RTO)',
+        visas: ['189', '190', '482'],
+        isTAFE: false,
+        isMandatory: true,
+        sectors: ['Licensed Agent in Charge', 'Own Your Own Agency', 'Senior Property Management'],
+        note: 'Allows you to operate independently as a licensed agent or run your own real estate agency. Requires prior experience as a registered agent. The pathway to business ownership in the property sector.',
+    },
+
+    /* ═══════════════ EDUCATION & TRAINING ═══════════════ */
+    {
+        id: 'tae40122',
+        category: 'education',
+        name: 'Certificate IV in Training and Assessment',
+        code: 'TAE40122',
+        cost: '$1,500–3,000 AUD',
+        duration: '6–12 months',
+        how: 'Blended (TAFE or RTO)',
+        visas: ['500', '482', '189', '190'],
+        isTAFE: true,
+        isMandatory: true,
+        sectors: ['RTO Trainer', 'Corporate Trainer', 'Assessor', 'Facilitator', 'TAFE Lecturer'],
+        note: 'Mandatory to deliver or assess nationally recognised training in Australia — no TAE40122 means you cannot legally work as a trainer in any Registered Training Organisation (RTO). Widely considered the most strategically valuable certificate in the Australian workforce development ecosystem.',
+    },
+    {
+        id: 'education_wwc',
+        category: 'education',
+        name: 'Working with Children Check — Education Settings',
+        code: null,
+        cost: '$80 AUD NSW / Free QLD & VIC',
+        duration: 'Online application — 1–4 weeks processing',
+        how: 'Online (state government portal)',
+        visas: ['417', '462', '500', '482', '189', '190'],
+        isTAFE: false,
+        isMandatory: true,
+        sectors: ['Schools', 'TAFE', 'Tutoring', 'Libraries', 'Youth Programs'],
+        note: 'Mandatory for any role in any educational setting where you may have unsupervised contact with minors. Apply in your state before starting your role — working without this check is a criminal offence.',
+    },
+
+    /* ═══════════════ TRADES & MAINTENANCE ═══════════════ */
+    {
+        id: 'electrical_licence',
+        category: 'trades',
+        name: 'Electrical Licence — Electrician',
+        code: 'State-specific (e.g., NSW: Electrical Contractor Licence)',
+        cost: '$300–800 AUD (licence fee — trade qualification required separately)',
+        duration: 'After completing electrical trade apprenticeship (4 years)',
+        how: 'Application via state regulator (e.g., NSW Fair Trading)',
+        visas: ['189', '190', '482', '491'],
+        isTAFE: true,
+        isMandatory: true,
+        sectors: ['Residential Electrical', 'Commercial Electrical', 'Industrial Electrical'],
+        note: 'Strictly state-specific. Overseas electricians must have their qualifications assessed by Engineers Australia or VETASSESS before applying. Electricians appear on the MLTSSL — a direct PR pathway.',
+    },
+    {
+        id: 'plumbing_licence',
+        category: 'trades',
+        name: 'Plumbing Licence',
+        code: 'State-specific',
+        cost: '$200–600 AUD (licence fee)',
+        duration: 'After completing plumbing trade apprenticeship (4 years)',
+        how: 'Application via state regulator',
+        visas: ['189', '190', '482', '491'],
+        isTAFE: true,
+        isMandatory: true,
+        sectors: ['Residential Plumbing', 'Commercial Plumbing', 'Civil Works'],
+        note: "Plumbers are on Australia's priority occupation list. Skills assessment is done through the Plumbing Industry Commission or state plumbing regulators. One of the most direct PR pathways for tradespeople.",
+    },
+    {
+        id: 'gas_fitting',
+        category: 'trades',
+        name: 'Gas Fitting Licence',
+        code: 'State-specific',
+        cost: '$200–500 AUD (separate from plumbing licence)',
+        duration: 'Separate endorsement — weeks to months',
+        how: 'In-person assessment + application',
+        visas: ['189', '190', '482'],
+        isTAFE: false,
+        isMandatory: true,
+        sectors: ['Residential Gas', 'Commercial Kitchen Gas', 'Industrial Gas'],
+        note: 'A separate licence from plumbing — even licensed plumbers cannot do gas work without this specific endorsement. Significantly increases your earning potential and job scope.',
+    },
+    {
+        id: 'carpenter_joiner',
+        category: 'trades',
+        name: 'Carpentry & Joinery Trade Certificate',
+        code: 'CPC30220',
+        cost: '$3,000–8,000 AUD (or subsidised apprenticeship)',
+        duration: '3–4 year apprenticeship (TAFE component)',
+        how: 'Apprenticeship — on-the-job + TAFE',
+        visas: ['482', '189', '190', '491'],
+        isTAFE: true,
+        isMandatory: false,
+        sectors: ['Residential Construction', 'Commercial Fitout', 'Furniture Making', 'Formwork'],
+        note: "Carpenters are on Australia's Medium and Long-term Strategic Skills List. Overseas-qualified carpenters should seek a skills assessment via VETASSESS or Trades Recognition Australia (TRA) before applying for a licence.",
+    },
+    {
+        id: 'cleaning_cert',
+        category: 'trades',
+        name: 'Certificate II in Cleaning Operations',
+        code: 'CPP20616',
+        cost: '$200–500 AUD',
+        duration: '3–6 months',
+        how: 'Online or in-person',
+        visas: ['417', '462', '500', '482', '189', '190'],
+        isTAFE: false,
+        isMandatory: false,
+        sectors: ['Commercial Cleaning', 'Hospitality Cleaning', 'Healthcare Cleaning', 'Industrial Cleaning'],
+        note: 'A fast and affordable route into stable employment. Healthcare and pharmaceutical cleaning require this formal qualification — hospital cleaning roles pay significantly more than standard commercial cleaning.',
+    },
+    {
+        id: 'pesticide_licence',
+        category: 'trades',
+        name: 'Pesticide Applicator Licence',
+        code: 'State-specific',
+        cost: '$200–500 AUD',
+        duration: '1–3 days + application',
+        how: 'In-person (approved training provider)',
+        visas: ['417', '462', '482', '189', '190'],
+        isTAFE: false,
+        isMandatory: true,
+        sectors: ['Pest Control', 'Agriculture', 'Horticulture', 'Facilities Management'],
+        note: 'Legally required to commercially apply scheduled pesticides in Australia. State-issued — check your state agriculture department. Pest control technicians are in steady demand across urban and regional areas.',
     },
 ];
 
+/* ─────────────────────────── SECTOR PATHWAYS ─────────────────────────── */
 const SECTOR_PATHWAYS = [
-    { icon: '☕', label: 'Kafe & Restoran', labelEn: 'Café & Restaurant', path: 'RSA → Barista → Food Safety Supervisor' },
-    { icon: '🏗️', label: 'İnşaat & Saha', labelEn: 'Construction & Site', path: 'White Card → Traffic Controller → Forklift veya EWP' },
-    { icon: '🛡️', label: 'Güvenlik', labelEn: 'Security', path: 'First Aid → Security Licence → CPR' },
-    { icon: '💻', label: 'IT', labelEn: 'IT', path: 'CompTIA A+ → Network+ → Security+ veya AWS' },
-    { icon: '🤝', label: 'Bakım Hizmetleri', labelEn: 'Care Services', path: 'WWC Check → Cert III Individual Support → NDIS' },
-    { icon: '🚛', label: 'Lojistik', labelEn: 'Logistics', path: 'Forklift LF → HR Ehliyet → Dangerous Goods' },
+    { icon: '☕', label: 'Café & Restaurant',   path: 'Food Handler → RSA + RSG → Food Safety Supervisor → Barista' },
+    { icon: '🏗️', label: 'Construction & Site', path: 'White Card → Working at Heights → Traffic Control → Forklift or EWP' },
+    { icon: '🛡️', label: 'Security',            path: 'First Aid → Security Licence → Annual CPR Renewal' },
+    { icon: '💻', label: 'IT & Tech',            path: 'CompTIA A+ → Network+ → Security+ or AWS Cloud Practitioner' },
+    { icon: '🤝', label: 'Care Services',        path: 'WWC Check → Cert III Individual Support → NDIS Orientation → Medication Admin' },
+    { icon: '🚛', label: 'Transport & Logistics',path: 'Forklift LF → HR Licence → Dangerous Goods → CoR Training' },
+    { icon: '🏥', label: 'Aged Care Pathway',   path: 'NDIS Orientation (free) → Infection Control (free) → Cert III Individual Support → Cert IV Disability' },
+    { icon: '🎓', label: 'Education & Training', path: 'WWC Check → TAE40122 Certificate IV in Training & Assessment' },
 ];
 
+/* ─────────────────────────── SUB-COMPONENTS ──────────────────────────── */
 const VisaBadge = ({ visa }) => {
-    const cfg = VISA_CONFIG[visa];
+    const cfg = VISA_CONFIG[visa] ?? { color: '#ffffff', bg: '#ffffff15' };
     return (
         <span
-            className="text-[9px] font-black px-1.5 py-0.5 uppercase tracking-wider"
+            className="text-[9px] font-black px-1.5 py-0.5 uppercase tracking-wider rounded-sm"
             style={{ color: cfg.color, backgroundColor: cfg.bg, border: `1px solid ${cfg.color}40` }}
         >
             {visa}
@@ -506,127 +800,136 @@ const VisaBadge = ({ visa }) => {
     );
 };
 
-const CertCard = ({ cert, lang }) => {
-    const sectors = lang === 'en' ? cert.sectorsEn : cert.sectors;
-    const cost = (lang === 'en' && cert.costEn) ? cert.costEn : cert.cost;
-
-    return (
-        <div className="bg-[#111] border border-white/5 p-6 flex flex-col gap-4 hover:border-white/15 transition-all">
-            {/* Header */}
-            <div className="flex items-start justify-between gap-3">
-                <div className="flex-1">
-                    <h3 className="text-base font-black uppercase tracking-tight text-white leading-snug mb-1">
-                        {lang === 'en' ? cert.nameEn : cert.name}
-                    </h3>
-                    {cert.code && (
-                        <span className="text-[10px] text-white/30 font-mono">{cert.code}</span>
-                    )}
-                </div>
-                {cert.sektorSarti && (
-                    <div className="shrink-0 flex items-center gap-1 px-2 py-1" style={{ backgroundColor: '#ff6b6b20' }}>
-                        <AlertCircle size={10} className="text-[#ff6b6b]" />
-                        <span className="text-[9px] font-black tracking-[0.15em] uppercase text-[#ff6b6b]">
-                            {lang === 'en' ? 'Sector Req.' : 'Sektör Şartı'}
-                        </span>
+const CertCard = ({ cert }) => (
+    <div className="bg-[#111] border border-white/5 p-6 flex flex-col gap-4 hover:border-white/15 transition-all duration-200">
+        {/* ── Header ── */}
+        <div className="flex items-start justify-between gap-3">
+            <div className="flex-1 min-w-0">
+                <h3 className="text-sm font-black uppercase tracking-tight text-white leading-snug mb-1">
+                    {cert.name}
+                </h3>
+                {cert.code && (
+                    <span className="text-[10px] text-white/30 font-mono break-all">{cert.code}</span>
+                )}
+            </div>
+            <div className="shrink-0 flex flex-col gap-1 items-end">
+                {cert.isMandatory && (
+                    <div className="flex items-center gap-1 px-2 py-0.5" style={{ backgroundColor: '#ff6b6b18', border: '1px solid #ff6b6b40' }}>
+                        <AlertCircle size={9} className="text-[#ff6b6b]" />
+                        <span className="text-[9px] font-black tracking-[0.15em] uppercase text-[#ff6b6b]">MANDATORY</span>
+                    </div>
+                )}
+                {cert.isTAFE && (
+                    <div className="flex items-center gap-1 px-2 py-0.5" style={{ backgroundColor: '#00d4ff12', border: '1px solid #00d4ff40' }}>
+                        <CheckCircle size={9} className="text-[#00d4ff]" />
+                        <span className="text-[9px] font-black tracking-[0.15em] uppercase text-[#00d4ff]">TAFE</span>
                     </div>
                 )}
             </div>
-
-            {/* Sectors */}
-            <div className="flex flex-wrap gap-1.5">
-                {sectors.map(s => (
-                    <span key={s} className="text-[10px] px-2 py-0.5 bg-white/5 text-white/40 uppercase tracking-wider">
-                        {s}
-                    </span>
-                ))}
-            </div>
-
-            {/* Details grid */}
-            <div className="grid grid-cols-2 gap-3 text-xs">
-                <div className="flex items-start gap-2">
-                    <DollarSign size={13} className="text-white/20 mt-0.5 shrink-0" />
-                    <div>
-                        <p className="text-[10px] text-white/30 uppercase tracking-wider mb-0.5">
-                            {lang === 'en' ? 'Cost' : 'Maliyet'}
-                        </p>
-                        <p className="text-white/70 font-bold">{cost}</p>
-                    </div>
-                </div>
-                <div className="flex items-start gap-2">
-                    <Clock size={13} className="text-white/20 mt-0.5 shrink-0" />
-                    <div>
-                        <p className="text-[10px] text-white/30 uppercase tracking-wider mb-0.5">
-                            {lang === 'en' ? 'Duration' : 'Süre'}
-                        </p>
-                        <p className="text-white/70 font-bold">{lang === 'en' ? cert.durationEn : cert.duration}</p>
-                    </div>
-                </div>
-                <div className="flex items-start gap-2 col-span-2">
-                    <Monitor size={13} className="text-white/20 mt-0.5 shrink-0" />
-                    <div>
-                        <p className="text-[10px] text-white/30 uppercase tracking-wider mb-0.5">
-                            {lang === 'en' ? 'How' : 'Nasıl'}
-                        </p>
-                        <p className="text-white/70 font-bold">{lang === 'en' ? cert.howEn : cert.how}</p>
-                    </div>
-                </div>
-            </div>
-
-            {/* Visa badges */}
-            <div className="flex flex-wrap gap-1.5 items-center">
-                <span className="text-[9px] text-white/25 uppercase tracking-wider mr-1">
-                    {lang === 'en' ? 'Visa:' : 'Vize:'}
-                </span>
-                {cert.visas.map(v => (
-                    <VisaBadge key={v} visa={v} />
-                ))}
-            </div>
-
-            {/* TAFE badge */}
-            {cert.tafe && (
-                <div className="flex items-center gap-1.5">
-                    <CheckCircle size={12} className="text-[#00d4ff]" />
-                    <span className="text-[10px] text-[#00d4ff] font-bold">
-                        TAFE {lang === 'en' ? '(varies by state)' : '(eyaletinize göre)'}
-                    </span>
-                </div>
-            )}
-
-            {/* Note */}
-            <p className="text-xs text-white/40 leading-relaxed border-t border-white/5 pt-3 italic">
-                {lang === 'en' ? cert.noteEn : cert.note}
-            </p>
         </div>
-    );
-};
 
+        {/* ── Sectors ── */}
+        <div className="flex flex-wrap gap-1.5">
+            {cert.sectors.map(s => (
+                <span key={s} className="text-[10px] px-2 py-0.5 bg-white/5 text-white/40 uppercase tracking-wider">
+                    {s}
+                </span>
+            ))}
+        </div>
+
+        {/* ── Details grid ── */}
+        <div className="grid grid-cols-2 gap-3 text-xs">
+            <div className="flex items-start gap-2">
+                <DollarSign size={13} className="text-white/20 mt-0.5 shrink-0" />
+                <div>
+                    <p className="text-[10px] text-white/30 uppercase tracking-wider mb-0.5">Cost</p>
+                    <p className="text-white/70 font-bold text-[11px] leading-snug">{cert.cost}</p>
+                </div>
+            </div>
+            <div className="flex items-start gap-2">
+                <Clock size={13} className="text-white/20 mt-0.5 shrink-0" />
+                <div>
+                    <p className="text-[10px] text-white/30 uppercase tracking-wider mb-0.5">Duration</p>
+                    <p className="text-white/70 font-bold text-[11px] leading-snug">{cert.duration}</p>
+                </div>
+            </div>
+            <div className="flex items-start gap-2 col-span-2">
+                <Monitor size={13} className="text-white/20 mt-0.5 shrink-0" />
+                <div>
+                    <p className="text-[10px] text-white/30 uppercase tracking-wider mb-0.5">Delivery</p>
+                    <p className="text-white/70 font-bold text-[11px]">{cert.how}</p>
+                </div>
+            </div>
+        </div>
+
+        {/* ── Visa badges ── */}
+        <div className="flex flex-wrap gap-1.5 items-center">
+            <span className="text-[9px] text-white/25 uppercase tracking-wider mr-0.5">Visa:</span>
+            {cert.visas.map(v => <VisaBadge key={v} visa={v} />)}
+        </div>
+
+        {/* ── Note ── */}
+        <p className="text-[11px] text-white/40 leading-relaxed border-t border-white/5 pt-3 italic">
+            {cert.note}
+        </p>
+    </div>
+);
+
+/* ─────────────────────────── PAGE COMPONENT ──────────────────────────── */
 const SertifikalarPage = () => {
-    const { lang } = useLanguage();
-    const [activeFilter, setActiveFilter] = useState('TÜMÜ');
+    const [activeFilter, setActiveFilter] = useState('ALL');
+    const [searchQuery, setSearchQuery]   = useState('');
 
-    const _activeCategoryData = CATEGORIES.find(c => c.key === activeFilter);
+    const filteredCerts = useMemo(() => {
+        let list = CERTIFICATES;
+        if (activeFilter !== 'ALL') {
+            list = list.filter(c => c.category === activeFilter);
+        }
+        const q = searchQuery.trim().toLowerCase();
+        if (q) {
+            list = list.filter(c =>
+                c.name.toLowerCase().includes(q) ||
+                (c.code && c.code.toLowerCase().includes(q)) ||
+                c.sectors.some(s => s.toLowerCase().includes(q)) ||
+                c.note.toLowerCase().includes(q)
+            );
+        }
+        return list;
+    }, [activeFilter, searchQuery]);
+
+    /* Group for "ALL" view */
+    const groupedForAll = useMemo(() => {
+        if (activeFilter !== 'ALL' || searchQuery.trim()) return null;
+        return CATEGORIES.map(cat => ({
+            cat,
+            certs: CERTIFICATES.filter(c => c.category === cat.key),
+        }));
+    }, [activeFilter, searchQuery]);
+
+    const totalCount = CERTIFICATES.length;
 
     return (
         <>
             <SEOHead
-                title={lang === 'en' ? 'Certificates Guide — Australia' : "Avustralya'da İşine Yarayacak Sertifikalar"}
-                description={lang === 'en'
-                    ? 'All certificates that make it easier to find work in Australia, grouped by sector.'
-                    : "Avustralya'da iş bulmayı kolaylaştıran, sektöre göre gruplandırılmış tüm sertifikalar."}
+                title="Australian Certifications Guide for Migrants | MIGRON"
+                description="Comprehensive guide to 30+ industry certifications in Australia — food, construction, security, IT, health, transport, finance, real estate, education, and trades. Everything migrants need to know."
                 path="/sertifikalar"
             />
             <div className="min-h-screen bg-[#050505] text-[#e0e0e0] pt-20">
 
-                {/* Hero */}
+                {/* ── Hero ── */}
                 <section className="relative pt-8 pb-6 px-6 border-b border-white/10">
                     <div className="max-w-[1200px] mx-auto">
                         <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
-                            <Link to="/" className="inline-flex items-center gap-2 text-white/40 hover:text-[#ccff00] transition-colors text-[10px] font-black uppercase tracking-[0.2em]">
+                            <Link
+                                to="/"
+                                className="inline-flex items-center gap-2 text-white/40 hover:text-[#ccff00] transition-colors text-[10px] font-black uppercase tracking-[0.2em]"
+                            >
                                 <ArrowLeft size={14} />
-                                {lang === 'en' ? 'Back to Home' : 'Anasayfaya Dön'}
+                                Back to Home
                             </Link>
                             <p className="text-[10px] text-white/40 uppercase font-black tracking-[0.2em]">
-                                {lang === 'en' ? 'EDUCATION — CERTIFICATIONS' : 'EĞİTİM — SERTİFİKALAR'}
+                                EDUCATION — CERTIFICATIONS
                             </p>
                         </div>
 
@@ -635,112 +938,189 @@ const SertifikalarPage = () => {
                                 <Award className="text-black" size={28} strokeWidth={3} />
                             </div>
                             <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tighter italic text-[#ccff00]">
-                                {lang === 'en' ? 'CERTIFICATES' : 'SERTİFİKALAR'}
+                                CERTIFICATIONS
                             </h1>
                         </div>
-                        <p className="text-sm md:text-base text-white/50 leading-relaxed font-medium max-w-2xl">
-                            {lang === 'en'
-                                ? 'All certificates that make it easier to find work in Australia, grouped by sector.'
-                                : "Avustralya'da iş bulmayı kolaylaştıran, sektöre göre gruplandırılmış tüm sertifikalar."}
+                        <p className="text-sm md:text-base text-white/50 leading-relaxed font-medium max-w-2xl mb-3">
+                            All certifications that matter for migrants working in Australia — {totalCount}+ certificates across {CATEGORIES.length} industries, with costs, durations, and visa compatibility.
                         </p>
+                        <div className="flex items-center gap-3 flex-wrap">
+                            <span className="inline-flex items-center gap-1.5 text-[10px] text-[#ff6b6b] font-black uppercase tracking-wider">
+                                <AlertCircle size={10} />
+                                Red badge = legally required
+                            </span>
+                            <span className="inline-flex items-center gap-1.5 text-[10px] text-[#00d4ff] font-black uppercase tracking-wider">
+                                <CheckCircle size={10} />
+                                Blue badge = available at TAFE
+                            </span>
+                        </div>
                     </div>
                 </section>
 
                 <div className="max-w-[1200px] mx-auto px-6 py-8">
 
-                    {/* TAFE Info Box */}
+                    {/* ── TAFE Info Box ── */}
                     <div className="border border-[#ccff00]/40 bg-[#ccff00]/5 p-5 mb-8 flex items-start gap-4">
                         <div className="text-2xl shrink-0">🎓</div>
                         <div>
                             <p className="text-[10px] font-black tracking-[0.3em] uppercase text-[#ccff00] mb-2">
-                                {lang === 'en' ? 'ARE YOU A STUDENT?' : 'ÖĞRENCİ MİSİN?'}
+                                STUDENT VISA HOLDER? READ THIS FIRST
                             </p>
                             <p className="text-sm text-white/60 leading-relaxed">
-                                {lang === 'en'
-                                    ? 'TAFE (varies by state) offers discounts on many certificate courses to people with a valid student visa. Always check before enrolling — take your student card with you, the discount is not applied automatically, you need to mention it yourself.'
-                                    : 'TAFE (eyaletinize göre değişir), geçerli öğrenci vizesine sahip kişilere birçok sertifika kursunda indirim sunuyor. Kayıt olmadan önce mutlaka kontrol et — öğrenci kartını yanında götür, indirim otomatik uygulanmıyor, kendin belirtmen gerekiyor.'}
+                                TAFE (Technical and Further Education — varies by state) offers significant discounts on many certificate courses for valid student visa holders.
+                                Always check <strong className="text-white/80">before enrolling</strong> — bring your student card in person, as discounts are
+                                rarely applied automatically online. You must specifically mention your student status to receive the concession pricing.
                             </p>
                         </div>
                     </div>
 
                     <LiveExperimentBand />
 
-                    {/* Category Filter */}
-                    <div className="flex flex-wrap gap-2 mb-8 mt-6">
-                        <button
-                            onClick={() => setActiveFilter('TÜMÜ')}
-                            className={`px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.2em] border transition-all ${activeFilter === 'TÜMÜ'
-                                ? 'bg-[#ccff00] text-black border-[#ccff00]'
-                                : 'border-white/10 text-white/40 hover:border-white/30 hover:text-white/70'}`}
-                        >
-                            {lang === 'en' ? 'ALL' : 'TÜMÜ'}
-                        </button>
-                        {CATEGORIES.map(cat => (
+                    {/* ── Search Bar ── */}
+                    <div className="relative mt-6 mb-4">
+                        <Search size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30" />
+                        <input
+                            type="text"
+                            value={searchQuery}
+                            onChange={e => setSearchQuery(e.target.value)}
+                            placeholder="Search certificates, codes, or sectors..."
+                            className="w-full bg-[#111] border border-white/10 text-white/70 text-sm pl-10 pr-10 py-3 placeholder:text-white/25 focus:outline-none focus:border-[#ccff00]/40 transition-colors"
+                        />
+                        {searchQuery && (
                             <button
-                                key={cat.key}
-                                onClick={() => setActiveFilter(cat.key)}
-                                className={`px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.2em] border transition-all ${activeFilter === cat.key
-                                    ? 'bg-[#ccff00] text-black border-[#ccff00]'
-                                    : 'border-white/10 text-white/40 hover:border-white/30 hover:text-white/70'}`}
+                                onClick={() => setSearchQuery('')}
+                                className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60 transition-colors"
                             >
-                                {cat.icon} {lang === 'en' ? cat.labelEn : cat.label}
+                                <X size={14} />
                             </button>
-                        ))}
+                        )}
                     </div>
 
-                    {/* Certificate Grid */}
-                    {activeFilter === 'TÜMÜ' ? (
-                        <div className="space-y-10 mb-12">
-                            {CATEGORIES.map(cat => {
-                                const catCerts = certificates.filter(c => c.category === cat.key);
-                                return (
-                                    <div key={cat.key}>
-                                        <h2 className="text-[11px] font-black tracking-[0.3em] uppercase mb-4 flex items-center gap-2"
-                                            style={{ color: '#ccff00' }}>
-                                            <span>{cat.icon}</span>
-                                            <span>{lang === 'en' ? cat.labelEn : cat.label}</span>
-                                        </h2>
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            {catCerts.map(cert => (
-                                                <CertCard key={cert.id} cert={cert} lang={lang} />
-                                            ))}
-                                        </div>
+                    {/* ── Category Filter ── */}
+                    <div className="flex flex-wrap gap-2 mb-8">
+                        <button
+                            onClick={() => setActiveFilter('ALL')}
+                            className={`px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.2em] border transition-all ${
+                                activeFilter === 'ALL'
+                                    ? 'bg-[#ccff00] text-black border-[#ccff00]'
+                                    : 'border-white/10 text-white/40 hover:border-white/30 hover:text-white/70'
+                            }`}
+                        >
+                            ALL ({totalCount})
+                        </button>
+                        {CATEGORIES.map(cat => {
+                            const count = CERTIFICATES.filter(c => c.category === cat.key).length;
+                            return (
+                                <button
+                                    key={cat.key}
+                                    onClick={() => setActiveFilter(cat.key)}
+                                    className={`px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.2em] border transition-all ${
+                                        activeFilter === cat.key
+                                            ? 'bg-[#ccff00] text-black border-[#ccff00]'
+                                            : 'border-white/10 text-white/40 hover:border-white/30 hover:text-white/70'
+                                    }`}
+                                >
+                                    {cat.icon} {cat.label} ({count})
+                                </button>
+                            );
+                        })}
+                    </div>
+
+                    {/* ── Certificate Grid ── */}
+                    {searchQuery.trim() || activeFilter !== 'ALL' ? (
+                        /* Flat filtered view */
+                        <div className="mb-12">
+                            {filteredCerts.length === 0 ? (
+                                <div className="text-center py-20">
+                                    <p className="text-white/25 text-sm uppercase tracking-widest">No certificates match your search.</p>
+                                </div>
+                            ) : (
+                                <>
+                                    {searchQuery.trim() && (
+                                        <p className="text-[10px] text-white/30 uppercase tracking-wider mb-4">
+                                            {filteredCerts.length} result{filteredCerts.length !== 1 ? 's' : ''} for "{searchQuery}"
+                                        </p>
+                                    )}
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        {filteredCerts.map(cert => <CertCard key={cert.id} cert={cert} />)}
                                     </div>
-                                );
-                            })}
+                                </>
+                            )}
                         </div>
                     ) : (
-                        <div className="mb-12">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {certificates.filter(c => c.category === activeFilter).map(cert => (
-                                    <CertCard key={cert.id} cert={cert} lang={lang} />
-                                ))}
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Sector Pathway Section */}
-                    <div className="bg-[#111] border border-white/5 p-6 mb-8">
-                        <h2 className="text-[10px] font-black tracking-[0.3em] uppercase text-[#ccff00] mb-2">
-                            {lang === 'en' ? 'WHERE SHOULD I START?' : 'HANGİ SERTİFİKADAN BAŞLAMALIYIMi?'}
-                        </h2>
-                        <p className="text-[11px] text-white/40 mb-5 uppercase tracking-wider">
-                            {lang === 'en'
-                                ? 'Choose your starting point based on your target sector'
-                                : 'Hedef sektörüne göre başlangıç noktanı seç'}
-                        </p>
-                        <div className="space-y-3">
-                            {SECTOR_PATHWAYS.map((p, i) => (
-                                <div key={i} className="flex items-start gap-3">
-                                    <span className="text-base shrink-0">{p.icon}</span>
-                                    <div className="flex-1 flex flex-wrap items-baseline gap-x-2 gap-y-1">
-                                        <span className="font-black text-sm text-white uppercase">
-                                            {lang === 'en' ? p.labelEn : p.label}
+                        /* Grouped by category view */
+                        <div className="space-y-12 mb-12">
+                            {groupedForAll.map(({ cat, certs }) => (
+                                <div key={cat.key}>
+                                    <div className="flex items-center gap-3 mb-5">
+                                        <span className="text-xl">{cat.icon}</span>
+                                        <h2
+                                            className="text-[11px] font-black tracking-[0.3em] uppercase"
+                                            style={{ color: '#ccff00' }}
+                                        >
+                                            {cat.label}
+                                        </h2>
+                                        <span className="text-[10px] text-white/20 font-mono">
+                                            — {certs.length} certificate{certs.length !== 1 ? 's' : ''}
                                         </span>
-                                        <span className="text-xs text-white/40">→ {p.path}</span>
+                                    </div>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        {certs.map(cert => <CertCard key={cert.id} cert={cert} />)}
                                     </div>
                                 </div>
                             ))}
+                        </div>
+                    )}
+
+                    {/* ── Recommended Pathways ── */}
+                    <div className="bg-[#111] border border-white/5 p-6 mb-8">
+                        <h2 className="text-[10px] font-black tracking-[0.3em] uppercase text-[#ccff00] mb-1">
+                            WHERE SHOULD I START?
+                        </h2>
+                        <p className="text-[11px] text-white/40 mb-6 uppercase tracking-wider">
+                            Recommended certificate pathways by target sector
+                        </p>
+                        <div className="space-y-4">
+                            {SECTOR_PATHWAYS.map((p, i) => (
+                                <div key={i} className="flex items-start gap-3 pb-4 border-b border-white/5 last:border-0 last:pb-0">
+                                    <span className="text-lg shrink-0 mt-0.5">{p.icon}</span>
+                                    <div className="flex-1 min-w-0">
+                                        <p className="font-black text-sm text-white uppercase mb-1">{p.label}</p>
+                                        <p className="text-xs text-white/40 leading-relaxed">{p.path}</p>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* ── Visa Legend ── */}
+                    <div className="bg-[#111] border border-white/5 p-6 mb-8">
+                        <h2 className="text-[10px] font-black tracking-[0.3em] uppercase text-white/50 mb-4">
+                            VISA SUBCLASS LEGEND
+                        </h2>
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                            {[
+                                ['417', 'Working Holiday (1st)'],
+                                ['462', 'Work & Holiday (2nd)'],
+                                ['500', 'Student Visa'],
+                                ['482', 'Temporary Skill Shortage'],
+                                ['189', 'Skilled Independent (PR)'],
+                                ['190', 'Skilled Nominated (PR)'],
+                                ['491', 'Skilled Work Regional'],
+                            ].map(([code, label]) => {
+                                const cfg = VISA_CONFIG[code] ?? { color: '#fff', bg: '#ffffff15' };
+                                return (
+                                    <div key={code} className="flex items-center gap-2">
+                                        <span
+                                            className="text-[9px] font-black px-1.5 py-0.5 uppercase tracking-wider shrink-0"
+                                            style={{ color: cfg.color, backgroundColor: cfg.bg, border: `1px solid ${cfg.color}40` }}
+                                        >
+                                            {code}
+                                        </span>
+                                        <span className="text-[10px] text-white/40">{label}</span>
+                                    </div>
+                                );
+                            })}
                         </div>
                     </div>
 

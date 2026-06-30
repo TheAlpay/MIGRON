@@ -1,280 +1,263 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Camera, AlertTriangle, RefreshCw, MapPin, Clock, Wifi, WifiOff } from 'lucide-react';
+import { ArrowLeft, Navigation, AlertTriangle, Info, MapPin } from 'lucide-react';
+import { APIProvider, Map, useMap } from '@vis.gl/react-google-maps';
 import SEOHead from '../seo/SEOHead';
 import { env } from '../../lib/env.ts';
 
-const NSW_KEY = env.VITE_NSW_TRANSPORT_API_KEY;
+const GOOGLE_MAPS_API_KEY = env.VITE_GOOGLE_MAPS_API_KEY || '';
 
-const CAMERAS = [
-  { id: 'cam-m1-00010', title: 'M1 — Cahill Expressway', suburb: 'Sydney CBD', lat: -33.862, lng: 151.213 },
-  { id: 'cam-m2-00020', title: 'M2 Hills Motorway', suburb: 'Baulkham Hills', lat: -33.756, lng: 150.981 },
-  { id: 'cam-m4-00030', title: 'M4 Western Motorway', suburb: 'Parramatta', lat: -33.812, lng: 151.002 },
-  { id: 'cam-m5-00040', title: 'M5 South West Motorway', suburb: 'Revesby', lat: -33.956, lng: 151.014 },
-  { id: 'cam-m7-00050', title: 'M7 Western Sydney Motorway', suburb: 'Liverpool', lat: -33.922, lng: 150.868 },
-  { id: 'cam-a1-00060', title: 'Pacific Highway', suburb: 'North Sydney', lat: -33.838, lng: 151.207 },
+const CITIES = [
+  { id: 'sydney',    name: 'Sydney',    state: 'NSW', lat: -33.868, lng: 151.209, zoom: 12 },
+  { id: 'melbourne', name: 'Melbourne', state: 'VIC', lat: -37.813, lng: 144.963, zoom: 12 },
+  { id: 'brisbane',  name: 'Brisbane',  state: 'QLD', lat: -27.470, lng: 153.021, zoom: 12 },
+  { id: 'perth',     name: 'Perth',     state: 'WA',  lat: -31.953, lng: 115.857, zoom: 12 },
+  { id: 'adelaide',  name: 'Adelaide',  state: 'SA',  lat: -34.928, lng: 138.600, zoom: 12 },
+  { id: 'canberra',  name: 'Canberra',  state: 'ACT', lat: -35.282, lng: 149.128, zoom: 12 },
+  { id: 'goldcoast', name: 'Gold Coast',state: 'QLD', lat: -28.016, lng: 153.400, zoom: 12 },
+  { id: 'darwin',    name: 'Darwin',    state: 'NT',  lat: -12.462, lng: 130.842, zoom: 12 },
+  { id: 'hobart',    name: 'Hobart',    state: 'TAS', lat: -42.882, lng: 147.327, zoom: 12 },
 ];
 
-const INCIDENT_TYPES = {
-  ACCIDENT:       { color: '#ff6b6b', label: 'Accident' },
-  ROADWORKS:      { color: '#f59e0b', label: 'Road Works' },
-  CONGESTION:     { color: '#f97316', label: 'Congestion' },
-  HAZARD:         { color: '#ef4444', label: 'Hazard' },
-  POLICE_ACTIVITY:{ color: '#8b5cf6', label: 'Police Activity' },
-  SPECIAL_EVENT:  { color: '#3b82f6', label: 'Special Event' },
-};
+const TRAFFIC_LEGEND = [
+  { color: '#00c853', label: 'Free flowing' },
+  { color: '#ffca28', label: 'Slow traffic' },
+  { color: '#f44336', label: 'Heavy traffic' },
+  { color: '#b71c1c', label: 'Stop & go' },
+];
 
-const useNSWIncidents = () => {
-  const [incidents, setIncidents] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [lastUpdated, setLastUpdated] = useState(null);
+const DRIVING_TIPS = [
+  { icon: '🛣️', title: 'Drive on the LEFT', body: 'Australia drives on the left-hand side. Give way to the right at unmarked intersections.' },
+  { icon: '🚦', title: 'Speed Limits', body: 'Default urban: 50 km/h. School zones: 40 km/h. Open road: 100–110 km/h (state-specific). Always check signs.' },
+  { icon: '📱', title: 'Phones Banned', body: 'Using a handheld mobile while driving is illegal in all states. Fines are severe — use hands-free only.' },
+  { icon: '🚗', title: 'P-Plates', body: 'Overseas licences can typically be used for 3–6 months. After that you must get an Australian licence.' },
+  { icon: '🦘', title: 'Wildlife Hazard', body: 'Dawn and dusk are high-risk times for kangaroos on roads, especially in rural areas. Slow down.' },
+  { icon: '⛽', title: 'Fuel Types', body: 'Most cars use Unleaded 91 or E10. Premium: 95/98 RON. Diesel for trucks/4WDs. Check before filling.' },
+  { icon: '🅿️', title: 'Parking Rules', body: 'Read signs carefully — time limits, clearway zones and clearway times vary by suburb and day of week.' },
+  { icon: '🚨', title: 'Speed Cameras', body: 'Fixed and mobile speed cameras operate state-wide. Demerit points apply on overseas licences too.' },
+];
 
-  const fetch_incidents = useCallback(async () => {
-    if (!NSW_KEY) return;
-    setLoading(true);
-    setError(null);
-    try {
-      const resp = await fetch(
-        'https://api.transport.nsw.gov.au/v1/traffic/hazards/incident?active=true',
-        { headers: { Authorization: `apikey ${NSW_KEY}` } }
-      );
-      if (!resp.ok) throw new Error(`API ${resp.status}`);
-      const data = await resp.json();
-      const features = data?.features || [];
-      const items = features
-        .slice(0, 20)
-        .map(f => ({
-          id: f.id,
-          type: f.properties?.mainCategory || 'HAZARD',
-          headline: f.properties?.headline || 'Traffic Incident',
-          start: f.properties?.start,
-          roads: f.properties?.roads?.map(r => r.shortDescription).filter(Boolean).join(', '),
-          impact: f.properties?.impact || '',
-          advice: f.properties?.advice || '',
-          lat: f.geometry?.coordinates?.[1],
-          lng: f.geometry?.coordinates?.[0],
-        }));
-      setIncidents(items);
-      setLastUpdated(new Date());
-    } catch (e) {
-      setError(e.message);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+function TrafficLayerOverlay() {
+  const map = useMap();
 
-  useEffect(() => { fetch_incidents(); }, [fetch_incidents]);
+  useEffect(() => {
+    if (!map || !window.google?.maps?.TrafficLayer) return;
+    const trafficLayer = new window.google.maps.TrafficLayer();
+    trafficLayer.setMap(map);
+    return () => trafficLayer.setMap(null);
+  }, [map]);
 
-  return { incidents, loading, error, lastUpdated, refetch: fetch_incidents };
-};
+  return null;
+}
 
-const IncidentCard = ({ incident }) => {
-  const info = INCIDENT_TYPES[incident.type] || INCIDENT_TYPES.HAZARD;
-  return (
-    <div className="bg-[#111] border border-white/5 p-4 hover:border-white/10 transition-colors">
-      <div className="flex items-start gap-3">
-        <div className="mt-0.5 shrink-0">
-          <AlertTriangle size={14} style={{ color: info.color }} />
-        </div>
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-[9px] font-black uppercase tracking-widest px-1.5 py-0.5" style={{ backgroundColor: `${info.color}20`, color: info.color }}>
-              {info.label}
-            </span>
-            {incident.start && (
-              <span className="text-[9px] text-white/30 flex items-center gap-1">
-                <Clock size={9} />
-                {new Date(incident.start).toLocaleTimeString('en-AU', { hour: '2-digit', minute: '2-digit' })}
-              </span>
-            )}
-          </div>
-          <p className="text-sm font-bold text-white/80 leading-snug mb-1">{incident.headline}</p>
-          {incident.roads && (
-            <p className="text-xs text-white/40 flex items-center gap-1">
-              <MapPin size={9} />{incident.roads}
-            </p>
-          )}
-          {incident.advice && (
-            <p className="text-xs text-white/30 mt-1 leading-relaxed">{incident.advice}</p>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-};
-
-const CameraGrid = () => (
-  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-    {CAMERAS.map(cam => (
-      <div key={cam.id} className="bg-[#111] border border-white/5 overflow-hidden group hover:border-white/10 transition-colors">
-        <div className="aspect-video bg-[#0a0a0a] relative flex items-center justify-center">
-          <img
-            src={`https://www.livetraffic.com/webcams/${cam.id}.jpg`}
-            alt={cam.title}
-            className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"
-            onError={e => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }}
-          />
-          <div className="absolute inset-0 hidden items-center justify-center flex-col gap-2 bg-[#0a0a0a]">
-            <Camera size={24} className="text-white/20" />
-            <span className="text-[9px] text-white/20 uppercase font-bold">Feed Unavailable</span>
-          </div>
-          <div className="absolute top-2 left-2 bg-black/70 px-2 py-0.5 flex items-center gap-1">
-            <div className="w-1.5 h-1.5 rounded-full bg-[#ff4444] animate-pulse" />
-            <span className="text-[9px] text-white/60 font-bold uppercase">Live</span>
-          </div>
-        </div>
-        <div className="p-3">
-          <p className="text-xs font-black text-white/80 uppercase tracking-tight">{cam.title}</p>
-          <p className="text-[10px] text-white/30 mt-0.5 flex items-center gap-1"><MapPin size={9} />{cam.suburb}</p>
-        </div>
-      </div>
-    ))}
+const MapView = ({ city }) => (
+  <div style={{ width: '100%', height: '500px' }}>
+    <Map
+      defaultCenter={{ lat: city.lat, lng: city.lng }}
+      defaultZoom={city.zoom}
+      mapId={env.VITE_GOOGLE_MAPS_MAP_ID || undefined}
+      gestureHandling="greedy"
+      disableDefaultUI={false}
+      mapTypeId="roadmap"
+      colorScheme="DARK"
+    >
+      <TrafficLayerOverlay />
+    </Map>
   </div>
 );
 
 const TrafficPage = () => {
-  const { incidents, loading, error, lastUpdated, refetch } = useNSWIncidents();
+  const [selectedCity, setSelectedCity] = useState(CITIES[0]);
 
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'WebPage',
-    name: 'NSW Live Traffic — Sydney Road Incidents & Cameras',
-    description: 'Live traffic conditions, incidents and speed camera feeds for NSW roads. Real-time data for new migrants navigating Sydney.',
+    name: 'Australia Live Traffic Map — All Capital Cities',
+    description: 'Real-time traffic conditions for Sydney, Melbourne, Brisbane, Perth, Adelaide, Canberra, Gold Coast, Darwin and Hobart.',
     url: 'https://migron.mtive.tech/traffic',
-    about: { '@type': 'Place', name: 'New South Wales, Australia' },
+    about: { '@type': 'Place', name: 'Australia' },
   };
 
   return (
     <>
       <SEOHead
-        title="NSW Live Traffic — Sydney Road Incidents & Camera Feeds"
-        description="Real-time NSW traffic incidents, road conditions and live camera feeds. Essential for new migrants navigating Sydney and NSW roads."
+        title="Australia Live Traffic Map — All Capital Cities"
+        description="Real-time traffic conditions across Australia. Live traffic layer for Sydney, Melbourne, Brisbane, Perth, Adelaide, Canberra, Gold Coast, Darwin and Hobart."
         path="/traffic"
-        schema={jsonLd}
       />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+
       <div className="min-h-screen bg-[#050505] text-[#e0e0e0] pt-20">
+
         {/* Header */}
         <section className="pt-8 pb-6 px-6 border-b border-white/10">
-          <div className="max-w-[1100px] mx-auto">
+          <div className="max-w-[1200px] mx-auto">
             <div className="flex items-center justify-between mb-6">
               <Link to="/" className="inline-flex items-center gap-2 text-white/40 hover:text-[#ccff00] transition-colors text-[10px] font-black uppercase tracking-[0.2em]">
                 <ArrowLeft size={14} /> Back to Home
               </Link>
               <span className="text-[10px] text-white/40 uppercase font-black tracking-[0.2em]">SETTLEMENT — TRANSPORT</span>
             </div>
+
             <div className="flex items-center gap-4 mb-4">
-              <div className="p-2.5 bg-[#ff6b6b]">
-                <Camera className="text-white" size={28} strokeWidth={3} />
+              <div className="p-2.5 bg-[#ccff00]">
+                <Navigation className="text-black" size={28} strokeWidth={3} />
               </div>
               <div>
-                <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tighter italic text-[#ff6b6b]">
-                  NSW LIVE TRAFFIC
+                <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tighter italic text-[#ccff00]">
+                  LIVE TRAFFIC
                 </h1>
-                <p className="text-sm text-white/40 mt-1">Real-time incidents and camera feeds for NSW roads</p>
+                <p className="text-sm text-white/40 mt-1">Real-time traffic conditions — all Australian capital cities</p>
               </div>
             </div>
 
-            {/* Status bar */}
-            <div className="flex items-center gap-4 mt-4">
-              <div className="flex items-center gap-1.5 text-[10px] text-white/40">
-                {NSW_KEY ? <Wifi size={11} className="text-[#00ff88]" /> : <WifiOff size={11} className="text-[#ff6b6b]" />}
-                <span>{NSW_KEY ? 'NSW Transport API Connected' : 'API Key Not Configured'}</span>
-              </div>
-              {lastUpdated && (
-                <span className="text-[10px] text-white/30">
-                  Updated {lastUpdated.toLocaleTimeString('en-AU', { hour: '2-digit', minute: '2-digit' })}
+            {/* Traffic legend */}
+            <div className="flex flex-wrap items-center gap-4 mt-4">
+              {TRAFFIC_LEGEND.map(l => (
+                <span key={l.label} className="flex items-center gap-1.5 text-[10px] text-white/50">
+                  <span className="w-3 h-3 rounded-full" style={{ backgroundColor: l.color }} />
+                  {l.label}
                 </span>
-              )}
-              <button
-                onClick={refetch}
-                disabled={loading || !NSW_KEY}
-                className="ml-auto flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-white/40 hover:text-white disabled:opacity-30 transition-colors"
-              >
-                <RefreshCw size={11} className={loading ? 'animate-spin' : ''} />
-                Refresh
-              </button>
+              ))}
+              <span className="ml-auto text-[9px] text-white/20 uppercase font-bold">Powered by Google Maps</span>
             </div>
           </div>
         </section>
 
-        <div className="max-w-[1100px] mx-auto px-6 py-10 space-y-12">
-          {/* Camera Feeds */}
-          <div>
-            <div className="flex items-center justify-between mb-5">
-              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[#ff6b6b]">LIVE CAMERA FEEDS</p>
-              <a
-                href="https://www.livetraffic.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[10px] text-white/30 hover:text-[#ccff00] transition-colors uppercase font-bold"
-              >
-                Full LiveTraffic Map →
-              </a>
-            </div>
-            <CameraGrid />
-          </div>
+        <div className="max-w-[1200px] mx-auto px-6 py-8 space-y-8">
 
-          {/* Incidents */}
+          {/* City selector */}
           <div>
-            <div className="flex items-center justify-between mb-5">
-              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[#ff6b6b]">
-                ACTIVE INCIDENTS
-                {incidents.length > 0 && <span className="ml-2 text-white/30">({incidents.length})</span>}
-              </p>
-              <div className="flex items-center gap-3">
-                {Object.entries(INCIDENT_TYPES).map(([key, val]) => (
-                  <span key={key} className="hidden sm:flex items-center gap-1 text-[9px] uppercase font-bold" style={{ color: val.color }}>
-                    <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: val.color }} />
-                    {val.label}
+            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[#ccff00] mb-4">SELECT CITY</p>
+            <div className="flex flex-wrap gap-2">
+              {CITIES.map(city => (
+                <button
+                  key={city.id}
+                  onClick={() => setSelectedCity(city)}
+                  className={`flex items-center gap-1.5 px-4 py-2 text-[10px] font-black uppercase tracking-wider border transition-all ${
+                    selectedCity.id === city.id
+                      ? 'border-[#ccff00] bg-[#ccff00] text-black'
+                      : 'border-white/10 text-white/50 hover:border-white/30 hover:text-white'
+                  }`}
+                >
+                  <MapPin size={10} />
+                  {city.name}
+                  <span className={`text-[8px] ${selectedCity.id === city.id ? 'text-black/50' : 'text-white/20'}`}>
+                    {city.state}
                   </span>
-                ))}
-              </div>
-            </div>
-
-            {!NSW_KEY && (
-              <div className="bg-[#111] border border-white/5 p-6 text-center">
-                <WifiOff size={24} className="mx-auto mb-3 text-white/20" />
-                <p className="text-sm font-bold text-white/40">NSW Transport API key not configured.</p>
-                <p className="text-xs text-white/20 mt-1">Add VITE_NSW_TRANSPORT_API_KEY to your environment variables.</p>
-              </div>
-            )}
-
-            {NSW_KEY && loading && (
-              <div className="space-y-3">
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <div key={i} className="h-20 bg-white/3 animate-pulse" />
-                ))}
-              </div>
-            )}
-
-            {NSW_KEY && error && (
-              <div className="bg-[#111] border border-[#ff6b6b]/20 p-6 text-center">
-                <AlertTriangle size={20} className="mx-auto mb-2 text-[#ff6b6b]" />
-                <p className="text-sm text-[#ff6b6b]/80">Could not load incidents: {error}</p>
-                <button onClick={refetch} className="mt-3 text-xs text-white/40 hover:text-white uppercase font-bold">
-                  Try again
                 </button>
-              </div>
-            )}
-
-            {NSW_KEY && !loading && !error && incidents.length === 0 && (
-              <div className="bg-[#111] border border-white/5 p-6 text-center">
-                <p className="text-sm text-white/40">No active incidents reported — roads are clear.</p>
-              </div>
-            )}
-
-            {NSW_KEY && !loading && incidents.length > 0 && (
-              <div className="space-y-2">
-                {incidents.map(inc => <IncidentCard key={inc.id} incident={inc} />)}
-              </div>
-            )}
+              ))}
+            </div>
           </div>
 
-          {/* Info box */}
-          <div className="bg-[#111] border border-white/5 p-5 text-xs text-white/30 leading-relaxed">
-            <strong className="text-white/50">Why traffic matters for new migrants:</strong> Understanding NSW road rules, toll roads (e-TAG required), speed camera zones, and school zones is essential. Speed limits in school zones drop to 40 km/h — fines start at $330 AUD.{' '}
-            <a href="https://www.rms.nsw.gov.au" target="_blank" rel="noopener noreferrer" className="text-[#ccff00] hover:underline">Roads NSW →</a>
+          {/* Map */}
+          <div className="border border-white/10 overflow-hidden">
+            {GOOGLE_MAPS_API_KEY ? (
+              <APIProvider apiKey={GOOGLE_MAPS_API_KEY}>
+                <MapView city={selectedCity} />
+              </APIProvider>
+            ) : (
+              <div className="h-[500px] bg-[#111] flex flex-col items-center justify-center gap-3">
+                <Navigation size={32} className="text-white/20" />
+                <p className="text-white/40 text-sm font-bold">Google Maps API key not configured.</p>
+                <p className="text-white/20 text-xs">Add VITE_GOOGLE_MAPS_API_KEY to your environment.</p>
+              </div>
+            )}
+            <div className="bg-[#0a0a0a] border-t border-white/5 px-4 py-2.5 flex items-center justify-between">
+              <span className="text-[10px] text-white/30 font-black uppercase tracking-widest">{selectedCity.name}, {selectedCity.state}</span>
+              <span className="text-[9px] text-white/20">Data: Google Maps Traffic Layer · Updated in real-time</span>
+            </div>
+          </div>
+
+          {/* Info notice */}
+          <div className="bg-[#111] border border-white/5 p-4 flex items-start gap-3">
+            <Info size={14} className="text-[#ccff00] shrink-0 mt-0.5" />
+            <p className="text-xs text-white/50 leading-relaxed">
+              Traffic data is sourced from Google Maps in real-time. Colour overlay shows current road conditions.
+              For detailed navigation or incident alerts, open <a href="https://maps.google.com" target="_blank" rel="noopener noreferrer" className="text-[#ccff00] hover:underline">Google Maps</a> or
+              your state&apos;s official traffic site.
+            </p>
+          </div>
+
+          {/* Official traffic links */}
+          <div>
+            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[#ccff00] mb-4">OFFICIAL TRAFFIC SITES</p>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+              {[
+                { state: 'NSW', url: 'https://www.livetraffic.com', label: 'Live Traffic NSW' },
+                { state: 'VIC', url: 'https://traffic.vicroads.vic.gov.au', label: 'VicRoads Traffic' },
+                { state: 'QLD', url: 'https://131940.com.au', label: 'Transport for Qld' },
+                { state: 'WA',  url: 'https://www.mainroads.wa.gov.au', label: 'Main Roads WA' },
+                { state: 'SA',  url: 'https://dpti.sa.gov.au', label: 'DPTI South Australia' },
+                { state: 'ACT', url: 'https://www.accesscanberra.act.gov.au', label: 'Access Canberra' },
+                { state: 'NT',  url: 'https://nt.gov.au/driving', label: 'NT Transport' },
+                { state: 'TAS', url: 'https://www.transport.tas.gov.au', label: 'Transport Tasmania' },
+              ].map(({ state, url, label }) => (
+                <a
+                  key={state}
+                  href={url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-[#111] border border-white/5 px-4 py-3 hover:border-[#ccff00]/30 hover:text-[#ccff00] transition-all group"
+                >
+                  <div className="text-[9px] font-black uppercase tracking-[0.2em] text-white/30 mb-1 group-hover:text-[#ccff00]/50">
+                    {state}
+                  </div>
+                  <div className="text-xs font-bold text-white/60 group-hover:text-white">{label}</div>
+                </a>
+              ))}
+            </div>
+          </div>
+
+          {/* Driving tips for migrants */}
+          <div>
+            <div className="flex items-center gap-3 mb-5">
+              <div className="p-1.5 bg-[#ccff00]">
+                <AlertTriangle size={14} className="text-black" />
+              </div>
+              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[#ccff00]">DRIVING IN AUSTRALIA — MIGRANT GUIDE</p>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {DRIVING_TIPS.map(tip => (
+                <div key={tip.title} className="bg-[#111] border border-white/5 p-5 hover:border-white/10 transition-colors">
+                  <div className="text-2xl mb-3">{tip.icon}</div>
+                  <h3 className="text-[11px] font-black uppercase tracking-wider text-white mb-2">{tip.title}</h3>
+                  <p className="text-xs text-white/50 leading-relaxed">{tip.body}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Licence info */}
+          <div className="bg-[#111] border border-white/5 p-6">
+            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[#ccff00] mb-4">OVERSEAS LICENCE — HOW LONG CAN YOU DRIVE?</p>
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs">
+                <thead>
+                  <tr className="border-b border-white/10">
+                    <th className="text-left py-2 pr-4 text-white/30 font-black uppercase tracking-wider">State</th>
+                    <th className="text-left py-2 pr-4 text-white/30 font-black uppercase tracking-wider">Duration</th>
+                    <th className="text-left py-2 text-white/30 font-black uppercase tracking-wider">Notes</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {[
+                    { state: 'NSW', duration: '3 months', notes: 'Must carry overseas licence + translation if not in English' },
+                    { state: 'VIC', duration: '6 months', notes: 'After 6 months as a resident, must convert to Victorian licence' },
+                    { state: 'QLD', duration: '3 months', notes: '3 months from arrival as a Queensland resident' },
+                    { state: 'WA',  duration: '3 months', notes: 'After 3 months, must apply for WA licence' },
+                    { state: 'SA',  duration: '3 months', notes: 'Translation required if licence not in English' },
+                    { state: 'ACT', duration: '3 months', notes: 'Visit Access Canberra to convert your licence' },
+                  ].map(row => (
+                    <tr key={row.state} className="border-b border-white/5 hover:bg-white/2">
+                      <td className="py-3 pr-4 font-black text-white/80">{row.state}</td>
+                      <td className="py-3 pr-4 text-[#ccff00] font-bold">{row.duration}</td>
+                      <td className="py-3 text-white/40">{row.notes}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>

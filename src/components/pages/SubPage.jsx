@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Scale, BookOpen, Users, Briefcase, Mail, Clock, ArrowUpRight } from 'lucide-react';
+import { ArrowLeft, Scale, BookOpen, Users, Briefcase, Mail, Clock, ArrowUpRight, Send, CheckCircle } from 'lucide-react';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { SITE_EMAIL } from '../../config/constants';
@@ -15,6 +15,99 @@ const pageConfig = {
     sosyal: { icon: Users, accent: '#ff6b6b', titleKey: 'page_social_title', subtitleKey: 'page_social_subtitle', descKey: 'page_social_desc', category: 'sosyal' },
     projeler: { icon: Briefcase, accent: '#a78bfa', titleKey: 'page_projects_title', subtitleKey: 'page_projects_subtitle', descKey: 'page_projects_desc', category: 'projeler' },
     iletisim: { icon: Mail, accent: '#ccff00', titleKey: 'page_contact_title', subtitleKey: 'page_contact_subtitle', descKey: 'page_contact_desc', category: null },
+};
+
+const ContactForm = ({ accent }) => {
+    const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' });
+    const [status, setStatus] = useState('idle'); // idle | loading | success | error
+    const [errorMsg, setErrorMsg] = useState('');
+
+    const handleChange = (e) => setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setStatus('loading');
+        setErrorMsg('');
+        try {
+            const res = await fetch('/api/contact', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(form),
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || 'Failed to send.');
+            setStatus('success');
+            setForm({ name: '', email: '', subject: '', message: '' });
+        } catch (err) {
+            setErrorMsg(err.message);
+            setStatus('error');
+        }
+    };
+
+    const inputCls = "w-full bg-[#0a0a0a] border border-white/10 px-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:border-[#ccff00]/50 transition-colors font-mono";
+
+    if (status === 'success') {
+        return (
+            <div className="bg-[#111] border border-[#00ff88]/30 p-12 text-center">
+                <CheckCircle size={40} className="mx-auto mb-4 text-[#00ff88]" />
+                <h3 className="text-xl font-black uppercase tracking-tight text-[#00ff88] mb-2">Message Sent</h3>
+                <p className="text-white/50 text-sm">We'll get back to you within 24 hours.</p>
+                <button onClick={() => setStatus('idle')} className="mt-6 text-[10px] font-black uppercase tracking-[0.2em] text-white/30 hover:text-white transition-colors">
+                    Send Another
+                </button>
+            </div>
+        );
+    }
+
+    return (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="lg:col-span-2">
+                <form onSubmit={handleSubmit} className="space-y-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label className="block text-[9px] font-black uppercase tracking-[0.2em] text-white/30 mb-1.5">Name *</label>
+                            <input name="name" value={form.name} onChange={handleChange} required placeholder="Your full name" className={inputCls} />
+                        </div>
+                        <div>
+                            <label className="block text-[9px] font-black uppercase tracking-[0.2em] text-white/30 mb-1.5">Email *</label>
+                            <input name="email" type="email" value={form.email} onChange={handleChange} required placeholder="your@email.com" className={inputCls} />
+                        </div>
+                    </div>
+                    <div>
+                        <label className="block text-[9px] font-black uppercase tracking-[0.2em] text-white/30 mb-1.5">Subject</label>
+                        <input name="subject" value={form.subject} onChange={handleChange} placeholder="What is your message about?" className={inputCls} />
+                    </div>
+                    <div>
+                        <label className="block text-[9px] font-black uppercase tracking-[0.2em] text-white/30 mb-1.5">Message *</label>
+                        <textarea name="message" value={form.message} onChange={handleChange} required rows={7} placeholder="Your message..." className={`${inputCls} resize-none`} />
+                    </div>
+                    {status === 'error' && (
+                        <p className="text-[#ff6b6b] text-xs font-bold">{errorMsg}</p>
+                    )}
+                    <button type="submit" disabled={status === 'loading'}
+                        className="flex items-center gap-2 px-8 py-3.5 bg-[#ccff00] text-black text-[11px] font-black uppercase tracking-[0.2em] hover:bg-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                        {status === 'loading' ? 'SENDING...' : <><Send size={13} /> SEND MESSAGE</>}
+                    </button>
+                </form>
+            </div>
+            <div className="space-y-4">
+                <div className="bg-[#111] border border-white/5 p-6">
+                    <p className="text-[9px] font-black uppercase tracking-[0.2em] text-white/30 mb-3">Direct Email</p>
+                    <a href="mailto:migron@mtive.tech" className="text-sm font-black italic tracking-tight underline decoration-[#ccff00] hover:text-[#ccff00] transition-colors break-all">
+                        migron@mtive.tech
+                    </a>
+                </div>
+                <div className="bg-[#111] border border-white/5 p-6">
+                    <p className="text-[9px] font-black uppercase tracking-[0.2em] text-white/30 mb-3">Response Time</p>
+                    <p className="text-sm text-white/60">Within 24 hours on business days.</p>
+                </div>
+                <div className="bg-[#111] border border-white/5 p-6">
+                    <p className="text-[9px] font-black uppercase tracking-[0.2em] text-white/30 mb-3">Languages</p>
+                    <p className="text-sm text-white/60">English & Turkish</p>
+                </div>
+            </div>
+        </div>
+    );
 };
 
 const SubPage = ({ pageId }) => {
@@ -110,14 +203,7 @@ const SubPage = ({ pageId }) => {
                     {pageId !== 'iletisim' && <LiveExperimentBand />}
 
                     {pageId === 'iletisim' ? (
-                        <div className="bg-[#111] border border-white/5 p-12">
-                            <h3 className="text-[10px] font-black tracking-[0.3em] uppercase mb-3" style={{ color: config.accent }}>
-                                {t('page_email_label')}
-                            </h3>
-                            <a href={`mailto:${SITE_EMAIL}`} className="text-2xl font-black italic tracking-tight underline decoration-[#ccff00] hover:text-[#ccff00] transition-colors">
-                                {SITE_EMAIL}
-                            </a>
-                        </div>
+                        <ContactForm accent={config.accent} />
                     ) : (
                         <>
                             {loading ? (
